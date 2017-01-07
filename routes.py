@@ -28,7 +28,7 @@ def parks():
 
 def search():
     parks = session.query(Parks).all()
-    return render_template('search.html', parks=parks)
+    return render_template('search.html', parks=parks, page='search')
 
 
 def addPark():
