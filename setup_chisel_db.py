@@ -27,6 +27,7 @@ class Parks(Base):
     name = Column(String(250), nullable=False)
     lat = Column(Integer, nullable=False)
     lon = Column(Integer, nullable=False)
+    kind = Column(String(20))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     description = Column(Text)
@@ -39,6 +40,7 @@ class Parks(Base):
             'name' : self.name,
             'lat' : self.lat,
             'lon' : self.lon,
+            'kind' : self.kind,
             'description' : self.description
         }
 

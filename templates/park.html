@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <h1>{{park.name}}</h1>
+    <h1>{{park.name + ' ' + park.kind}}</h1>
     
     <!-- notify user of any changes -->
     {% with messages = get_flashed_messages() %}

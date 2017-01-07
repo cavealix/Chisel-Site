@@ -40,8 +40,8 @@ def addPark():
             user_id = uid_cookie.split('|')[0]
             newPark = Parks(
                 name=request.form['name'], lat=request.form['lat'], 
-                lon=request.form['lon'], user_id=user_id, 
-                description=request.form['description'])
+                lon=request.form['lon'], kind=request.form['kind'], 
+                user_id=user_id, description=request.form['description'])
             session.add(newPark)
             session.commit()
             #notify user
@@ -94,6 +94,7 @@ def editPark(park_id):
                     park.name = request.form['name']
                     park.lon = request.form['lon']
                     park.lat = request.form['lat']
+                    park.kind = request.form['kind']
                     park.description = request.form['description']
                     session.add(park)
                     session.commit()
