@@ -5,10 +5,18 @@ activities on a per location basis.
 
 Currently building and testing via Vagrant, using SQLLite, Flask, Jinja2, Python, and Knockout.js.
 
-#Features
-Site features user login via OAuth2 with Facebook and Google, only users can add/edit database entries, and currently working to make search page query databse entries via AJAX. 
+##Features
+Site features 
+ - User login via OAuth2 with Facebook and Google
+ - Only users can add/edit database entries 
+ - Currently working to make search page query databse entries via AJAX. 
 
-Features to be included are integrating Google Maps, Elevation, Places, and Photo Shere APIs, Instagram, Youtube, and Open Weather Maps APIS with affiliate marketing links available for users recommned gear for purchase.
+Features to be included are
+ - Integrating Google Maps, Elevation, Places, and Photo Shere APIs 
+ - Instagram API
+ - Youtube API
+ - Open Weather Maps APIS 
+ - Affiliate marketing links available for users to recommned gear for purchase
 
-#Issues
+##Issues
 Database structure may need to be switched over to Google App Engine depending on hosting options.
