@@ -20,3 +20,7 @@ Features to be included are
 
 ##Issues
 Database structure may need to be switched over to Google App Engine depending on hosting options.
+
+##License
+I still have yet to decide on how to license, but placing this here for future reference.
+Licensing reference: http://choosealicense.com/
