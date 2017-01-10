@@ -22,6 +22,9 @@ def parkTrailsJSON(park_id):
     trails = session.query(Trails).filter_by(park_id=park_id).all()
     return jsonify(Trails=[t.serialize for t in trails])
 
+def home():
+    return render_template('home.html')
+
 def parks():
     parks = session.query(Parks).all()
     return render_template('parks.html', parks=parks)

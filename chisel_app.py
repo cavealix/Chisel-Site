@@ -76,7 +76,9 @@ def gdisconnect():
     return goauth.gdisconnect()
 
 # Main Page, Parks
-@app.route('/')
+@app.route('/', methods=['Get'])
+def home():
+    return routes.home()
 @app.route('/parks/', methods=['Get'])
 def parks():
     return routes.parks()
