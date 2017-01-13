@@ -5,11 +5,11 @@
     <!-- Description -->
     <meta name="description" content="Find trails to hike, bike, camp, with 360 images, trail data, videos, and more.">
     <!-- Tab Img -->
-    <link rel="shortcut icon" type="image/png" href="img/brand/cairn_grey.png"/>
+    <link rel="shortcut icon" type="image/png" href="/static/imgs/brand/cairn_grey.png"/>
 
     <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="/static/styles.css">
-    <link rel="stylesheet" type="text/css" href="/static/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/header.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.6/css/bootstrap.css">
 
     <!-- Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
@@ -38,13 +38,14 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/parks">Chisel Outdoors</a>
+                    <a class="navbar-brand" href="/">Chisel Outdoors</a>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="">
                   <ul class="nav navbar-nav navbar-right">
-                    
+
+                    <li><a href="/parks">Parks</a></li>
                     <!-- only show 'search' link on other pages -->
                     {% if page != 'search' %}
                     <li><a href="/search">Search</a></li>

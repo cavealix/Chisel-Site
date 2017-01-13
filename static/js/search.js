@@ -1,5 +1,5 @@
 var map, google, VM;
-var parksData = [
+/*var parksData = [
     {
         name: 'Zion',
         lon: -113.1833195,
@@ -27,7 +27,18 @@ var parksData = [
         lat: 41.2329664,
         activities: ['pets']
     }
-];
+];*/
+
+//Query parks in DB
+    $.getJSON( "http://localhost:5000/parksJSON", {
+      format: "json"
+    })
+    .done(function( data ) {
+      var parksData = data.Restaurants;
+    })
+    .error( function() {
+        alert('parks AJAX request failed');
+    });
 
 
 function initMap() {
