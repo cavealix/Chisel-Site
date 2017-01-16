@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from setup_chisel_db import Base, Parks, Trails, User
 
-import cookies
+import cookies, simplejson, json
 
 # Connect to Database
 engine = create_engine('sqlite:///chisel.db')
@@ -16,7 +16,7 @@ session = DBSession()
 
 def parksJSON():
     parks = session.query(Parks).all()
-    return jsonify(Restaurants=[p.serialize for p in parks])
+    return jsonify(Parks=[p.serialize for p in parks])
 
 def parkTrailsJSON(park_id):
     trails = session.query(Trails).filter_by(park_id=park_id).all()
@@ -31,6 +31,18 @@ def parks():
 
 def search():
     parks = session.query(Parks).all()
+
+    #convert parks data to json
+    parks_as_dict = []
+    for park in parks:
+        park_as_dict = {
+            'name' : park.name,
+            'lat' : park.lat,
+            'lon' : park.lon}
+        parks_as_dict.append(park_as_dict)
+
+    parks = json.dumps(parks_as_dict)
+
     return render_template('search.html', parks=parks, page='search')
 
 

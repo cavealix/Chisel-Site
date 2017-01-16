@@ -15,13 +15,14 @@ import json
 from flask import make_response
 import requests
 
+from flask_cors import CORS, cross_origin
+
 # custom libraries
 import routes
 import goauth
 import fboauth
 
 app = Flask(__name__)
-
 
 # Context processor for header.html to have access to logged-in user info
 @app.context_processor
@@ -30,10 +31,12 @@ def inject_user():
 
 
 @app.route('/parksJSON')
+@cross_origin()
 def parksJSON():
     return routes.parksJSON()
 
 @app.route('/parks/<int:park_id>JSON')
+@cross_origin()
 def parkTrailsJSON(park_id):
     return routes.parkTrailsJSON(park_id)
 

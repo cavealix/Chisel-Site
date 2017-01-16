@@ -1,44 +1,4 @@
-var map, google, VM;
-/*var parksData = [
-    {
-        name: 'Zion',
-        lon: -113.1833195,
-        lat: 37.3222826,
-        activities: ['hike', 'camp']
-    },
-    {
-        name: 'Big Bend',
-        lon: -103.5675743,
-        lat: 29.3345519,
-        activities: ['camp', 'pets']
-    },{
-        name: 'Rocky Mountain',
-        lon: -102.480236,
-        lat: 39.7219579,
-        activities: ['hike', 'pets']
-    },{
-        name: 'Great Smoky Mountains',
-        lon: -83.6713626,
-        lat: 35.5812846,
-        activities: ['hike']
-    },{
-        name: 'Cuyahoga Valley',
-        lon: -81.5795699,
-        lat: 41.2329664,
-        activities: ['pets']
-    }
-];*/
-
-//Query parks in DB
-    $.getJSON( "http://localhost:5000/parksJSON", {
-      format: "json"
-    })
-    .done(function( data ) {
-      var parksData = data.Restaurants;
-    })
-    .error( function() {
-        alert('parks AJAX request failed');
-    });
+var map, google, VM, parksData;
 
 
 function initMap() {
@@ -122,13 +82,25 @@ var Park = function(data) {
 var ViewModel = function() {
     var self = this;
 
+    //Query parks in DB
+    $.getJSON( "http://localhost:5000/parksJSON", {
+      format: "json"
+    })
+    .done(function( data ) {
+
+      data.Parks.forEach( function(park){
+        self.parkList.push( new Park(park) );
+        });
+    })
+    .error( function() {
+        alert('parks AJAX request failed');
+    });
+
     self.parkList = ko.observableArray([]);
     self.filteredParks = ko.observableArray([]);
     self.activities = ['pets', 'hike', 'camp'];
 
-    parksData.forEach( function(park){
-        self.parkList.push( new Park(park) );
-    });
+    
 
     self.filteredParks( self.parkList() );
     this.currentPark = ko.observable( this.parkList()[0] );
