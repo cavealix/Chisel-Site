@@ -5,7 +5,7 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 38.9776681,lng: -96.847185},
-      zoom: 5
+      zoom: 4 
     });
 
     VM = new ViewModel();
@@ -28,6 +28,14 @@ var Trail = function(data) {
             url: 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png'
           }
     });
+
+    this.clear = function() {
+        marker.setMap(null);
+    };
+
+    this.set = function() {
+        marker.setMap(map);
+    };
 }
 
 var Park = function(data) {
@@ -82,7 +90,7 @@ var Park = function(data) {
     };
 
     this.zoom = function() {
-        map.setZoom(8);
+        map.setZoom(11);
     };
 
     this.center = function() {
@@ -116,6 +124,7 @@ var ViewModel = function() {
     });
 
     self.parkList = ko.observableArray([]);
+    self.trailList = ko.observableArray([]);
     self.filteredParks = ko.observableArray([]);
     self.activities = ['pets', 'hike', 'camp'];
 
@@ -124,6 +133,7 @@ var ViewModel = function() {
 
     //User clicks on park marker
     this.switchPark = function(park) {
+        self.clearTrails();
         self.currentPark(park);
         self.openMenu();
         park.zoom();
@@ -145,7 +155,6 @@ var ViewModel = function() {
             alert('Trails AJAX request failed');
         });
 
-        self.trailList = ko.observableArray([]);
     };
 
     //User selects filter, display relevant parks
@@ -163,6 +172,12 @@ var ViewModel = function() {
         self.setMarkers( self.filteredParks() );
     };
 
+    this.clearTrails = function() {
+        for (var i = 0; i < self.trailList().length; i++) {
+            self.trailList()[i].clear();
+        }
+    };
+
     this.clearMap = function() {
         // Removes the markers from the map
         for (var i = 0; i < self.parkList().length; i++) {
@@ -171,11 +186,13 @@ var ViewModel = function() {
     };
 
     this.resetMap = function() {
+        self.clearMap();
+        self.clearTrails();
         self.filteredParks( self.parkList() );
         self.setMarkers(self.filteredParks());
         self.closeMenu();
         map.setCenter({lat: 38.9776681,lng: -96.847185});
-        map.setZoom(5);
+        map.setZoom(4);
     };
 
     this.setMarkers = function(list) {
