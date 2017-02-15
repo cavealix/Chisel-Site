@@ -71,7 +71,9 @@ class Trails(Base):
             'name' : self.name,
             'park' : self.park_id,
             'description' : self.description,
-            'coords' : self.coords
+            'lat' : self.lat,
+            'lon' : self.lon
+            #'coords' : self.coords
         }
 
 
