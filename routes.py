@@ -149,7 +149,9 @@ def addTrail(park_id):
             user_id = uid_cookie.split('|')[0]
             newTrail = Trails(name=request.form['name'],
                             park_id=park_id, user_id=user_id,
-                            description=request.form['description'])
+                            description=request.form['description'],
+                            lat=request.form['lat'],
+                            lon=request.form['lon'])
             session.add(newTrail)
             session.commit()
             #notify user

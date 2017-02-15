@@ -57,10 +57,11 @@ class Trails(Base):
     park_id = Column(Integer, ForeignKey('parks.id'))
     park = relationship(Parks)
     user_id = Column(Integer, ForeignKey('user.id'))
-    lat = Column(Integer, nullable=False)
-    lon = Column(Integer, nullable=False)
+    lat = Column(Integer)
+    lon = Column(Integer)
     user = relationship(User)
     description = Column(Text)
+    #coords = Column(Text)
 
     @property
     def serialize(self):
@@ -69,7 +70,8 @@ class Trails(Base):
             'id' : self.id,
             'name' : self.name,
             'park' : self.park_id,
-            'description' : self.description
+            'description' : self.description,
+            'coords' : self.coords
         }
 
 
