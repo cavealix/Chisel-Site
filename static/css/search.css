@@ -6,6 +6,7 @@ html, body {
 
 .map-canvas {
     height: 70%;
+    overflow: hidden;
 }
 
 #map {
@@ -22,6 +23,7 @@ html, body {
     width: 285px;
     z-index: 1;
     color: white;
+    display: inline-block;
 }
 .menu h1 {
     text-align: center;

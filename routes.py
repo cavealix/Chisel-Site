@@ -151,7 +151,8 @@ def addTrail(park_id):
                             park_id=park_id, user_id=user_id,
                             description=request.form['description'],
                             lat=request.form['lat'],
-                            lon=request.form['lon'])
+                            lon=request.form['lon'],
+                            coords=request.form['coords'])
             session.add(newTrail)
             session.commit()
             #notify user
@@ -176,6 +177,9 @@ def editTrail(park_id, trail_id):
                 if request.form['name'] and request.form['description']:
                     trail.name = request.form['name']
                     trail.description = request.form['description']
+                    trail.lat = request.form['lat']
+                    trail.lon = request.form['lon']
+                    trail.coords = request.form['coods']
                     session.add(trail)
                     session.commit()
                     #notify user

@@ -5,7 +5,7 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 38.9776681,lng: -96.847185},
-      zoom: 4 
+      zoom: 5
     });
 
     VM = new ViewModel();

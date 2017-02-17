@@ -61,7 +61,7 @@ class Trails(Base):
     lon = Column(Integer)
     user = relationship(User)
     description = Column(Text)
-    #coords = Column(Text)
+    coords = Column(Text)
 
     @property
     def serialize(self):
@@ -72,8 +72,8 @@ class Trails(Base):
             'park' : self.park_id,
             'description' : self.description,
             'lat' : self.lat,
-            'lon' : self.lon
-            #'coords' : self.coords
+            'lon' : self.lon,
+            'coords' : self.coords
         }
 
 
