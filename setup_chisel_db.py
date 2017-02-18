@@ -1,6 +1,7 @@
 #configuration
 import os
 import sys
+import json
 from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -73,7 +74,7 @@ class Trails(Base):
             'description' : self.description,
             'lat' : self.lat,
             'lon' : self.lon,
-            'coords' : self.coords
+            'coords' : json.loads(self.coords)
         }
 
 

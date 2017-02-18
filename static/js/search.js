@@ -29,13 +29,25 @@ var Trail = function(data) {
           }
     });
 
+    //Set Trail
+    var trail = new google.maps.Polyline({
+        path: data.coords,
+        geodesic: true,
+        strokeColor: 'orange',
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    });
+
     this.clear = function() {
         marker.setMap(null);
+        trail.setMap(null);
     };
 
     this.set = function() {
         marker.setMap(map);
+        trail.setMap(map);
     };
+
 }
 
 var Park = function(data) {
