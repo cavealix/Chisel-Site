@@ -29,9 +29,15 @@ var Trail = function(data) {
           }
     });
 
+    //Trigger 'Set Path' KO event
+    google.maps.event.addListener(marker, 'click', function() { 
+        VM.switchTrail(self);
+    });
+
     //Set Trail
     var trail = new google.maps.Polyline({
         path: data.coords,
+        map: map,
         geodesic: true,
         strokeColor: 'orange',
         strokeOpacity: 1.0,
@@ -44,8 +50,19 @@ var Trail = function(data) {
     };
 
     this.set = function() {
-        marker.setMap(map);
+        //marker.setMap(map);
         trail.setMap(map);
+    };
+
+    this.center = function() {
+        map.setCenter(marker.getPosition());
+    };
+
+    this.bounce = function() {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout( function() { 
+            marker.setAnimation(null); 
+        }, 1500);
     };
 
 }
@@ -71,8 +88,6 @@ var Park = function(data) {
         title: data.name,
         animation: google.maps.Animation.DROP
     });
-
-    //this.marker = ko.observable(marker);
 
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() { 
@@ -142,6 +157,8 @@ var ViewModel = function() {
 
     self.filteredParks( self.parkList() );
     this.currentPark = ko.observable( this.parkList()[0] );
+    this.currentTrail = ko.observable( this.trailList()[0] );
+    self.weather = ko.observable();
 
     //User clicks on park marker
     this.switchPark = function(park) {
@@ -159,14 +176,21 @@ var ViewModel = function() {
         })
         .done(function( data ) {
     
-          data.Trails.forEach( function(trail){
+          data.Trails.forEach( function(trail) {
             self.trailList.push( new Trail(trail) );
             });
         })
         .error( function() {
             alert('Trails AJAX request failed');
         });
+    };
 
+    this.switchTrail = function(trail) {
+        //Display trail info in menu
+        //self.currentTrail(trail);
+        self.openMenu();
+        trail.center();
+        trail.bounce();
     };
 
     //User selects filter, display relevant parks
@@ -184,7 +208,13 @@ var ViewModel = function() {
         self.setMarkers( self.filteredParks() );
     };
 
+    this.setPath = function(trail) {
+        // Set trail path
+        trail.set();
+    };
+
     this.clearTrails = function() {
+        // Remove trail markers and paths from map
         for (var i = 0; i < self.trailList().length; i++) {
             self.trailList()[i].clear();
         }

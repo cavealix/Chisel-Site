@@ -68,13 +68,12 @@ class Trails(Base):
     def serialize(self):
         #returns data in serializable format
         return {
-            'id' : self.id,
-            'name' : self.name,
-            'park' : self.park_id,
+            'coords' : json.loads(self.coords),
             'description' : self.description,
             'lat' : self.lat,
             'lon' : self.lon,
-            'coords' : json.loads(self.coords)
+            'name' : self.name,
+            'id' : self.id
         }
 
 
