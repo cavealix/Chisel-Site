@@ -8,17 +8,13 @@
     <div class="map-canvas">
 
       <!-- Menu -->
-      <div class="menu" data-bind="with: currentPark">
+      <div class="menu" data-bind="with: currentPlace">
         <!-- Close icon -->
         <div class="icon-close">
           <img data-bind="click: $parent.closeMenu" src="http://s3.amazonaws.com/codecademy-content/courses/ltp2/img/uber/close.png" alt="close-icon">
         </div>
-        <!-- Current Park Info -->
-        <h1 data-bind="text: name"></h1>
-        <!-- <ul>
-          <li data-bind="text: lat"></li>
-          <li data-bind="text: lon"></li>
-        </ul> -->
+        <!-- Current Marker Info -->
+        <a data-bind="attr: { href: address}"><h1 data-bind="text: name"></h1></a>
         <div class="weather">
           <h2 data-bind="text: current_avg"></h2>
           <img id="weather-img" src="" alt="weather forecast" data-bind="attr: {src: current_img}">

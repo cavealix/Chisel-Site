@@ -12,12 +12,16 @@ function initMap() {
     ko.applyBindings(VM);
 }
 
-var Trail = function(data) {
+/////////////////////////////////////////////////////////////////
+
+var Trail = function(data, park_id) {
     var self = this;
 
-    this.name = ko.observable(data.name);
-    this.lon = ko.observable(data.lon);
-    this.lat = ko.observable(data.lat);
+    self.id = data.id;
+    self.address = "http://localhost:5000/parks/" + park_id + "/" + data.id;
+    self.name = ko.observable(data.name);
+    self.lon = ko.observable(data.lon);
+    self.lat = ko.observable(data.lat);
 
     var marker = new google.maps.Marker({
         position: {lat: data.lat, lng: data.lon},
@@ -29,9 +33,30 @@ var Trail = function(data) {
           }
     });
 
+    //Current Weather
+    self.current_img = ko.observable();
+    self.current_avg = ko.observable();
+    self.current_conditions = ko.observable();
+    self.current_wind = ko.observable();
+
+    //Query Current Weather
+    var weather_query = "http://api.openweathermap.org/data/2.5/weather?lat="+data.lat+"&lon="+data.lon+"&APPID=1088269cadd02d84dba9b274fc7bc097&units=imperial";
+    $.getJSON( weather_query, {
+      format: "json"
+    })
+    .done(function( data ) {
+      self.current_img =  "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
+      self.current_avg = Math.round(data.main.temp)+'°F'; 
+      self.current_conditions = data.weather[0].description;
+      self.current_wind = "Wind " + data.wind.speed + "mph";
+    })
+    .error( function() {
+        alert('AJAX weather request failed');
+    });
+
     //Trigger 'Set Path' KO event
     google.maps.event.addListener(marker, 'click', function() { 
-        VM.switchTrail(self);
+        VM.switchPlace(self);
     });
 
     //Set Trail
@@ -54,6 +79,10 @@ var Trail = function(data) {
         trail.setMap(map);
     };
 
+    this.zoom = function() {
+        map.setZoom(13);
+    };
+
     this.center = function() {
         map.setCenter(marker.getPosition());
     };
@@ -70,17 +99,12 @@ var Trail = function(data) {
 var Park = function(data) {
     var self = this;
 
-    this.id = data.id;
-    this.name = ko.observable(data.name);
-    this.lon = ko.observable(data.lon);
-    this.lat = ko.observable(data.lat);
-    this.activities = ko.observableArray(data.activities);
-
-    //Current Weather
-    this.current_img = ko.observable();
-    this.current_avg = ko.observable();
-    this.current_conditions = ko.observable();
-    this.current_wind = ko.observable();
+    self.id = data.id;
+    self.address = "http://localhost:5000/parks/" + data.id;
+    self.name = ko.observable(data.name);
+    self.lon = ko.observable(data.lon);
+    self.lat = ko.observable(data.lat);
+    self.activities = ko.observableArray(data.activities);
 
     var marker = new google.maps.Marker({
         position: {lat: data.lat, lng: data.lon},
@@ -91,8 +115,16 @@ var Park = function(data) {
 
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() { 
-        VM.switchPark(self);
+        VM.clearTrails();
+        VM.switchPlace(self);
+        VM.setTrails(self);
     });
+
+    //Current Weather
+    self.current_img = ko.observable();
+    self.current_avg = ko.observable();
+    self.current_conditions = ko.observable();
+    self.current_wind = ko.observable();
 
     //Query Current Weather
     var weather_query = "http://api.openweathermap.org/data/2.5/weather?lat="+data.lat+"&lon="+data.lon+"&APPID=1088269cadd02d84dba9b274fc7bc097&units=imperial";
@@ -133,6 +165,8 @@ var Park = function(data) {
     };
 };
 
+/////////////////////////////////////////////////////////////////
+
 var ViewModel = function() {
     var self = this;
 
@@ -156,41 +190,32 @@ var ViewModel = function() {
     self.activities = ['pets', 'hike', 'camp'];
 
     self.filteredParks( self.parkList() );
-    this.currentPark = ko.observable( this.parkList()[0] );
-    this.currentTrail = ko.observable( this.trailList()[0] );
-    self.weather = ko.observable();
+    this.currentPlace = ko.observable( this.parkList()[0] );
 
     //User clicks on park marker
-    this.switchPark = function(park) {
-        self.clearTrails();
-        self.currentPark(park);
+    this.switchPlace = function(park) {
+        self.currentPlace(park);
         self.openMenu();
         park.zoom();
         park.center();
         park.bounce();
+    };
 
+    this.setTrails = function(park) {
         //Query and show trails within park
         url = "http://localhost:5000/parks/" + park.id + "JSON";
         $.getJSON( url, {
           format: "json"
         })
         .done(function( data ) {
-    
+
           data.Trails.forEach( function(trail) {
-            self.trailList.push( new Trail(trail) );
+            self.trailList.push( new Trail(trail, park.id) );
             });
         })
         .error( function() {
             alert('Trails AJAX request failed');
         });
-    };
-
-    this.switchTrail = function(trail) {
-        //Display trail info in menu
-        //self.currentTrail(trail);
-        self.openMenu();
-        trail.center();
-        trail.bounce();
     };
 
     //User selects filter, display relevant parks
