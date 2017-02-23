@@ -13,12 +13,12 @@ def parseGpx(gpxFile):
   for track in tracks:
     outputTracks.append(readTrack(track))
 
-  return outputTracks
+  return outputTracks[0]
 
 def readTrack(track): 
   trackData = {}
-  if ( getTextValue(track, "name") ):
-    trackData = {"name": getTextValue(track, "name")}
+  #if ( getTextValue(track, "name") ):
+    #trackData = {"name": getTextValue(track, "name")}
   trackData["segments"] = []
 
   trackSegments = track.getElementsByTagName("trkseg")
@@ -41,10 +41,10 @@ def readTrackSegment(segment):
 
 def readTrackPoint(point):
   return {
-    "lat": point.getAttribute("lat"),
-    "lon": point.getAttribute("lon"),
-    "elevation": getTextValue(point, "ele"),
-    "time": getTextValue(point, "time")
+    "lat": float(point.getAttribute("lat")),
+    "lon": float(point.getAttribute("lon"))#,
+    #"elevation": getTextValue(point, "ele"),
+    #"time": getTextValue(point, "time")
   }
 
 ## Utility

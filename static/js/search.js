@@ -61,7 +61,7 @@ var Trail = function(data, park_id) {
 
     //Set Trail
     var trail = new google.maps.Polyline({
-        path: data.coords,
+        path: data.coords.segments,
         map: map,
         geodesic: true,
         strokeColor: 'orange',
