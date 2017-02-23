@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, request, \
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from setup_chisel_db import Base, Parks, Trails, User
-
+from modules.gpxjson import gpxToJson
 import cookies, simplejson, json
 
 # Connect to Database
@@ -152,7 +152,7 @@ def addTrail(park_id):
                             description=request.form['description'],
                             lat=request.form['lat'],
                             lon=request.form['lon'],
-                            coords=request.form['coords'])
+                            coords= gpxToJson( request.files['gpx'] ))
             session.add(newTrail)
             session.commit()
             #notify user

@@ -2,13 +2,14 @@
 
 {% block content %}
 
-    <form method="post" action="{{ url_for('addTrail', park_id=park_id) }}">
+    <form method="post" action="{{ url_for('addTrail', park_id=park_id) }}" enctype="multipart/form-data">
         <h1>Add new Trail</h1>
         <input type="text" name="name" placeholder="New Trail">
         <input type="textarea" name="description" placeholder="Description">
         <input type="text" name="lat" placeholder="latitude">
         <input type="text" name="lon" placeholder="longitude">
         <input type="text" name="coords" placeholder="coords">
+        <input type="file" name="gpx" accept=".gpx">
         <input type="submit" value="Add">
         <a href="{{ url_for('park', park_id=park_id) }}">Cancel</a>
     </form>
