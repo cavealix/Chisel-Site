@@ -1,0 +1,54 @@
+{% extends "header.html" %}
+
+{% block content %}
+  
+  <!-- CSS -->
+  <link rel="stylesheet" type="text/css" href="/static/css/search.css">
+
+    <div class="map-canvas">
+
+      <!-- Menu -->
+      <div class="menu" data-bind="with: currentPlace">
+        <!-- Close icon -->
+        <div class="icon-close">
+          <img data-bind="click: $parent.closeMenu" src="http://s3.amazonaws.com/codecademy-content/courses/ltp2/img/uber/close.png" alt="close-icon">
+        </div>
+        <!-- Current Marker Info -->
+        <a data-bind="attr: { href: address}"><h1 data-bind="text: name"></h1></a>
+        <div class="weather">
+          <h2 data-bind="text: current_avg"></h2>
+          <img id="weather-img" src="" alt="weather forecast" data-bind="attr: {src: current_img}">
+          <p data-bind="text: current_conditions"></p>
+          <p data-bind="text: current_wind"></p>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div id="map"></div>
+    </div>
+
+    <div class="list">
+      <ul class="park" data-bind="foreach: filteredParks">
+        <li>
+          <a href="#"><h2 data-bind="text: name, click: $parent.switchPark"></h2></a>
+          <hr>
+        </li>
+      </ul>
+    </div>
+
+  <!-- JQuery -->
+  <script src="/static/js/jquery/jquery.js"></script>
+  <!-- Bootstrap -->
+  <script src="/static/bootstrap-3.3.6/js/bootstrap.js"></script>
+  <!-- Knockout -->
+  <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+  <!-- App -->
+  <!-- <script type="text/javascript">var parksData={{parks}}</script> -->
+  <script src="/static/js/search.js"></script>
+  <!-- AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ -->
+  <!-- Google Maps -->
+  <script onload="initMap()" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" 
+    async defer ></script>
+
+
+{% endblock %}
