@@ -2,6 +2,7 @@ import logging
 
 from flask import Flask, render_template, url_for, request, \
     redirect, flash, jsonify
+#from flask_cors import CORS, cross_origin
 from DBclasses import Park, Trail
 
 
@@ -10,22 +11,32 @@ from google.appengine.ext import db
 
 app = Flask(__name__)
 
+#API
+@app.route('/parksJSON')
+#@cross_origin()
+def parksJSON():
+    parks = db.GqlQuery("select * from Park")
+    return jsonify(Parks=[p.serialize for p in parks])
 
+#Home
 @app.route('/', methods=['Get'])
 def home():
     return render_template('home.html')
 
+#List Parks
 @app.route('/parks', methods=['Get'])
 def parks():
     parks = db.GqlQuery("select * from Park")
     return render_template('parks.html', parks=parks)
 
-@app.route('/parks/<int:park_key>/', methods=['Get'])
-def park(park_key):
-    park = Park.get_by_id(park_key)
-    trails = Trail.gql("where park_key = :park_key", park_key)
-    return render_template('park.html', park=park)
+#Park Page
+@app.route('/parks/<int:park_id>/', methods=['Get'])
+def park(park_id):
+    park = Park.get_by_id(park_id)
+    trails = Trail.gql("where park_id = :park_id", park_id=park_id).fetch(limit=None)
+    return render_template('park.html', park=park, trails=trails)
 
+#Add Park
 @app.route('/addPark', methods=['Get', 'Post'])
 def addPark():
     if request.method == 'POST':
@@ -34,53 +45,94 @@ def addPark():
         #if uid_cookie != '' and uid_cookie != None \
         #        and cookies.check_secure_val(uid_cookie):
         #    user_id = uid_cookie.split('|')[0]
+        lat = float(request.form['lat'])
+        lon = float(request.form['lon'])
         newPark = Park(
-            name=request.form['name'])
+            name=request.form['name'], 
+            position=(lat,lon),
+            kind=request.form['kind']
+        )
         newPark.put()
         
         #notify user
         #flash('New park created')
         return redirect(url_for('parks'))
-        
     #Get
     else:
         return render_template('addPark.html')
 
-@app.route('/parks/<int:park_key>/edit', methods=['Get', 'Post'])
-def editPark():
+#Edit Park
+@app.route('/parks/<int:park_id>/edit', methods=['Get', 'Post'])
+def editPark(park_id):
     #Post
     if request.method == 'POST':
         return 'Edit Park (Post)'
     #Get
     else:
-        return 'Edit Park (Get)'
+        park = Park.get_by_id(park_id)
+        return render_template('editPark.html', park=park)
 
-@app.route('/parks/<int:park_key>/delete', methods=['Get', 'Post'])
-def deletePark():
+#Delete Park
+@app.route('/parks/<int:park_id>/delete', methods=['Get', 'Post'])
+def deletePark(park_id):
     #Post
     if request.method == 'POST':
-        return 'Delete Park (Post)'
+        park = Park.get_by_id(park_id)
+        park.delete()
+        return redirect( url_for('parks') )
     #Get
     else:
-        return 'Delete Park (Get)'
+        park = Park.get_by_id(park_id)
+        return render_template('deletePark.html', park=park)
 
-@app.route('/parks/<int:park_key>/<int:trail_key>', methods=['Get', 'Post'])
-def trail():
+#Trail Page
+@app.route('/parks/<int:park_id>/<int:trail_id>', methods=['Get'])
+def trail(park_id, trail_id):
+    park = Park.get_by_id(park_id)
+    trail = Trail.get_by_id(trail_id)
+    return render_template('trail.html', park=park, trail=trail)
+
+#Add Trail
+@app.route('/parks/<int:park_id>/addTrail', methods=['Get', 'Post'])
+def addTrail(park_id):
     #Post
     if request.method == 'POST':
-        return 'Trail (Post)'
+        newTrail = Trail(name=request.form['name'], park_id=park_id)
+        newTrail.put()
+        return redirect( url_for('park', park_id=park_id) )
     #Get
     else:
-        return 'Trail (Get)'
+        park = Park.get_by_id(park_id)
+        return render_template('addTrail.html', park=park)
 
-@app.route('/parks/<int:park_key>/addTrail', methods=['Get', 'Post'])
-def addTrail():
+#Edit Trail
+@app.route('/parks/<int:park_id>/<int:trail_id>/edit', methods=['Get', 'Post'])
+def editTrail(park_id, trail_id):
     #Post
     if request.method == 'POST':
-        return 'Add Trail (Post)'
+        trail = Trail.get_by_id(trail_id)
+        trail.name = request.form['name']
+        trail.put()
+        return redirect( url_for('trail', park_id=trail.park_id, trail_id=trail.key().id() ))
     #Get
     else:
-        return 'Add Trail (Get)'
+        park = Park.get_by_id(park_id)
+        trail = Trail.get_by_id(trail_id)
+        return render_template('editTrail.html', park=park, trail=trail)
+
+#Delete Trail
+@app.route('/parks/<int:park_id>/<int:trail_id>/delete', methods=['Get', 'Post'])
+def deleteTrail(park_id, trail_id):
+    #Post
+    if request.method == 'POST':
+        trail = Trail.get_by_id(trail_id)
+        trail.delete()
+        return redirect( url_for('park', park_id=park_id) )
+    #Get
+    else:
+        park = Park.get_by_id(park_id)
+        trail = Trail.get_by_id(trail_id)
+        return render_template('deleteTrail.html', park=park, trail=trail)
 
 
 @app.errorhandler(500)

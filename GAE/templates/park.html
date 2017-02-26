@@ -4,16 +4,16 @@
 
     <h1>{{ park.name }}</h1>
     
-        <a href="{{ url_for('deletePark', park_key=park.key().id()) }}">Delete</a>
-        <a href="{{ url_for('editPark', park_key=park.key().id()) }}">Edit</a>
-        <a href="{{ url_for('addTrail', park_key=park.key().id()) }}">Add a trail</a>
+        <a href="{{ url_for('deletePark', park_id=park.key().id()) }}">Delete</a>
+        <a href="{{ url_for('editPark', park_id=park.key().id()) }}">Edit</a>
+        <a href="{{ url_for('addTrail', park_id=park.key().id()) }}">Add a trail</a>
     
     {% if trails %}
         {% for trail in trails %}
         
         <div>
             <hr>
-            <p><a href="{{ url_for('trail', park_key=park.key().id(), trail_id=trail.id) }}">{{ trail.name }}</a></p>
+            <p><a href="{{ url_for('trail', park_id=park.key().id(), trail_id=trail.key().id()) }}">{{ trail.name }}</a></p>
             <br>
         </div>
 

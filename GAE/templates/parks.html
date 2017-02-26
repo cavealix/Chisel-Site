@@ -20,7 +20,7 @@
     {% for park in parks %}
     <div>
         <hr>
-        <h3><a href="{{ url_for('park', park_key=park.key().id()) }}">{{park.name}}</a></h3>
+        <h3><a href="{{ url_for('park', park_id=park.key().id()) }}">{{park.name}}</a></h3>
         <br>
     </div>
     {% endfor %}

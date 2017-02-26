@@ -4,12 +4,12 @@
 
     <h1> Are you sure you want to delete {{park.name}}? </h1>
     
-    <form action="{{ url_for('deletePark',park_id = park.id )}}" method = 'post'>
+    <form action="{{ url_for('deletePark',park_id=park.key().id() )}}" method = 'post'>
     
     <input type='submit', value = 'Delete'>
     
     </form>
     
-    <a href = "{{ url_for('parks') }}"> Cancel </a>
+    <a href = "{{ url_for('park', park_id=park.key().id()) }}"> Cancel </a>
 
 {% endblock %}

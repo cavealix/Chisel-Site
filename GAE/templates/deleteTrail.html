@@ -3,12 +3,12 @@
 {% block content %}
     <h1> Are you sure you want to delete {{trail.name}}? </h1>
     
-    <form action="{{ url_for('deleteTrail',park_id = trail.park_id, trail_id=trail.id)}}" method = 'post'>
+    <form action="{{ url_for('deleteTrail', park_id = trail.park_id, trail_id=trail.key().id())}}" method = 'post'>
     
     <input type='submit', value = 'Delete'>
     
     </form>
     
-    <a href = "{{ url_for('park', park_id = park_id)}}"> Cancel </a>
+    <a href = "{{ url_for('trail', park_id = trail.park_id, trail_id = trail.key().id()) }}"> Cancel </a>
 
 {% endblock %}
