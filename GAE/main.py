@@ -11,14 +11,30 @@ from google.appengine.ext import db
 
 app = Flask(__name__)
 
-#API
+#API -------------------------------------------------
 @app.route('/parksJSON')
 #@cross_origin()
 def parksJSON():
     parks = db.GqlQuery("select * from Park")
     return jsonify(Parks=[p.serialize for p in parks])
 
-#Home
+#Park API 
+@app.route('/parkAPI/<int:park_id>')
+def parkAPI(park_id):
+    park = Park.get_by_id(park_id)
+    trails = Trail.gql(
+            "where park_id = :park_id",
+            park_id=park_id).fetch(limit=None)
+    return jsonify(Park=park.serialize, Trails=[t.serialize for t in trails])
+
+#Trail API
+@app.route('/trailAPI/<int:trail_id>')
+def trailAPI(trail_id):
+    trail = Trail.get_by_id(trail_id)
+    return jsonify(Trail=trail.serialize)
+
+
+#Home -------------------------------------------------
 @app.route('/', methods=['Get'])
 def home():
     return render_template('home.html')
@@ -29,7 +45,8 @@ def parks():
     parks = db.GqlQuery("select * from Park")
     return render_template('parks.html', parks=parks)
 
-#Park Page
+
+#Park Page-------------------------------------------------
 @app.route('/parks/<int:park_id>/', methods=['Get'])
 def park(park_id):
     park = Park.get_by_id(park_id)
@@ -45,12 +62,10 @@ def addPark():
         #if uid_cookie != '' and uid_cookie != None \
         #        and cookies.check_secure_val(uid_cookie):
         #    user_id = uid_cookie.split('|')[0]
-        lat = float(request.form['lat'])
-        lon = float(request.form['lon'])
         newPark = Park(
             name=request.form['name'], 
-            position=(lat,lon),
-            kind=request.form['kind']
+            lat=float(request.form['lat']),
+            lon=float(request.form['lon'])
         )
         newPark.put()
         
@@ -66,7 +81,12 @@ def addPark():
 def editPark(park_id):
     #Post
     if request.method == 'POST':
-        return 'Edit Park (Post)'
+        park = Park.get_by_id(trail_id)
+        park.name = request.form['name']
+        park.lat = float(request.form['lat'])
+        park.lon = float(request.form['lon'])
+        park.put()
+        return redirect( url_for('park', park_id=park.key().id() ))
     #Get
     else:
         park = Park.get_by_id(park_id)
@@ -85,7 +105,8 @@ def deletePark(park_id):
         park = Park.get_by_id(park_id)
         return render_template('deletePark.html', park=park)
 
-#Trail Page
+
+#Trail Page -------------------------------------------------
 @app.route('/parks/<int:park_id>/<int:trail_id>', methods=['Get'])
 def trail(park_id, trail_id):
     park = Park.get_by_id(park_id)
@@ -97,7 +118,11 @@ def trail(park_id, trail_id):
 def addTrail(park_id):
     #Post
     if request.method == 'POST':
-        newTrail = Trail(name=request.form['name'], park_id=park_id)
+        newTrail = Trail(name=request.form['name'], 
+            park_id=park_id,
+            lat=request.form['lat'],
+            lon=request.form['lon']
+        )
         newTrail.put()
         return redirect( url_for('park', park_id=park_id) )
     #Get
@@ -112,6 +137,8 @@ def editTrail(park_id, trail_id):
     if request.method == 'POST':
         trail = Trail.get_by_id(trail_id)
         trail.name = request.form['name']
+        trail.lat = float(request.form['lat'])
+        trail.lon = float(request.form['lon'])
         trail.put()
         return redirect( url_for('trail', park_id=trail.park_id, trail_id=trail.key().id() ))
     #Get
