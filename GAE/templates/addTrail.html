@@ -7,9 +7,9 @@
         <input type="text" name="name" placeholder="New Trail">
         <input type="text" name="lat" placeholder="latitude">
         <input type="text" name="lon" placeholder="longitude">
-        <!-- <input type="textarea" name="description" placeholder="Description">
+        <!-- <input type="textarea" name="description" placeholder="Description"> -->
         <input type="file" name="gpx" accept=".gpx">
-        <input type="submit" value="Add"> -->
+        <input type="submit" value="Add">
         <a href="{{ url_for('park', park_id=park.key().id()) }}">Cancel</a>
     </form>
 

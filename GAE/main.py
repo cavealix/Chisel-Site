@@ -1,13 +1,15 @@
 import logging
 
+# Flask
 from flask import Flask, render_template, url_for, request, \
     redirect, flash, jsonify
-#from flask_cors import CORS, cross_origin
-from DBclasses import Park, Trail
 
+# 3rd Party Modules
+from modules.gpxjson import gpxToJson
 
 # import the db library from GAE
 from google.appengine.ext import db
+from DBclasses import Park, Trail
 
 app = Flask(__name__)
 
@@ -118,10 +120,12 @@ def trail(park_id, trail_id):
 def addTrail(park_id):
     #Post
     if request.method == 'POST':
+        lat=float(request.form['lat'])
+        lon=float(request.form['lon'])
         newTrail = Trail(name=request.form['name'], 
             park_id=park_id,
-            lat=request.form['lat'],
-            lon=request.form['lon']
+            position=db.GeoPt(lat,lon),
+            coords= gpxToJson( request.files['gpx'])
         )
         newTrail.put()
         return redirect( url_for('park', park_id=park_id) )
