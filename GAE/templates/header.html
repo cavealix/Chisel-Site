@@ -47,11 +47,11 @@
 
                     <li><a href="/parks">Parks</a></li>
                     
-                    <!-- only show 'search' link on other pages -->
-                    {% if page != 'search' %}
-                    <li><a href="/search">Search</a></li>
+                    <!-- only show 'map' link on other pages -->
+                    {% if page != 'map' %}
+                    <li><a href="/map">Map</a></li>
                     {% else %}
-                    <!-- only show 'reset' and 'filter' on search page -->
+                    <!-- only show 'reset' and 'filter' on map page -->
                     <li><a href="#" data-bind="click: resetMap">Reset</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter <span class="caret"></span></a>

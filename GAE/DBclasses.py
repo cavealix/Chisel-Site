@@ -12,11 +12,11 @@ class Park(db.Model):
     @property 
     def serialize(self):
         #returns data in serializable format
-        position = {"lat": self.lat, "lon": self.lon}
         return {
             'id' : self.key().id(),
             'name' : self.name,
-            'position' : position
+            'lat' : self.lat,
+            'lon' : self.lon
         }
 
 class Trail(db.Model):
@@ -28,10 +28,16 @@ class Trail(db.Model):
     @property 
     def serialize(self):
         #returns data in serializable format
+        path = []
+        for coord in self.coords:
+            pt = {'lat': coord.lat, 'lon': coord.lon}
+            path.append(pt)
+
         return {
             'id' : self.key().id(),
             'park_id' : self.park_id,
             'name' : self.name,
-            'position' : self.position#,
-            #'coords' : self.coords
+            'lat' : self.position.lat,
+            'lon' : self.position.lon,
+            'coords' : path
         }

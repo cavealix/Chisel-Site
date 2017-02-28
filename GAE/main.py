@@ -47,6 +47,10 @@ def parks():
     parks = db.GqlQuery("select * from Park")
     return render_template('parks.html', parks=parks)
 
+@app.route('/map', methods=['Get'])
+def map():
+    return render_template('map.html')
+
 
 #Park Page-------------------------------------------------
 @app.route('/parks/<int:park_id>/', methods=['Get'])

@@ -18,7 +18,7 @@ var Trail = function(data, park_id) {
     var self = this;
 
     self.id = data.id;
-    self.address = "http://localhost:5000/parks/" + park_id + "/" + data.id;
+    self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
     self.name = ko.observable(data.name);
     self.lon = ko.observable(data.lon);
     self.lat = ko.observable(data.lat);
@@ -48,7 +48,7 @@ var Trail = function(data, park_id) {
       self.current_img =  "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
       self.current_avg = Math.round(data.main.temp)+'°F'; 
       self.current_conditions = data.weather[0].description;
-      self.current_wind = "Wind " + data.wind.speed + "mph";
+      self.current_wind = "Wind " + data.wind.speed + " MPH";
     })
     .error( function() {
         alert('AJAX weather request failed');
@@ -59,9 +59,17 @@ var Trail = function(data, park_id) {
         VM.switchPlace(self);
     });
 
+    //Create polyline from JSON data
+    var path = new Array();
+    for(var i=0; i < data.coords.length; i++){
+        //Tokenise the coordinates
+        coord = data.coords[i];
+        path.push(new google.maps.LatLng(coord.lat, coord.lon));
+    }
+
     //Set Trail
     var trail = new google.maps.Polyline({
-        path: data.coords.segments,
+        path: path,
         map: map,
         geodesic: true,
         strokeColor: 'orange',
@@ -100,9 +108,9 @@ var Park = function(data) {
     var self = this;
 
     self.id = data.id;
-    self.address = "http://localhost:5000/parks/" + data.id;
+    self.address = "http://localhost:8080/park/" + data.id;
     self.name = ko.observable(data.name);
-    self.lon = ko.observable(data.lon);
+    self.position = ko.observable(data.position);
     self.lat = ko.observable(data.lat);
     self.activities = ko.observableArray(data.activities);
 
@@ -135,7 +143,7 @@ var Park = function(data) {
       self.current_img =  "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
       self.current_avg = Math.round(data.main.temp)+'°F'; 
       self.current_conditions = data.weather[0].description;
-      self.current_wind = "Wind " + data.wind.speed + "mph";
+      self.current_wind = "Wind " + data.wind.speed + " MPH";
     })
     .error( function() {
         alert('AJAX weather request failed');
@@ -171,7 +179,7 @@ var ViewModel = function() {
     var self = this;
 
     //Query parks in DB
-    $.getJSON( "http://localhost:5000/parksJSON", {
+    $.getJSON( "http://localhost:8080/parksJSON", {
       format: "json"
     })
     .done(function( data ) {
@@ -203,7 +211,7 @@ var ViewModel = function() {
 
     this.setTrails = function(park) {
         //Query and show trails within park
-        url = "http://localhost:5000/parks/" + park.id + "JSON";
+        url = "http://localhost:8080/parkAPI/" + park.id;
         $.getJSON( url, {
           format: "json"
         })
