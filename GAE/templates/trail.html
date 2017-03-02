@@ -19,6 +19,22 @@
     <a href="{{ url_for('deleteTrail', park_id=park.key().id(), trail_id=trail.key().id()) }}">Delete</a>
     <a href="{{ url_for('editTrail', park_id=park.key().id(), trail_id=trail.key().id()) }}">Edit</a>
 
-    
+    <!--Trail Map -->
+    <div class="section" id="trailMap">
+        <div id="trail_map_canvas" style="width:100%;height:100%;">
+        </div>
+    </div>
+    <!--End Map -->
 
+    <!-- JQuery -->
+    <script src="/static/js/jquery/jquery.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/bootstrap-3.3.6/js/bootstrap.js"></script>
+    <!-- Page CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/css/trail.css"></link>
+    <!-- Page JS -->
+    <script src="/static/js/trail.js"></script>
+    <script>var trail = JSON.parse('{{trail_json|safe}}');</script>
+    <!-- Google Maps -->
+    <script onload="initMap( trail )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" async defer></script>
 {% endblock %}

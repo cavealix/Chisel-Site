@@ -1,4 +1,4 @@
-import logging
+import logging, json, urllib
 
 # Flask
 from flask import Flask, render_template, url_for, request, \
@@ -117,7 +117,8 @@ def deletePark(park_id):
 def trail(park_id, trail_id):
     park = Park.get_by_id(park_id)
     trail = Trail.get_by_id(trail_id)
-    return render_template('trail.html', park=park, trail=trail)
+    trail_json = json.dumps(trail.serialize)
+    return render_template('trail.html', park=park, trail=trail, trail_json=trail_json)
 
 #Add Trail
 @app.route('/parks/<int:park_id>/addTrail', methods=['Get', 'Post'])

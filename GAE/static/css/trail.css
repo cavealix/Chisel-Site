@@ -1,0 +1,217 @@
+.section {
+  height: 500px;
+  width: 100%;
+  position: relative;
+  margin-top: 3.5em;
+}
+.mini_section{
+    height: 150px;
+}
+.slide {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.container {
+    height: 100%;
+    width: 100%;
+} 
+.slider_bar {
+    width: 100%;
+    font-size: 1.25em;
+    margin-bottom: 20px;
+}
+.slider_bar ul {
+    text-align: center;
+    font-family: Raleway, 400;
+}
+.slider_bar ul li {
+    padding: 0.5em 1em;
+    display: inline-block;
+    text-align: center;
+}
+.slider_bar img {
+    max-height: 20px;
+    max-width: 20px;
+}
+.slide_menu {
+    height: 100%;
+    width: 250px;
+    color: #fff;
+    z-index: 1;
+    background-color: #333;
+    opacity: .85;
+    position: absolute;
+    right: 0px;
+}
+.headline {
+    height: 100%;
+    width: 100px;
+    color: #fff;
+    z-index: 1;
+    background-color: #333;
+    opacity: .85;
+    position: absolute;
+    left: 0px;
+}
+.headline h3 {
+    width: 50px;
+    height: 100%;
+    text-align: center;
+    letter-spacing: 10px;
+    font-size: 60px;
+    margin-top: 10px;
+    margin-left: 10px;
+    word-wrap:break-word;
+}
+
+
+/* Forecast menu */
+.forecast {
+  background-color: #333;
+  opacity: .85;
+  right: -250px;  /* start off behind the scenes */
+  height: 500px;
+  position: absolute;
+  width: 250px;
+  color: white;
+  z-index: 1;
+}
+.forecast ul {
+    list-style-type: none;
+    padding: 0;
+}
+.weather_list {
+    list-style-type: none;
+    padding: 0;
+}
+.weather_list li {
+    text-align: center;
+    width: 30%;
+    height: 100%;
+    border:solid 1px white;
+    display: inline-block;
+}
+#current {
+    margin-bottom: 15px;
+}
+.day {
+    height: 60px;
+    width: 100%;
+}
+.day img {
+    height: 70px;
+    width: 70px;
+    display: inline-block;
+}
+.avg {
+    font-size: 30px;
+    display: inline-block;
+}
+.range {
+    display: inline-block;
+}
+.description {
+    height: 100%;
+    display: inline-block;
+    list-style-type: none;
+    margin-left: 10px;
+}
+
+
+/* Trail Info */
+#quickInfo{
+    margin-left: 60px;
+}
+/* End Trail Info */
+
+
+/* MAP SLIDER */
+.active-slide-map {
+    display: block;
+}
+#map_headline {
+    font-size: 50px;
+}
+/* End Prep Map */
+
+/* Prep Map Menu */
+#map_menu ul {
+    list-style-type: none;
+}
+#map_menu li {
+    margin-bottom: 5px;
+}
+#place_name {
+    font-size: 20px;
+}
+
+/* Gear Slider */
+#prep_gear h3 {
+  font-family: Raleway, 600;
+  display: inline-block;
+}
+.active-slide-gear {
+    display: block;
+}
+.active-slide-nearby {
+    display: block;
+}
+.active-btn{
+    background-color: #333;
+    opacity: .5;
+}
+/* END GEAR SLIDER */
+
+
+/* STORE LIST */
+#gear_menu h3 {
+    font-size:50px;
+    text-align: center;
+}
+#gear_menu ul {
+    list-style-type: none;
+    padding: 0;
+}
+#gear_menu li {
+    width: cover;
+    height: 80px;
+    padding: 10px 10px 10px 10px;
+}
+#gear_menu li img {
+    height: 100%;
+    width: 100%;
+}
+#gear_menu li:hover {
+    background-color: #fff;
+}
+/* END STORE LIST */
+
+
+/* GEAR SLIDES */
+#clothes-slide {
+    background-image: url(../img/highlight_photos/Models.jpg);
+    background-size: cover;
+}
+#pack-slide {
+    background-image: url(../img/Thinkstock/ThinkstockPhotos-479765440.jpg);
+    background-size: cover;
+}
+#sleep-slide {
+    background-image: url(../img/Thinkstock/ThinkstockPhotos-473422218.jpg);
+    background-size: cover;
+}
+#food-slide {
+    background-image: url(../img/Thinkstock/ThinkstockPhotos-486106706.jpg);
+    background-size: cover;
+}
+#safety-slide {
+    background-image: url(../img/Thinkstock/ThinkstockPhotos-473422218.jpg);
+    background-size: cover;
+}
+#play-slide {
+    background-image: url(../img/Thinkstock/ThinkstockPhotos-481328894.jpg);
+    background-size: cover;
+}
+/* End GEAR Slider */
