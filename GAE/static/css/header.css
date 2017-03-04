@@ -1,7 +1,32 @@
+/* Containers ////////////////////////////////////////////*/
 .wrapper {
 	max-width: 1200px;
     height: 100%;
+    overflow: hidden;
 }
+.section {
+  height: 500px;
+  width: 100%;
+  position: relative;
+}
+.mini-section{
+    height: 150px;
+}
+.slide {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.container {
+    height: 100%;
+    width: 100%;
+} 
+.map-canvas {
+    height: 100%;
+    width: 100%;
+}
+
 
 .navbar .navbar-default {
     margin-bottom: 0px;

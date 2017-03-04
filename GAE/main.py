@@ -87,7 +87,7 @@ def addPark():
 def editPark(park_id):
     #Post
     if request.method == 'POST':
-        park = Park.get_by_id(trail_id)
+        park = Park.get_by_id(park_id)
         park.name = request.form['name']
         park.lat = float(request.form['lat'])
         park.lon = float(request.form['lon'])

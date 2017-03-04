@@ -1,16 +1,6 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.map-canvas {
-    height: 70%;
-    overflow: hidden;
-}
-
-#map {
-    height: 100%;
+/* Local override */
+.section {
+  height: 750px;
 }
 
 /* Pop In Menu */

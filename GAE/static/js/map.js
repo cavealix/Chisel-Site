@@ -108,7 +108,7 @@ var Park = function(data) {
     var self = this;
 
     self.id = data.id;
-    self.address = "http://localhost:8080/park/" + data.id;
+    self.address = "http://localhost:8080/parks/" + data.id;
     self.name = ko.observable(data.name);
     self.position = ko.observable(data.position);
     self.lat = ko.observable(data.lat);
