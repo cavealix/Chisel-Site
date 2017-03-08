@@ -49,7 +49,7 @@ def parks():
 
 @app.route('/map', methods=['Get'])
 def map():
-    return render_template('map.html')
+    return render_template('map.html', page='map')
 
 
 #Park Page-------------------------------------------------
@@ -71,7 +71,9 @@ def addPark():
         newPark = Park(
             name=request.form['name'], 
             lat=float(request.form['lat']),
-            lon=float(request.form['lon'])
+            lon=float(request.form['lon']),
+            type=request.form['type'],
+            state=request.form['state']
         )
         newPark.put()
         
@@ -91,6 +93,8 @@ def editPark(park_id):
         park.name = request.form['name']
         park.lat = float(request.form['lat'])
         park.lon = float(request.form['lon'])
+        park.type = request.form['type']
+        park.state = request.form['state']
         park.put()
         return redirect( url_for('park', park_id=park.key().id() ))
     #Get

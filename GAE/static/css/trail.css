@@ -3,6 +3,23 @@
     padding-top: 10px;
 }
 
+.canvas {
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+
+#forecast-week {
+  margin-right: auto;
+  margin-left: auto;
+}
+.day {
+  display: inline-block;
+  width: 10%;
+  text-align: center;
+}
+
 /* Pop In Menu */
 .menu {
     background-color: #333;

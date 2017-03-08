@@ -21,22 +21,28 @@
       </div>
 
       <!-- Map -->
-      <div class="map-canvas" id="map"></div>
+      <div class="section">
+        <div class="map-canvas" id="map"></div>
+      </div>
     </div>
 
     <div class="list">
-      <ul class="park" data-bind="foreach: filteredParks">
+      <ul class="park" data-bind="foreach: filteredList">
         <li>
-          <a href="#"><h2 data-bind="text: name, click: $parent.switchPark"></h2></a>
+          <a href="#"><h2 data-bind="text: name, click: $parent.switchPlace"></h2></a>
           <hr>
         </li>
       </ul>
     </div>
 
+  
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/static/css/map.css">
   <!-- JQuery -->
   <script src="/static/js/jquery/jquery.js"></script>
+  <!-- Bootstrap -->
+  <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.6/css/bootstrap.min.css">
+  <script src="/static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
   <!-- Knockout -->
   <script src="/static/js/knockout/knockout-3.4.0.js"></script>
   <!-- Map JS -->

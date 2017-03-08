@@ -25,9 +25,19 @@
     </div>
     <!-- Trail Map -->
 
-    <div class="mini-section"></div>
+    <div class="mini-section" id="forecast">
+        <ul class="canvas" id="forecast-week" data-bind="foreach: forecast">
+            <li class="day">
+                <img id="weather-img" src="" alt="weather forecast" data-bind="attr: {src: img}">
+                <p data-bind="text: avg"></p>
+                <p data-bind="text: range"></p>
+                <p data-bind="text: desc"></p>
+            </li>
+        </ul>
+    </div>
 
     <!-- PREP MAP -->
+    <h1>Places Nearby</h1>
     <div class="section">
 
         <!-- Menu -->
@@ -37,7 +47,9 @@
                 <img id="close-btn" data-bind="click: $parent.closeMenu" src="/static/imgs/google_icons/ic_cancel_white_36dp/web/ic_cancel_white_36dp_1x.png" alt="close-icon">
             </div>
             <!-- Current Marker Info -->
+            
             <h1 data-bind="text: name"></h1>
+            
         </div>
 
         <!-- Prep Map -->
@@ -59,6 +71,9 @@
     <link rel="stylesheet" type="text/css" href="/static/css/trail.css"></link>
     <!-- JQuery -->
     <script src="/static/js/jquery/jquery.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.6/css/bootstrap.min.css">
+    <script src="/static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <!-- Knockout -->
     <script src="/static/js/knockout/knockout-3.4.0.js"></script>
     <!-- Page JS -->

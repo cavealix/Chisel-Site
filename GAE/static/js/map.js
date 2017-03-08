@@ -5,23 +5,26 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 38.9776681,lng: -96.847185},
-      zoom: 5
+      zoom: 4
     });
 
     VM = new ViewModel();
     ko.applyBindings(VM);
+
 }
 
-/////////////////////////////////////////////////////////////////
+// Trail //////////////////////////////////////////////////////
 
 var Trail = function(data, park_id) {
     var self = this;
 
     self.id = data.id;
+    self.type = 'Trail';
     self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
     self.name = ko.observable(data.name);
     self.lon = ko.observable(data.lon);
     self.lat = ko.observable(data.lat);
+    self.bound = new google.maps.LatLng(data.lat, data.lon);
 
     var marker = new google.maps.Marker({
         position: {lat: data.lat, lng: data.lon},
@@ -108,16 +111,35 @@ var Park = function(data) {
     var self = this;
 
     self.id = data.id;
+    self.type = data.type;
     self.address = "http://localhost:8080/parks/" + data.id;
     self.name = ko.observable(data.name);
     self.position = ko.observable(data.position);
     self.lat = ko.observable(data.lat);
     self.activities = ko.observableArray(data.activities);
 
+    var markerUrl;
+    switch (data.type ) {
+        case 'state':
+            markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
+            break;
+        case 'natl':
+            markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png';
+            break;
+        case 'blm':
+            markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
+            break;
+        case 'city':
+            markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
+    }
+
     var marker = new google.maps.Marker({
         position: {lat: data.lat, lng: data.lon},
         map: map,
         title: data.name,
+        icon: {
+          url: markerUrl
+        },
         animation: google.maps.Animation.DROP
     });
 
@@ -125,7 +147,7 @@ var Park = function(data) {
     google.maps.event.addListener(marker, 'click', function() { 
         VM.clearTrails();
         VM.switchPlace(self);
-        VM.setTrails(self);
+        VM.listTrails(self);
     });
 
     //Current Weather
@@ -156,10 +178,6 @@ var Park = function(data) {
         }, 1500);
     };
 
-    this.zoom = function() {
-        map.setZoom(11);
-    };
-
     this.center = function() {
         map.setCenter(marker.getPosition());
     };
@@ -173,10 +191,16 @@ var Park = function(data) {
     };
 };
 
-/////////////////////////////////////////////////////////////////
+// View Model ////////////////////////////////////////////////////
 
 var ViewModel = function() {
     var self = this;
+
+    self.parkList = ko.observableArray([]);
+    self.trailList = ko.observableArray([]);
+    self.filteredList = ko.observableArray( self.parkList() );
+    self.currentPlace = ko.observable();
+    self.park_types = ['Natl Park', 'State Park', 'BLM', 'Natl Forrest'];
 
     //Query parks in DB
     $.getJSON( "http://localhost:8080/parksJSON", {
@@ -187,29 +211,38 @@ var ViewModel = function() {
       data.Parks.forEach( function(park){
         self.parkList.push( new Park(park) );
         });
+
+      //Display initial park list below map
+      self.filteredList( self.parkList() );
     })
     .error( function() {
         alert('parks AJAX request failed');
     });
 
-    self.parkList = ko.observableArray([]);
-    self.trailList = ko.observableArray([]);
-    self.filteredParks = ko.observableArray([]);
-    self.activities = ['pets', 'hike', 'camp'];
-
-    self.filteredParks( self.parkList() );
-    this.currentPlace = ko.observable( this.parkList()[0] );
-
     //User clicks on park marker
-    this.switchPlace = function(park) {
-        self.currentPlace(park);
+    this.switchPlace = function(place) {
+        self.currentPlace(place);
         self.openMenu();
-        park.zoom();
-        park.center();
-        park.bounce();
+        self.zoom();
+        //self.bounds();
+        place.center();
+        place.bounce();
     };
 
-    this.setTrails = function(park) {
+    this.zoom = function() {
+        map.setZoom(12);
+    };
+
+    self.bounds = function() {
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < self.trailList().length; i++) {
+            bounds.extend(self.trailList()[i].bound);
+        }
+        map.fitBounds(bounds);
+    };
+
+    this.listTrails = function(park) {
+        self.clearTrails();
         //Query and show trails within park
         url = "http://localhost:8080/parkAPI/" + park.id;
         $.getJSON( url, {
@@ -220,6 +253,8 @@ var ViewModel = function() {
           data.Trails.forEach( function(trail) {
             self.trailList.push( new Trail(trail, park.id) );
             });
+
+          self.filteredList( self.trailList() );
         })
         .error( function() {
             alert('Trails AJAX request failed');
@@ -230,15 +265,15 @@ var ViewModel = function() {
     this.filter = function(activity) {
         self.clearMap();
         //clear previous filter results
-        self.filteredParks([]);
+        self.filteredList([]);
         //setTimeout(self.setMarkers, 1000);
         for (var i = 0; i < self.parkList().length; i++) {
             if ( self.parkList()[i].activities.indexOf(activity) != -1 ){
-                self.filteredParks.push( self.parkList()[i] );
+                self.filteredList.push( self.parkList()[i] );
             }
         }
         
-        self.setMarkers( self.filteredParks() );
+        self.setMarkers( self.filteredList() );
     };
 
     this.setPath = function(trail) {
@@ -251,6 +286,8 @@ var ViewModel = function() {
         for (var i = 0; i < self.trailList().length; i++) {
             self.trailList()[i].clear();
         }
+
+        self.trailList( [] );
     };
 
     this.clearMap = function() {
@@ -263,8 +300,8 @@ var ViewModel = function() {
     this.resetMap = function() {
         self.clearMap();
         self.clearTrails();
-        self.filteredParks( self.parkList() );
-        self.setMarkers(self.filteredParks());
+        self.filteredList( self.parkList() );
+        self.setMarkers(self.filteredList());
         self.closeMenu();
         map.setCenter({lat: 38.9776681,lng: -96.847185});
         map.setZoom(4);

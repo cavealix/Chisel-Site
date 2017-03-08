@@ -8,6 +8,8 @@ class Park(db.Model):
     name = db.StringProperty(required = True)
     lat = db.FloatProperty()
     lon = db.FloatProperty()
+    type = db.StringProperty()
+    state = db.StringProperty()
 
     @property 
     def serialize(self):
@@ -16,7 +18,9 @@ class Park(db.Model):
             'id' : self.key().id(),
             'name' : self.name,
             'lat' : self.lat,
-            'lon' : self.lon
+            'lon' : self.lon,
+            'type': self.type,
+            'state': self.state
         }
 
 class Trail(db.Model):
