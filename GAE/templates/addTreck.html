@@ -1,0 +1,19 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <form method="post" action="{{ url_for('addTreck') }}" enctype="multipart/form-data">
+        <h1>Add a Treck</h1>
+        <input type="text" name="name" placeholder="New Treck">
+        <select name="park_id">
+            {% for park in parks %}
+                <option value="{{ park.key().id() }}">{{ park.name }} - {{ park.type }}</option>
+            {% endfor %}
+        </select>
+        <!-- <input type="textarea" name="description" placeholder="Description"> -->
+        <input type="file" name="gpx" accept=".gpx">
+        <input type="submit" value="Add">
+        <a href="{{ url_for('home') }}">Cancel</a>
+    </form>
+
+{% endblock %}

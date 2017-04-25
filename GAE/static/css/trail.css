@@ -1,24 +1,37 @@
+h1, h2 {
+  text-align: center;
+  color: orange;
+}
+
+/* BS Carousel */
+iframe, .item {
+  width: 100%;
+  height: 100%;
+}
+
 #close-btn {
     padding-left: 10px;
     padding-top: 10px;
 }
 
-.canvas {
-  height: 100%;
-  width: 100%;
-  padding: 0px;
-  margin: 0px;
-}
-
+/* Weather */
 #forecast-week {
-  margin-right: auto;
-  margin-left: auto;
+  
 }
 .day {
   display: inline-block;
-  width: 10%;
+  margin-right: auto;
+  margin-left: auto;
   text-align: center;
 }
+
+#elevation {
+  box-sizing: border-box;
+  height: auto;
+  max-height: 200px;
+  width: auto;
+}
+
 
 /* Pop In Menu */
 .menu {
@@ -50,28 +63,29 @@
   padding-top: 3px;
 }
 
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+    width: 70%;
+    margin: auto;
+}
+
 /* Icon Bar */
-.slider_bar {
+.icon_bar {
     width: 100%;
     font-size: 1.25em;
     margin-bottom: 20px;
 }
-.slider_bar ul {
+.icon_bar ul {
     text-align: center;
     font-family: Raleway, 400;
 }
-.slider_bar ul li {
+.icon_bar ul li {
     padding: 0.5em 1em;
     display: inline-block;
     text-align: center;
 }
-.slider_bar img {
-    max-height: 20px;
-    max-width: 20px;
-}
-
-/* Trail Info */
-#quickInfo{
-    margin-left: 60px;
+.icon_bar img {
+    max-height: 25px;
+    max-width: 25px;
 }
 

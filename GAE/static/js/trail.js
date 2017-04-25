@@ -1,5 +1,6 @@
-var prep_map;
-var prep_icons = [{"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
+var prep_map, videos;
+var prep_icons = [
+  {"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
   "title": "Food", "alt": "food-btn", "type": "restaurant"},
   {"img": "/static/imgs/google_icons/ic_store_mall_directory_black_36dp/web/ic_store_mall_directory_black_36dp_2x.png",
   "title": "Gear Shops", "alt": "gear-shop-icon", "type": "clothing_store"},
@@ -15,30 +16,66 @@ var prep_icons = [{"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/we
   "title": "Camp", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
   "title": "Hospital", "alt": "hospital-btn", "type": "hospital"}];
+var info_icons = [
+  {"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
+  "title": "Info", "alt": "info-icon", "id": "info"},
+  {"img": "/static/imgs/google_icons/ic_show_chart_black_36dp/web/ic_show_chart_black_36dp_2x.png",
+  "title": "Elevation", "alt": "elevation-icon", "id": "elevation"},
+  {"img": "/static/imgs/google_icons/ic_cloud_black_36dp/web/ic_cloud_black_36dp_2x.png",
+  "title": "Forecast", "alt": "forecast-icon", "id": "forecast"}
+  ];
 
 // Main ////////////////////////////////////////////////////
 var main = function(trail) {
   setTrailMap(trail);
   setPrepMap(trail);
+  setChart(trail);
 
   // Instantiate Knockout VM
   VM = new ViewModel(trail);
   ko.applyBindings(VM);
 
-};
+  // Initiate Masterslider
+  var slider = new MasterSlider();
+  slider.setup('masterslider' , {
+      width:1024,
+      height:580,
+      space:0,
+      fillMode:'fit',
+      speed:25,
+      preload:'0',
+      view:'mask',
+      loop:true
+  });
+     
+  slider.control('arrows');  
+  slider.control('bullets');
+}
 
 // VIEW MODEL ////////////////////////////////////////////////////
 var ViewModel = function(trail) {
   var self = this;
 
+  //Create Prep Nav Btns
   self.prep_btns = ko.observableArray([]);
   prep_icons.forEach( function(icon) {
     self.prep_btns.push( new iconButton(icon) );
   });
+
+  //Create Info Btns
+  self.info_btns = ko.observableArray([]);
+  info_icons.forEach( function(icon) {
+    self.info_btns.push( new iconButton(icon) );
+  });
+  self.current_info_btn = ko.observable( info_icons[0] );
+
   self.placeArray = ko.observableArray([]);
   self.currentPlace = ko.observable( self.placeArray()[0] );
 
   self.forecast = ko.observableArray([]);
+
+  self.videos = ko.observableArray([]);
+  self.currentVideo = ko.observable();
 
 
   self.getForecast = function(trail) {
@@ -64,12 +101,27 @@ var ViewModel = function(trail) {
     }
   };
 
+  self.toggle = function(iconButton) {
+
+    $('#info-title').innerHTML = iconButton.title;
+
+    $('#'+self.current_info_btn().id).collapse('hide');
+
+    $('#'+iconButton.id).collapse('show');
+
+    self.current_info_btn(iconButton);
+
+  };
+
   self.search = function(iconButton) {
 
     //Clear previous results
     self.clearMap();
 
+    //Create bounds object for scaling map to search results
+    var bounds = new google.maps.LatLngBounds;
     var trailhead = new google.maps.LatLng(trail.lat,trail.lon);
+    
     var request = {
       keyword: iconButton.type,
       location: trailhead,
@@ -87,7 +139,11 @@ var ViewModel = function(trail) {
       }
       for (var i = 0, result; result = results[i]; i++) {
         self.placeArray().push( new Place(result) );
+        //Fit map to results
+        bounds.extend(result.geometry.location);   
       }
+      //Include trailhead in map resize
+      prep_map.fitBounds(bounds.extend(trailhead));
     }
   };
 
@@ -95,6 +151,13 @@ var ViewModel = function(trail) {
     self.currentPlace(place);
     self.currentPlace().bounce();
     self.openMenu();
+    self.distance();
+  };
+
+  self.distance = function(trail) {
+    
+    var request = 'http://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='
+      +trail.lat+','+trail.lon+'&destinations=place_id:'+self.currentPlace().id+'&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ';
   };
 
   self.clearMap = function() {
@@ -122,6 +185,8 @@ var ViewModel = function(trail) {
   self.search( self.prep_btns()[0] );
   //Query weather forecast
   self.getForecast(trail);
+  //Query Youtube
+  //self.queryYoutube(trail);
 }
 
 // Button Object ///////////////////////////////////////////
@@ -133,7 +198,7 @@ var iconButton = function(icon) {
   self.class = ko.observable(icon.class);
   self.alt = ko.observable(icon.alt);
   self.type = icon.type;
-
+  self.id = icon.id;
 }
 
 // Day Object ///////////////////////////////////////////
@@ -151,6 +216,10 @@ var Place = function(place) {
   var self = this;
 
   self.name = ko.observable(place.name);
+  self.id = ko.observable(place.place_id);
+  self.rating = ko.observable(place.rating);
+  self.address = ko.observable(place.formatted_address);
+  self.phone = ko.observable(place.formatted_phone_number);
 
   var marker = new google.maps.Marker({
       map: prep_map,
@@ -184,13 +253,59 @@ var Place = function(place) {
   };
 }
 
+// Video Object ///////////////////////////////////////////
+var Video = function(video) {
+  var self = this;
+
+  self.title = ko.observable(video.title);
+  self.url = ko.observable(video.url);
+  self.description = ko.observable(video.description);
+  self.thumbnails = ko.observable(video.thumbnails.medium);
+}
+
+//Set Elevation Chart
+function setChart(trail) {
+  google.charts.load('current', {packages: ['corechart', 'line']});
+  google.charts.setOnLoadCallback(drawBackgroundColor);
+
+  function drawBackgroundColor() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'Distance');
+      data.addColumn('number', 'Elevation');
+
+      chart_matrix = [];
+      for (var i = 0; i < trail.elevation.length-1; i++) {
+        cell = [trail.cumulative_distance[i], trail.elevation[i]];
+        chart_matrix.push(cell);
+      }
+
+      data.addRows(chart_matrix);
+
+      var options = {
+        hAxis: {
+          title: 'Distance (mi)'
+        },
+        vAxis: {
+          title: 'Elevation (ft)'
+        },
+        backgroundColor: '#ffffff',
+        legend: 'none'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('elevation'));
+      chart.draw(data, options);
+  }
+}
+
 // Set Prep Map
 function setPrepMap(trail) {
 
   var trailhead = new google.maps.LatLng(trail.lat,trail.lon);
   prep_map = new google.maps.Map(document.getElementById('prep_map'), {
     center: trailhead,
-    zoom: 15
+    zoom: 15,
+    scrollwheel: false
   });
 
   /* Add trailhead marker */
@@ -201,14 +316,15 @@ function setPrepMap(trail) {
   });
 }
 
-
 // SET TRAIL MAP
 function setTrailMap(trail) {  
 
   var trailhead = new google.maps.LatLng(trail.lat,trail.lon);
   var map = new google.maps.Map(document.getElementById('trail_map'), {
     center: trailhead,
-    zoom: 15
+    zoom: 15,
+    scrollwheel: false,
+    mapTypeID: 'terrain'
   });
 
   /* Add trailhead marker */
@@ -226,6 +342,16 @@ function setTrailMap(trail) {
       path.push(new google.maps.LatLng(coord.lat, coord.lon));
   }
 
+  //Fit map bounds to trail
+  var bounds = new google.maps.LatLngBounds;
+  for(var i=0; i < path.length; i+=25){
+    bounds.extend(path[i]); 
+  }
+  //Incude last coord point
+  bounds.extend(path[path.length-1]);
+  //Include trailhead and fit map
+  map.fitBounds(bounds.extend(trailhead));
+
   //Set Trail
   var trail = new google.maps.Polyline({
       path: path,
@@ -235,6 +361,7 @@ function setTrailMap(trail) {
       strokeOpacity: 1.0,
       strokeWeight: 3
   });
+
 }
 
 function mapError() {

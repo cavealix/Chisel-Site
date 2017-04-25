@@ -18,8 +18,10 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
 
+    <!-- JQuery -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
     <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="//apis.google.com/js/platform.js?onload=start"></script>
 
 </head>
@@ -45,18 +47,29 @@
                 <div class="collapse navbar-collapse" id="">
                   <ul class="nav navbar-nav navbar-right">
 
-                    <li><a href="/parks">Parks</a></li>
+                    <!-- <li><a href="/parks">Parks</a></li> -->
+                    
+
                     
                     <!-- only show 'map' link on other pages -->
                     {% if page != 'map' %}
+                    <li><a href="/addTreck">+Treck</a></li>
                     <li><a href="/map">Map</a></li>
                     {% else %}
                     <!-- only show 'reset' and 'filter' on map page -->
                     <li><a href="#" data-bind="click: resetMap">Reset</a></li>
+                    <!-- Filter by Park type (Area) -->
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Areas<span class="caret"></span></a>
                         <ul class="dropdown-menu" data-bind="foreach: park_types">
-                            <li><a href="#" data-bind="click: $parent.filter, text:$data"></a></li>
+                            <li><a href="#" data-bind="click: $parent.filterType, text:$data"></a></li>
+                        </ul>
+                    </li>
+                    <!-- Filter by State -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">State<span class="caret"></span></a>
+                        <ul class="dropdown-menu scrollable-menu" data-bind="foreach: states" role="menu">
+                            <li><a href="#" data-bind="click: $parent.filterState, text:$data"></a></li>
                         </ul>
                     </li>
                     {% endif %}

@@ -25,7 +25,58 @@
     </div>
     <!-- Trail Map -->
 
-    <div class="mini-section" id="forecast">
+    <!-- SnapWidget -->
+    <!-- <div class="mini-section" id="insta_feed">
+        <iframe id="snap_widget" src="http://snapwidget.com/sc/?u=Y2hpc2Vsb3V0ZG9vcnN8aW58MTUwfDN8M3x8bm98NXxub25lfG9uU3RhcnR8eWVzfG5v&ve=101215" title="Instagram Widget" class="snapwidget-widget" allowTransparency="true" frameborder="0" scrolling="no" style="border:none; overflow:hidden; width:100%; height:150px"></iframe>
+    </div> -->
+    <!-- End SnapWidget -->
+
+    <!-- Quick Info -->
+    <h2 id="info-title">Info</h2>
+    
+    <div class="mini-section">
+        <div class="canvas collapse in" id="info">
+            <div class="col-lg-4 col-md-4 col-xs-6" id="stats">
+            <ul>
+                <li>Distance: {{ trail.total_distance }}(mi)</li>
+                <li>Start Elevation: {{ trail.start_elevation }}(ft)</li>
+                <li>End Elevation: {{ trail.end_elevation }}(ft)</li>
+                <li>Elevation Change: {{ trail.total_elevation_change }}(ft)</li>
+            </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-xs-6" id="activities">
+            <ul>
+                <li>Hike</li>
+                <li>Bike</li>
+                <li>Pets</li>
+            </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-xs-6" id="cell">
+            <ul>
+                <li>AT&T: Weak</li>
+                <li>Verizon: Strong</li>
+                <li>T-Mobile: None</li>
+            </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-xs-6" id="cell">
+            <ul>
+                <li>Popularity: Low</li>
+                <li>Best Season: Fall</li>
+                <li>Requires Permit?: Yes</li>
+                <li></li>
+            </ul>
+            </div>
+        </div>
+
+        <!-- Elevation -->
+        <div class="canvas collapse" id="elevation">
+        </div>
+
+        <!-- Forecast -->
+        <div class="canvas collapse" id="forecast">
         <ul class="canvas" id="forecast-week" data-bind="foreach: forecast">
             <li class="day">
                 <img id="weather-img" src="" alt="weather forecast" data-bind="attr: {src: img}">
@@ -34,6 +85,269 @@
                 <p data-bind="text: desc"></p>
             </li>
         </ul>
+        </div>
+    </div>
+
+    <!-- Info Btns -->
+    <div class="icon_bar" id="info-btns">
+        <ul class="btns" data-bind="foreach:info_btns">
+            <li class="info-btn"><img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.toggle"></li>
+            <li>|</li>
+        </ul>
+    </div>
+
+    <!-- Guide -->
+    <!-- <h1>Loadouts</h1>
+    <div class="ms-showcase1">
+        <div class="master-slider ms-skin-light-6 round-skin" id="masterslider">
+            <div class="ms-slide loadout1">
+                        <img src="/static/masterslider/style/blank.gif" data-src="/static/imgs/loadouts/loadout1/1.jpg" alt="lorem ipsum dolor sit"/>    
+                      
+                           <h4  class="ms-layer product-title"  style="left:637px; top:270px;" 
+                            data-effect="left(100)"
+                            data-delay="0"
+                            data-ease="easeOutQuad"
+                        >ORANGE T-SHIRT</h4>
+                        
+                        <div class="ms-layer product-title slash" style="left:855px; top:270px;" 
+                            data-effect="left(20)"
+                            data-delay="100"
+                            data-ease="easeOutQuad"
+                        >/</div>
+                        <div class="ms-layer product-price" style="left:868px; top:270px;"
+                            data-effect="right(20)"
+                            data-delay="400"
+                            data-ease="easeOutQuad"
+                        >$8</div>
+                        <div class="ms-layer product-size"  style="left:637px; top:310px;"
+                            data-effect="right(20)"
+                            data-delay="600"
+                            data-ease="easeOutExpo"
+                        >Medium Size</div>
+                        <div class="ms-layer product-desc"  style="left:637px; top:335px;"
+                            data-effect="bottom(40)"
+                            data-delay="500"
+                            data-ease="easeInOutQuad"
+                        >Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincid</div>
+                        
+                        <div class="ms-layer buy-btn" style="left:637px; top:385px;"
+                            data-effect="bottom(40)"
+                            data-delay="900"
+                            data-ease="easeInOutQuad">
+                            <a href="#" title="buy">BUY</a>
+                        </div>
+                        
+                          <div class="ms-layer" style="left:418px; top:335px;"
+                            data-delay="300"
+                            data-type="hotspot"
+                            data-align="left"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:664px; top:208px;"
+                            data-delay="400"
+                            data-type="hotspot"
+                            data-align="right"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:375px; top:115px;"
+                            data-delay="500"
+                            data-type="hotspot"
+                            data-align="bottom"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+            </div>
+            <div class="ms-slide loadout2">
+                        <img src="/static/masterslider/style/blank.gif" data-src="/static/imgs/loadouts/loadout2/0,75x.jpg" alt="lorem ipsum dolor sit"/>    
+                        
+                        <h4  class="ms-layer product-title" style="left:637px; top:270px;" 
+                            data-effect="left(100)"
+                            data-delay="0"
+                            data-ease="easeOutQuad"
+                        >RED T-SHIRT</h4>
+                        
+                        <div class="ms-layer product-title slash" style="left:799px; top:270px;" 
+                            data-effect="left(20)"
+                            data-delay="100"
+                            data-ease="easeOutQuad"
+                        >/</div>
+                        <div class="ms-layer product-price" style="left:811px; top:270px;"
+                            data-effect="right(20)"
+                            data-delay="400"
+                            data-ease="easeOutQuad"
+                        >$8</div>
+                        <div class="ms-layer product-size"  style="left:637px; top:310px;"
+                            data-effect="right(20)"
+                            data-delay="600"
+                            data-ease="easeOutExpo"
+                        >Medium Size</div>
+                        <div class="ms-layer product-desc"  style="left:637px; top:335px;"
+                            data-effect="bottom(40)"
+                            data-delay="500"
+                            data-ease="easeInOutQuad"
+                        >Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincid</div>
+                        
+                        <div class="ms-layer buy-btn" style="left:637px; top:385px;"
+                            data-effect="bottom(40)"
+                            data-delay="900"
+                            data-ease="easeInOutQuad">
+                            <a href="#" title="buy">BUY</a>
+                        </div>
+                        
+                         <div class="ms-layer"  style="left:418px; top:335px;"
+                            data-delay="300"
+                            data-type="hotspot"
+                            data-align="left"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:664px; top:208px;"
+                            data-delay="400"
+                            data-type="hotspot"
+                            data-align="right"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:375px; top:115px;"
+                            data-delay="500"
+                            data-type="hotspot"
+                            data-align="bottom"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+            </div>
+            <div class="ms-slide loadout3">
+                        <img src="/static/imgs/loadouts/loadout3/0,5x.jpg" data-src="/static/masterslider/showcase1/img/5.png" alt="lorem ipsum dolor sit"/>  
+                         <h4  class="ms-layer product-title"    style="left:637px; top:270px;" 
+                            data-effect="left(100)"
+                            data-delay="0"
+                            data-ease="easeOutQuad"
+                        >BLUE T-SHIRT</h4>
+                        
+                        <div class="ms-layer product-title slash" style="left:809px; top:270px;" 
+                            data-effect="left(20)"
+                            data-delay="100"
+                            data-ease="easeOutQuad"
+                        >/</div>
+                        <div class="ms-layer product-price" style="left:822px; top:270px;"
+                            data-effect="right(20)"
+                            data-delay="400"
+                            data-ease="easeOutQuad"
+                        >$8</div>
+                        <div class="ms-layer product-size"  style="left:637px; top:310px;"
+                            data-effect="right(20)"
+                            data-delay="600"
+                            data-ease="easeOutExpo"
+                        >Medium Size</div>
+                        <div class="ms-layer product-desc"  style="left:637px; top:335px;"
+                            data-effect="bottom(40)"
+                            data-delay="500"
+                            data-ease="easeInOutQuad"
+                        >Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincid</div>
+                        
+                        <div class="ms-layer buy-btn" style="left:637px; top:385px;"
+                            data-effect="bottom(40)"
+                            data-delay="900"
+                            data-ease="easeInOutQuad">
+                            <a href="#" title="buy">BUY</a>
+                        </div>
+                        
+                         <div class="ms-layer"  style="left:418px; top:335px;"
+                            data-delay="300"
+                            data-type="hotspot"
+                            data-align="left"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:664px; top:208px;"
+                            data-delay="400"
+                            data-type="hotspot"
+                            data-align="right"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+                        
+                         <div class="ms-layer" style="left:375px; top:115px;"
+                            data-delay="500"
+                            data-type="hotspot"
+                            data-align="bottom"
+                        >
+                            <div class="product-tt"><h3>LOREM IPSUM DOLOR</h3>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.</div>
+                        </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Videos -->
+    <h1>Videos</h1>
+    <div class="section">
+
+        <div id="myCarousel" class="carousel slide canvas" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+              <li data-target="#myCarousel" data-slide-to="1"></li>
+              <li data-target="#myCarousel" data-slide-to="2"></li>
+              <li data-target="#myCarousel" data-slide-to="3"></li>
+            </ol>
+            
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner canvas" role="listbox">
+              
+              <div class="item active">
+                <iframe id="ytplayer" type="text/html" 
+                    src="https://www.youtube.com/embed/{{ videos[0]['id']['videoId'] }}?"
+                    frameborder="0">
+                </iframe>
+              </div>
+            
+              <div class="item">
+                <iframe id="ytplayer" type="text/html" 
+                    src="https://www.youtube.com/embed/{{ videos[1]['id']['videoId'] }}?"
+                    frameborder="0">
+                </iframe>
+              </div>
+            
+              <div class="item">
+                <iframe id="ytplayer" type="text/html" 
+                    src="https://www.youtube.com/embed/{{ videos[2]['id']['videoId'] }}?"
+                    frameborder="0">
+                </iframe>
+              </div>
+            
+              <div class="item">
+                <iframe id="ytplayer" type="text/html" 
+                    src="https://www.youtube.com/embed/{{ videos[3]['id']['videoId'] }}?"
+                    frameborder="0">
+                </iframe>
+              </div>
+
+              <div class="item">
+                <iframe id="ytplayer" type="text/html" 
+                    src="https://www.youtube.com/embed/{{ videos[4]['id']['videoId'] }}?"
+                    frameborder="0">
+                </iframe>
+              </div>
+
+            </div>
+
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
     </div>
 
     <!-- PREP MAP -->
@@ -48,37 +362,68 @@
             </div>
             <!-- Current Marker Info -->
             
-            <h1 data-bind="text: name"></h1>
+            <h2 data-bind="text: name"></h2>
+            <ul id="current_place">
+                <li>Rating: <span data-bind="text: rating"></span></li>
+                <li>Addres: <span data-bind="text: address"></span></li>
+                <li>Phone: <span data-bind="text: phone"></span></li>
+            </ul>
             
         </div>
 
         <!-- Prep Map -->
-        <div class="map-canvas" id="prep_map"></div>
-
+        <div class="canvas" id="prep_map"></div>
     </div>
-    <!-- Prep Map -->
 
     <!-- Prep Map Nav -->
-    <div class="slider_bar" id="prepMapnav">
+    <div class="icon_bar" id="prepMapnav">
         <ul class="btns" data-bind="foreach:prep_btns">
             <li class="services-btn"><img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search"></li>
             <li>|</li>
         </ul>
     </div>
-    <!-- End Prep Map Nav -->
 
-    <!-- Page CSS -->
-    <link rel="stylesheet" type="text/css" href="/static/css/trail.css"></link>
-    <!-- JQuery -->
-    <script src="/static/js/jquery/jquery.js"></script>
+    
+    <!-- Base MasterSlider style sheet -->
+    <link rel="stylesheet" href="/static/masterslider/style/masterslider.css" />
+        
+    <!-- Master Slider Skin -->
+    <link href="/static/masterslider/skins/light-6/style.css" rel='stylesheet' type='text/css'>
+         
+    <!-- MasterSlider Template Style -->
+    <link href='/static/masterslider/showcase1/style/ms-showcase1.css' rel='stylesheet' type='text/css'>
+        
+        
+    <!-- jQuery -->
+    <script src="/static/masterslider/jquery.min.js"></script>
+    <script src="/static/masterslider/jquery.easing.min.js"></script>
+        
+    <!-- Master Slider -->
+    <script src="/static/masterslider/masterslider.min.js"></script>
+
     <!-- Bootstrap -->
     <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.6/css/bootstrap.min.css">
     <script src="/static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+
     <!-- Knockout -->
     <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+    
     <!-- Page JS -->
-    <script src="/static/js/trail.js"></script>
     <script>var trail = JSON.parse('{{trail_json|safe}}');</script>
+    <script src="/static/js/trail.js"></script>
+     
+    <!-- Page CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/css/trail.css"></link>
+
+    <!-- Google Charts API -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Google Maps API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script>
+    <!--  1. Load the JavaScript client library. -->
+    <script></script>
+     
 
     <!-- Google Maps -->
     <script onload="main( trail )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ&libraries=places" async defer></script>

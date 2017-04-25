@@ -6,6 +6,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 38.9776681,lng: -96.847185},
       zoom: 4
+
     });
 
     VM = new ViewModel();
@@ -24,7 +25,7 @@ var Trail = function(data, park_id) {
     self.name = ko.observable(data.name);
     self.lon = ko.observable(data.lon);
     self.lat = ko.observable(data.lat);
-    self.bound = new google.maps.LatLng(data.lat, data.lon);
+    self.bound = ko.observable(new google.maps.LatLng(data.lat, data.lon));
 
     var marker = new google.maps.Marker({
         position: {lat: data.lat, lng: data.lon},
@@ -117,19 +118,20 @@ var Park = function(data) {
     self.position = ko.observable(data.position);
     self.lat = ko.observable(data.lat);
     self.activities = ko.observableArray(data.activities);
+    self.state = data.state;
 
     var markerUrl;
     switch (data.type ) {
-        case 'state':
+        case 'State Park':
             markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
             break;
-        case 'natl':
+        case 'Nat\'l Park':
             markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png';
             break;
-        case 'blm':
+        case 'BLM':
             markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
             break;
-        case 'city':
+        case 'City Park':
             markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
     }
 
@@ -145,9 +147,7 @@ var Park = function(data) {
 
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() { 
-        VM.clearTrails();
         VM.switchPlace(self);
-        VM.listTrails(self);
     });
 
     //Current Weather
@@ -200,7 +200,9 @@ var ViewModel = function() {
     self.trailList = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
     self.currentPlace = ko.observable();
-    self.park_types = ['Natl Park', 'State Park', 'BLM', 'Natl Forrest'];
+    self.park_types = ['Nat\'l Park', 'State Park', 'BLM', 'Nat\'l Forrest', 'City Park'];
+    self.states = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MI","MA","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+    //self.activities = ['Hike', 'Bike', 'Camp', 'Pets', 'Climb', 'Swim', 'Offroad', 'Ski', 'Sail'];
 
     //Query parks in DB
     $.getJSON( "http://localhost:8080/parksJSON", {
@@ -227,6 +229,11 @@ var ViewModel = function() {
         //self.bounds();
         place.center();
         place.bounce();
+        if (place.type != 'Trail') {
+            self.clearTrails();
+            self.listTrails(place);
+            self.bounds();
+        }
     };
 
     this.zoom = function() {
@@ -234,11 +241,11 @@ var ViewModel = function() {
     };
 
     self.bounds = function() {
-        var bounds = new google.maps.LatLngBounds();
+        var bounds = new google.maps.LatLngBounds;
         for (var i = 0; i < self.trailList().length; i++) {
             bounds.extend(self.trailList()[i].bound);
         }
-        map.fitBounds(bounds);
+        map.fitBounds(bounds.extend(self.currentPlace().position));
     };
 
     this.listTrails = function(park) {
@@ -262,13 +269,28 @@ var ViewModel = function() {
     };
 
     //User selects filter, display relevant parks
-    this.filter = function(activity) {
+    this.filterType = function(park_type) {
         self.clearMap();
         //clear previous filter results
         self.filteredList([]);
         //setTimeout(self.setMarkers, 1000);
         for (var i = 0; i < self.parkList().length; i++) {
-            if ( self.parkList()[i].activities.indexOf(activity) != -1 ){
+            if ( self.parkList()[i].type == park_type ){
+                self.filteredList.push( self.parkList()[i] );
+            }
+        }
+        
+        self.setMarkers( self.filteredList() );
+    };
+
+    //User selects filter, display relevant State and results
+    this.filterState = function(state) {
+        self.clearMap();
+        //clear previous filter results
+        self.filteredList([]);
+        //setTimeout(self.setMarkers, 1000);
+        for (var i = 0; i < self.parkList().length; i++) {
+            if ( self.parkList()[i].state == state ){
                 self.filteredList.push( self.parkList()[i] );
             }
         }

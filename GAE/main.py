@@ -2,16 +2,38 @@ import logging, json, urllib
 
 # Flask
 from flask import Flask, render_template, url_for, request, \
-    redirect, flash, jsonify
+    redirect, flash, jsonify, make_response
 
 # 3rd Party Modules
 from modules.gpxjson import gpxToJson
+from modules.getElevate import getElevate
+from modules.haversine import haversine
+from modules.youtubeLocationSearch import youtube_search
 
 # import the db library from GAE
 from google.appengine.ext import db
-from DBclasses import Park, Trail
+from DBclasses import Park, Trail, User
+
+import googlemaps
+from googlemaps import elevation
+gmaps = googlemaps.Client(key='AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI')
+
+from classes.youtube import locationSearchOptions
+
+# Oauth/Security
+#from security.oauth2client.client import flow_from_clientsecrets
+#from security.oauth2client.client import FlowExchangeError
+#import httplib2, requests, random, string
+#from security import cookies
+#from security import fboauth
+#from security import goauth
 
 app = Flask(__name__)
+
+#Login -------------------------------------------------
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 #API -------------------------------------------------
 @app.route('/parksJSON')
@@ -34,6 +56,21 @@ def parkAPI(park_id):
 def trailAPI(trail_id):
     trail = Trail.get_by_id(trail_id)
     return jsonify(Trail=trail.serialize)
+
+#Add Video
+@app.route('/addVideo/<int:park_id>/<int:trail_id>', methods = ['Post'])
+def addVideo(park_id, trail_id):
+    url = request.form['url']
+    if trail_id == None:
+        park = Park.get_by_id(park_id)
+        park.videos.append(db.Link(url))
+        park.put()
+        return redirect( url_for('park', park_id = park.key().id() ))
+    else:
+        trail = Trail.get_by_id(trail_id)
+        trail.videos.append(db.Link(url))
+        trail.put()
+        return redirect( url_for( 'trail', park_id=trail.park_id, trail_id=trail.key().id() ))
 
 
 #Home -------------------------------------------------
@@ -121,8 +158,15 @@ def deletePark(park_id):
 def trail(park_id, trail_id):
     park = Park.get_by_id(park_id)
     trail = Trail.get_by_id(trail_id)
+
+    #q = search terms, ex. 'sailing|boating -fishing', | = or, - = not, | must be escaped as %7C
+    options = locationSearchOptions('', 5, trail.position, '1mi')
+
+    videos = youtube_search(options)
+    #print videos, len(videos)
+
     trail_json = json.dumps(trail.serialize)
-    return render_template('trail.html', park=park, trail=trail, trail_json=trail_json)
+    return render_template('trail.html', park=park, trail=trail, trail_json=trail_json, videos=videos)
 
 #Add Trail
 @app.route('/parks/<int:park_id>/addTrail', methods=['Get', 'Post'])
@@ -142,6 +186,49 @@ def addTrail(park_id):
     else:
         park = Park.get_by_id(park_id)
         return render_template('addTrail.html', park=park)
+
+#Add Treck
+@app.route('/addTreck', methods=['Get', 'Post'])
+def addTreck():
+    #Post
+    if request.method == 'POST':
+        gpx = gpxToJson(request.files['gpx'])
+        coords =  gpx['coords']
+        elevation = gpx['elevation']
+        cumulative_distance = [0.0]
+        total_distance = 0
+        for i in range(1,len(coords)-1):
+            leg = haversine(coords[i].lon, coords[i].lat, coords[i+1].lon, coords[i+1].lat)
+            cumulative_distance.append(total_distance + leg)
+            total_distance = total_distance + leg
+        #Ensure cumulative distance list same length as coords
+        cumulative_distance.append(total_distance)
+        park_id=int(request.form['park_id'])
+
+        total_elevation_change = 0
+        for i in range(0,len(elevation)-1):
+            leg = abs(elevation[i]-abs(elevation[i+1]))
+            total_elevation_change = total_elevation_change + leg
+
+        newTrail = Trail(
+            name=request.form['name'], 
+            park_id=park_id,
+            position=coords[0],
+            coords= coords,
+            elevation=elevation,
+            cumulative_distance = cumulative_distance,
+            total_distance = round(total_distance, 2),
+            total_elevation_change = total_elevation_change,
+            start_elevation = elevation[0],
+            end_elevation = elevation[len(elevation)-1]
+        )
+
+        newTrail.put()
+        return redirect( url_for('park', park_id=park_id) )
+    #Get
+    else:
+        parks = db.GqlQuery("select * from Park")
+        return render_template('addTreck.html', parks=parks)
 
 #Edit Trail
 @app.route('/parks/<int:park_id>/<int:trail_id>/edit', methods=['Get', 'Post'])
@@ -173,7 +260,6 @@ def deleteTrail(park_id, trail_id):
         park = Park.get_by_id(park_id)
         trail = Trail.get_by_id(trail_id)
         return render_template('deleteTrail.html', park=park, trail=trail)
-
 
 @app.errorhandler(500)
 def server_error(e):

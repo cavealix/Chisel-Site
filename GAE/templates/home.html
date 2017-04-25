@@ -1,8 +1,25 @@
 {% extends "header.html" %}
 
 {% block content %}
+    
 
-    <H1>Chisel Outdoors</H1>
+    <div class="section">
+
+      <div class="canvas"></div>
+
+      <div id="welcome">
+        <H1>Chisel Outdoors</H1>
+        <h2>See It, Go There</h2>
+      </div>
+        
+      <video playsinline autoplay muted loop poster="/static/imgs/Chisel.jpg" id="bgvid">
+        <source src="/static/video/spark_video.mp4" type="video/mp4">
+      </video>
+
+    </div>
+    
+
+    
 
   <!-- Welcome container 
 
@@ -19,5 +36,6 @@
   </div>
 
   End Welcome container -->
+<link rel="stylesheet" type="text/css" href="/static/css/home.css">
 
 {% endblock %}
