@@ -12,10 +12,10 @@ from modules.youtubeLocationSearch import youtube_search
 
 # import the db library from GAE
 from google.appengine.ext import db
-from DBclasses import Park, Trail, User
+from DBclasses import Place, Trail, User
 
 import googlemaps
-from googlemaps import elevation
+from googlemaps import elevation, places
 gmaps = googlemaps.Client(key='AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI')
 
 from classes.youtube import locationSearchOptions
@@ -84,9 +84,16 @@ def parks():
     parks = db.GqlQuery("select * from Park")
     return render_template('parks.html', parks=parks)
 
-@app.route('/map', methods=['Get'])
+@app.route('/map', methods=['Get', 'Post'])
 def map():
-    return render_template('map.html', page='map')
+    if request.method == 'POST':
+        #parse url to get video id
+        url = str(request.form['url'])
+        video_id = url.split('watch?v=')[1]
+        video_id = video_id.split('&')[0]
+        return render_template('map.html', page='map', video_id=video_id)
+    else:
+        return render_template('map.html', page='map', url=None)
 
 
 #Park Page-------------------------------------------------
@@ -192,9 +199,55 @@ def addTrail(park_id):
 def addTreck():
     #Post
     if request.method == 'POST':
+
+        #Place Info
+        place = json.loads(request.form['place'])
+        place_id = place['place_id']
+
+        print place
+
+        for x in place['address_components']:
+            if 'administrative_area_level_1' in x['types']:
+                state = x['long_name']
+                abr_state = x['short_name']
+                print state
+
+            if 'country' in x['types']:
+                country = x['long_name']
+                abr_country = x['short_name']
+                print country
+
+        if 'National Park' in place['name']:
+            place_type = 'National Park'
+        elif 'State Park' in place['name']:
+            place_type = 'State Park'
+        elif 'National Forrest' in place['name']:
+            place_type = 'National Forrest'
+        elif 'Reserve' or 'Reservation' in place['name']:
+            place_type = 'Reservation'
+        else:
+            place_type = place['types'][0]
+
+        newPlace = Place(
+            name = place['name'],
+            place_id = place['place_id'],
+            location = place['geometry']['location'],
+            place_type = place_type,
+            place_tags = place['types'],
+            state = state,
+            abr_state = abr_state,
+            country = country,
+            abr_country = abr_country
+            )
+        print newPlace
+        newPlace.put()
+
+
+        #Trail info
         gpx = gpxToJson(request.files['gpx'])
         coords =  gpx['coords']
         elevation = gpx['elevation']
+        activities = request.form.getlist('activity')
         cumulative_distance = [0.0]
         total_distance = 0
         for i in range(1,len(coords)-1):
@@ -203,13 +256,12 @@ def addTreck():
             total_distance = total_distance + leg
         #Ensure cumulative distance list same length as coords
         cumulative_distance.append(total_distance)
-        park_id=int(request.form['park_id'])
-
         total_elevation_change = 0
         for i in range(0,len(elevation)-1):
             leg = abs(elevation[i]-abs(elevation[i+1]))
             total_elevation_change = total_elevation_change + leg
 
+        #Save Treck
         newTrail = Trail(
             name=request.form['name'], 
             park_id=park_id,
@@ -220,15 +272,17 @@ def addTreck():
             total_distance = round(total_distance, 2),
             total_elevation_change = total_elevation_change,
             start_elevation = elevation[0],
-            end_elevation = elevation[len(elevation)-1]
+            end_elevation = elevation[len(elevation)-1],
+            activities = activities
         )
-
         newTrail.put()
-        return redirect( url_for('park', park_id=park_id) )
+
+        
+
+        return redirect( url_for('map') )
     #Get
     else:
-        parks = db.GqlQuery("select * from Park")
-        return render_template('addTreck.html', parks=parks)
+        return render_template('addTreck.html')
 
 #Edit Trail
 @app.route('/parks/<int:park_id>/<int:trail_id>/edit', methods=['Get', 'Post'])

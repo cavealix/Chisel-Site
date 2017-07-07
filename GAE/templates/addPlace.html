@@ -1,0 +1,21 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+    <div class="section" id="map"></div>
+
+    <input class="btn btn-success" type="submit" id="submit" value="Add Place"></input>
+
+    <!-- Page CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/css/addPlace.css">
+
+    <!-- Knockout -->
+    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+
+    <!-- JS -->
+    <script src="/static/js/addPlace.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ&libraries=places&callback=initAutocomplete"
+         async defer></script>
+  
+  {% endblock %}

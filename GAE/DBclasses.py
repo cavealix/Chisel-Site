@@ -10,13 +10,19 @@ class User(db.Model):
     pw = db.StringProperty()
 
 
+
 #Create Park DB
-class Park(db.Model):
+class Place(db.Model):
     name = db.StringProperty(required = True)
-    lat = db.FloatProperty()
-    lon = db.FloatProperty()
-    type = db.StringProperty()
+    place_id = db.StringProperty()
+    location = db.GeoPtProperty()
+    place_type = db.StringProperty()
+    place_tags = db.StringListProperty()
+    fid = db.StringProperty()
     state = db.StringProperty()
+    abr_state = db.StringProperty()
+    country = db.StringProperty()
+    abr_country = db.StringProperty()
     pois = db.StringListProperty()
 
     @property 
@@ -25,10 +31,12 @@ class Park(db.Model):
         return {
             'id' : self.key().id(),
             'name' : self.name,
-            'lat' : self.lat,
-            'lon' : self.lon,
+            'lat' : self.location.lat,
+            'lon' : self.location.lng,
             'type': self.type,
-            'state': self.state
+            'state': self.state,
+            'abr_state': self.abr_state,
+            'country': self.country
         }
 
 
@@ -44,6 +52,7 @@ class Trail(db.Model):
     total_elevation_change = db.FloatProperty()
     start_elevation = db.FloatProperty()
     end_elevation = db.FloatProperty()
+    activities = db.StringListProperty()
 
     @property 
     def serialize(self):

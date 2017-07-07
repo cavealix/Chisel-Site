@@ -37,8 +37,34 @@
   padding-top: 10px;
 }
 
-.weather {
+/* Weather */
+#forecast-week {
+}
+.day {
+  display: inline-block;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+/* Icon Bar */
+.icon_bar {
+    width: 100%;
+    font-size: 1.25em;
+    margin-bottom: 20px;
+}
+.icon_bar ul {
     text-align: center;
+    font-family: Raleway, 400;
+}
+.icon_bar ul li {
+    padding: 0.5em 1em;
+    display: inline-block;
+    text-align: center;
+}
+.icon_bar img {
+    max-height: 25px;
+    max-width: 25px;
 }
 
 .list ul{

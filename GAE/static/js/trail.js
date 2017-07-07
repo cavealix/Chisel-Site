@@ -1,4 +1,5 @@
 var prep_map, videos;
+var instagram_access_token = '2319371178.64ffe15.33ea64b338fc491f845c21810178e9f1';
 var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
   "title": "Food", "alt": "food-btn", "type": "restaurant"},
@@ -77,6 +78,30 @@ var ViewModel = function(trail) {
   self.videos = ko.observableArray([]);
   self.currentVideo = ko.observable();
 
+  self.queryInsta = function(trail) {
+    
+    //dummy data for testing
+    trail = {'lat': 29.5590826, 'lng': -98.6743756};
+    //url = 'https://api.instagram.com/v1/users/2319371178/media/recent?access_token=2319371178.64ffe15.33ea64b338fc491f845c21810178e9f1';
+    var userid = '2319371178';
+    var token = '2319371178.64ffe15.33ea64b338fc491f845c21810178e9f1';
+
+    $.ajax({
+      url: 'https://api.instagram.com/v1/media/search?lat='+trail.lat+'&lng='+trail.lng, // or /users/self/media/recent for Sandbox
+      dataType: 'jsonp',
+      type: 'GET',
+      data: {access_token: instagram_access_token},
+      success: function(data){
+        console.log(data);
+        for( x in data.data ){
+
+        }
+      },
+      error: function(data){
+        console.log(data); // send the error notifications to console
+      }
+    });
+  };
 
   self.getForecast = function(trail) {
 
@@ -110,7 +135,6 @@ var ViewModel = function(trail) {
     $('#'+iconButton.id).collapse('show');
 
     self.current_info_btn(iconButton);
-
   };
 
   self.search = function(iconButton) {
@@ -185,6 +209,7 @@ var ViewModel = function(trail) {
   self.search( self.prep_btns()[0] );
   //Query weather forecast
   self.getForecast(trail);
+  self.queryInsta(trail);
   //Query Youtube
   //self.queryYoutube(trail);
 }
@@ -263,6 +288,20 @@ var Video = function(video) {
   self.thumbnails = ko.observable(video.thumbnails.medium);
 }
 
+// Instagram Photo Object /////////////////////////////////
+var Video = function(pic) {
+  var self = this;
+
+  self.type = pic.type;
+  self.tags = pic.tags;
+  self.caption = pic.caption;
+  self.username = pic.user.username;
+  self.profile_picture = pic.user.profile_picture;
+  self.thumbnail = pic.images.thumbnail.url;
+  self.low_res_pic = pic.images.low_resolution.url;
+  self.std_res_pic = pic.images.standard_resolution.url;
+}
+
 //Set Elevation Chart
 function setChart(trail) {
   google.charts.load('current', {packages: ['corechart', 'line']});
@@ -324,7 +363,7 @@ function setTrailMap(trail) {
     center: trailhead,
     zoom: 15,
     scrollwheel: false,
-    mapTypeID: 'terrain'
+    mapTypeId: 'terrain'
   });
 
   /* Add trailhead marker */
