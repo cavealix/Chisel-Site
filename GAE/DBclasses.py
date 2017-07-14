@@ -42,7 +42,7 @@ class Place(db.Model):
 
 class Trail(db.Model):
     name = db.StringProperty(required = True)
-    park_id = db.IntegerProperty(required = True)
+    park_id = db.StringProperty(required = True)
     park_key = db.Key()
     position = db.GeoPtProperty()
     coords = db.ListProperty(db.GeoPt)

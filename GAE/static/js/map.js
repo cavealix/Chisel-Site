@@ -16,7 +16,9 @@ var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_change_history_black_36dp/web/ic_change_history_black_36dp_2x.png",
   "title": "Camp", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
-  "title": "Hospital", "alt": "hospital-btn", "type": "hospital"}];
+  "title": "Hospital", "alt": "hospital-btn", "type": "hospital"},
+  {"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
+  "title": "Photos", "alt": "photos-btn", "type": "photos"}];
 var info_icons = [
   {"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
   "title": "Info", "alt": "info-icon", "id": "info"},
@@ -267,7 +269,7 @@ var ViewModel = function() {
             var parts = url.split('/');
             //console.log(parts);
             var photo_id = parts[parts.length-1];
-            console.log(photo_id);
+            //console.log(photo_id);
 
             self.flickrSearch(photo_id);
         }
@@ -276,7 +278,7 @@ var ViewModel = function() {
     self.flickrSearch = function(photo_id){
         
         var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation&api_key=3affae96f735ec3e200682d77d67eadb&photo_id='+photo_id;
-        console.log(url);
+        //console.log(url);
         
         $.getJSON( url, {
           format: "json"
@@ -303,6 +305,8 @@ var ViewModel = function() {
                 self.show('prep-icons');
                 self.show('forecast');
 
+                //find nearby trails
+                self.findTrails(self.currentContent().position);
             }
             else{
                 alert('AJAX flickrSearch request failed');
@@ -318,7 +322,7 @@ var ViewModel = function() {
           format: "json"
         })
         .done(function( data ) {
-            console.log(data);
+            //console.log(data);
             //place marker
             self.youtubeMarker(data.items[0]);
         })
@@ -342,10 +346,31 @@ var ViewModel = function() {
             self.getForecast(location);
             self.show('prep-icons');
             self.show('forecast');
+
+            //find nearby trails
+            self.findTrails(self.currentContent().position);
         }
         else {
             alert('Content is not geo-tagged');
         }   
+    };
+
+    self.findTrails = function(position) {
+        $.ajax({
+            url: 'https://trailapi-trailapi.p.mashape.com/', // The URL to the API. You can get this in the API page of the API you intend to consume
+            type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
+            data: {
+                lat: location.lat,
+                limit:15,
+                lon: location.lng
+            }, // Additional parameters here
+            dataType: 'json',
+            success: function(data) { console.log((data)); },
+            error: function(err) { alert(err); },
+            beforeSend: function(xhr) {
+            xhr.setRequestHeader("X-Mashape-Authorization", "50DlSbXy5Pmsh3OljMdfWI6ApsNHp1DQYKEjsnf77ATvEBikmb"); // Enter here your Mashape key
+            }
+        });
     };
 
     self.getForecast = function(location) {
@@ -373,35 +398,42 @@ var ViewModel = function() {
 
     self.search = function(iconButton) {
 
-      //Clear previous results
-      self.clearSearchResults();
+        //if photo btn, query Flickr
+        if (iconButton.type == 'photos'){
 
-      //Create bounds object for scaling map to search results
-      var bounds = new google.maps.LatLngBounds;
-      
-      var request = {
-        keyword: iconButton.type,
-        location: self.currentContent().position,
-        radius: 25000
-      };
+        } 
+        //else search Google places
+        else{
+            //Clear previous results
+            self.clearSearchResults();
 
-      //Perform Nearby Search
-      service = new google.maps.places.PlacesService(map);
-      service.nearbySearch(request, callback);
+            //Create bounds object for scaling map to search results
+            var bounds = new google.maps.LatLngBounds;
       
-      function callback(results, status) {
-        if (status !== google.maps.places.PlacesServiceStatus.OK) {
-          console.error(status);
-          return;
+            var request = {
+              keyword: iconButton.type,
+              location: self.currentContent().position,
+              radius: 25000
+            };
+
+            //Perform Nearby Search
+            service = new google.maps.places.PlacesService(map);
+            service.nearbySearch(request, callback);
+      
+            function callback(results, status) {
+              if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                console.error(status);
+                return;
+              }
+              for (var i = 0, result; result = results[i]; i++) {
+                self.placeArray().push( new Place(result) );
+                //Fit map to results
+                bounds.extend(result.geometry.location);   
+              }
+              //Include trailhead in map resize
+              map.fitBounds(bounds.extend(self.currentContent().position));
+            }
         }
-        for (var i = 0, result; result = results[i]; i++) {
-          self.placeArray().push( new Place(result) );
-          //Fit map to results
-          bounds.extend(result.geometry.location);   
-        }
-        //Include trailhead in map resize
-        map.fitBounds(bounds.extend(self.currentContent().position));
-      }
     };
 
     self.clearSearchResults = function() {
@@ -463,7 +495,7 @@ var ViewModel = function() {
         self.openMenu();
         //self.zoom();
         //self.bounds();
-        place.center();
+        //place.center();
         place.bounce();
         if (place.type != 'Trail') {
             self.clearTrails();

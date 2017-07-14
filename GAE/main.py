@@ -204,7 +204,7 @@ def addTreck():
         place = json.loads(request.form['place'])
         place_id = place['place_id']
 
-        print place
+        #print place
 
         for x in place['address_components']:
             if 'administrative_area_level_1' in x['types']:
@@ -228,10 +228,13 @@ def addTreck():
         else:
             place_type = place['types'][0]
 
+        location = place['geometry']['location']
+        location = db.GeoPt(float(location['lat']), float(location['lng']))
+
         newPlace = Place(
             name = place['name'],
             place_id = place['place_id'],
-            location = place['geometry']['location'],
+            location = location,
             place_type = place_type,
             place_tags = place['types'],
             state = state,
@@ -264,7 +267,7 @@ def addTreck():
         #Save Treck
         newTrail = Trail(
             name=request.form['name'], 
-            park_id=park_id,
+            park_id=place['id'],
             position=coords[0],
             coords= coords,
             elevation=elevation,

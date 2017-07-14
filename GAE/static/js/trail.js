@@ -288,20 +288,6 @@ var Video = function(video) {
   self.thumbnails = ko.observable(video.thumbnails.medium);
 }
 
-// Instagram Photo Object /////////////////////////////////
-var Video = function(pic) {
-  var self = this;
-
-  self.type = pic.type;
-  self.tags = pic.tags;
-  self.caption = pic.caption;
-  self.username = pic.user.username;
-  self.profile_picture = pic.user.profile_picture;
-  self.thumbnail = pic.images.thumbnail.url;
-  self.low_res_pic = pic.images.low_resolution.url;
-  self.std_res_pic = pic.images.standard_resolution.url;
-}
-
 //Set Elevation Chart
 function setChart(trail) {
   google.charts.load('current', {packages: ['corechart', 'line']});

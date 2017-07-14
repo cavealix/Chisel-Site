@@ -57,8 +57,8 @@ function initAutocomplete() {
     document.getElementById('place').value = JSON.stringify(places[0]);
 
     //Get Instagram place id
-    var fid = instaLocationSearch(places[0]);
-    document.getElementById('fid').value = fid;
+    //var fid = instaLocationSearch(places[0]);
+    //document.getElementById('fid').value = fid;
 
     // Clear out the old markers.
     markers.forEach(function(marker) {
