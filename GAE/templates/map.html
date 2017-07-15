@@ -5,6 +5,9 @@
   <div class="mini-section" id="search-bar">
     <input type="text" id="url" placeholder="YouTube Video URL">
     <input class="btn btn-success" type="submit" id="search_submit" value="Go There!"></input>
+
+    <input type="text" id="park_id" placeholder="Park ID">
+    <input class="btn btn-success" type="submit" id="submit_park_id" value="Find park!"></input>
   </div>
 
   <!-- Map Section -->
@@ -27,7 +30,8 @@
       </div>
 
       <!-- Map -->
-      <div class="section">
+      <div class="section" id="map_container">
+        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
         <div class="canvas" id="map"></div>
       </div>
   </div>
@@ -38,6 +42,47 @@
           <li class="info-btn"><img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search"></li>
           <li>|</li>
       </ul>
+  </div>
+
+  <!-- Trail Info -->
+  <div class="mini-section collapse" id="trail-info" data-bind="with: currentTrail">
+    <div class="col-lg-4 col-md-4 col-xs-6" id="stats">
+      <ul>
+        <li>Distance:  <span data-bind="text: total_distance"></span>(mi)</li>
+        <li>Start Elevation: <span data-bind="text: start_elevation"></span>(ft)</li>
+        <li>End Elevation: <span data-bind="text: end_elevation"></span>(ft)</li>
+        <li>Elevation Change: <span data-bind="text: total_elevation_change"></span>(ft)</li>
+      </ul>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-xs-6" id="activities">
+      <ul data-bind="foreach: activities">
+          <li><span data-bind"text: $data"></span></li>
+      </ul>
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-xs-6" id="cell">
+      <ul>
+          <li>AT&T: Weak</li>
+          <li>Verizon: Strong</li>
+          <li>T-Mobile: None</li>
+      </ul>
+    </div>
+
+    <div class="col-lg-3 col-md-3 col-xs-6" id="cell">
+      <ul>
+          <li>Popularity: Low</li>
+          <li>Best Season: Fall</li>
+          <li>Requires Permit?: Yes</li>
+          <li></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Elevation -->
+  <div class="mini-section collapse" id="elevation">
+    <!-- <div class="canvas " id="elevation">
+    </div> -->
   </div>
 
   <!-- Forecast -->

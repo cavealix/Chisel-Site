@@ -43,13 +43,16 @@ def parksJSON():
     return jsonify(Parks=[p.serialize for p in parks])
 
 #Park API 
-@app.route('/parkAPI/<int:park_id>')
-def parkAPI(park_id):
-    park = Park.get_by_id(park_id)
+@app.route('/parkAPI/<place_id>')
+def parkAPI(place_id):
+    place = Place.gql('WHERE place_id = :place_id', place_id=place_id).get() #Park.get_by_id(park_id)
     trails = Trail.gql(
-            "where park_id = :park_id",
-            park_id=park_id).fetch(limit=None)
-    return jsonify(Park=park.serialize, Trails=[t.serialize for t in trails])
+            "where place_id = :place_id",
+            place_id=place_id).fetch(limit=None)
+    logging.info(place)
+    logging.info(trails)
+    logging.info('HI')
+    return jsonify(Place=place.serialize, Trails=[t.serialize for t in trails])
 
 #Trail API
 @app.route('/trailAPI/<int:trail_id>')
@@ -99,7 +102,7 @@ def map():
 #Park Page-------------------------------------------------
 @app.route('/parks/<int:park_id>/', methods=['Get'])
 def park(park_id):
-    park = Park.get_by_id(park_id)
+    park = Place.get_by_id(park_id)
     trails = Trail.gql("where park_id = :park_id", park_id=park_id).fetch(limit=None)
     return render_template('park.html', park=park, trails=trails)
 
@@ -204,46 +207,49 @@ def addTreck():
         place = json.loads(request.form['place'])
         place_id = place['place_id']
 
-        #print place
+        #Check if place in DB
+        place_search = Place.gql('WHERE place_id = :place_id', place_id=place_id).get()
+        #Add place to DB if not found
+        if (place_search == None):
 
-        for x in place['address_components']:
-            if 'administrative_area_level_1' in x['types']:
-                state = x['long_name']
-                abr_state = x['short_name']
-                print state
+            for x in place['address_components']:
+                if 'administrative_area_level_1' in x['types']:
+                    state = x['long_name']
+                    abr_state = x['short_name']
+                    print state
 
-            if 'country' in x['types']:
-                country = x['long_name']
-                abr_country = x['short_name']
-                print country
+                if 'country' in x['types']:
+                    country = x['long_name']
+                    abr_country = x['short_name']
+                    print country
 
-        if 'National Park' in place['name']:
-            place_type = 'National Park'
-        elif 'State Park' in place['name']:
-            place_type = 'State Park'
-        elif 'National Forrest' in place['name']:
-            place_type = 'National Forrest'
-        elif 'Reserve' or 'Reservation' in place['name']:
-            place_type = 'Reservation'
-        else:
-            place_type = place['types'][0]
+                if 'National Park' in place['name']:
+                    place_type = 'National Park'
+                elif 'State Park' in place['name']:
+                    place_type = 'State Park'
+                elif 'National Forrest' in place['name']:
+                    place_type = 'National Forrest'
+                elif 'Reserve' or 'Reservation' in place['name']:
+                    place_type = 'Reservation'
+                else:
+                    place_type = place['types'][0]
 
-        location = place['geometry']['location']
-        location = db.GeoPt(float(location['lat']), float(location['lng']))
+            location = place['geometry']['location']
+            location = db.GeoPt(float(location['lat']), float(location['lng']))
 
-        newPlace = Place(
-            name = place['name'],
-            place_id = place['place_id'],
-            location = location,
-            place_type = place_type,
-            place_tags = place['types'],
-            state = state,
-            abr_state = abr_state,
-            country = country,
-            abr_country = abr_country
-            )
-        print newPlace
-        newPlace.put()
+            newPlace = Place(
+                name = place['name'],
+                place_id = place['place_id'],
+                location = location,
+                place_type = place_type,
+                place_tags = place['types'],
+                state = state,
+                abr_state = abr_state,
+                country = country,
+                abr_country = abr_country
+                )
+            print newPlace
+            newPlace.put()
 
 
         #Trail info
@@ -267,7 +273,7 @@ def addTreck():
         #Save Treck
         newTrail = Trail(
             name=request.form['name'], 
-            park_id=place['id'],
+            place_id=place_id,
             position=coords[0],
             coords= coords,
             elevation=elevation,
@@ -279,8 +285,6 @@ def addTreck():
             activities = activities
         )
         newTrail.put()
-
-        
 
         return redirect( url_for('map') )
     #Get

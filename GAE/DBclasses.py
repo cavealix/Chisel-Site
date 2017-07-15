@@ -10,7 +10,6 @@ class User(db.Model):
     pw = db.StringProperty()
 
 
-
 #Create Park DB
 class Place(db.Model):
     name = db.StringProperty(required = True)
@@ -31,9 +30,9 @@ class Place(db.Model):
         return {
             'id' : self.key().id(),
             'name' : self.name,
+            'place_id' : self.place_id,
             'lat' : self.location.lat,
-            'lon' : self.location.lng,
-            'type': self.type,
+            'lon' : self.location.lon,
             'state': self.state,
             'abr_state': self.abr_state,
             'country': self.country
@@ -42,7 +41,7 @@ class Place(db.Model):
 
 class Trail(db.Model):
     name = db.StringProperty(required = True)
-    park_id = db.StringProperty(required = True)
+    place_id = db.StringProperty()
     park_key = db.Key()
     position = db.GeoPtProperty()
     coords = db.ListProperty(db.GeoPt)
@@ -64,8 +63,10 @@ class Trail(db.Model):
 
         return {
             'id' : self.key().id(),
-            'park_id' : self.park_id,
             'name' : self.name,
+            'type' : 'Trail',
+            'place_id' : self.place_id,
+            
             'lat' : self.position.lat,
             'lon' : self.position.lon,
             'coords' : path,
@@ -74,6 +75,6 @@ class Trail(db.Model):
             'elevation' : self.elevation,
             'total_elevation_change' : self.total_elevation_change,
             'start_elevation' : self.start_elevation,
-            'end_elevation' : self.end_elevation
-            
+            'end_elevation' : self.end_elevation,
+            'activities' : self.activities
         }
