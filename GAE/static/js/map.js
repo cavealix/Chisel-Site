@@ -51,6 +51,8 @@ var ViewModel = function() {
     self.currentContent = ko.observable();
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
+    //Position for forecast and place search queries for content/trails/parks
+    self.currentPosition = ko.observable();
 
     self.placeArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
@@ -122,20 +124,26 @@ var ViewModel = function() {
                 data = data.replace(')','');
                 data = JSON.parse(data);
 
-                var location = data.photo.location;
-                var position = {lat: parseFloat(location.latitude), lng: parseFloat(location.longitude)}; 
+                if (data.photo.location != null) {
+                    var location = data.photo.location;
+                    var position = {lat: parseFloat(location.latitude), lng: parseFloat(location.longitude)}; 
 
-                self.currentContent(new Content(position, 'photo'));
-                self.centerMap(self.currentContent().position);
-                self.zoom();
+                    //Set as new position for weather/place queries
+                    self.currentPosition( position );
+                    self.getForecast();
+                    self.show('prep-icons');
 
-                //search for tour companies
-                self.getForecast(location);
-                self.show('prep-icons');
-                self.show('forecast');
+                    self.currentContent(new Content(position, 'photo'));
+                    self.centerMap(self.currentContent().position);
+                    self.zoom();
 
-                //find nearby trails
-                self.findTrails(self.currentContent().position);
+                    //find nearby trails
+                    self.findTrails(self.currentContent().position);
+                }
+                else {
+                    alert('Content is not geo-tagged');
+                    //(Find by tags, name, etc)
+                }
             }
             else{
                 alert('AJAX flickrSearch request failed');
@@ -152,47 +160,45 @@ var ViewModel = function() {
           format: "json"
         })
         .done(function( data ) {
-            //console.log(data);
-            //place marker
-            self.youtubeMarker(data.items[0]);
+            var video = data.items[0];
+
+            if (video.recordingDetails != null){
+                //set location
+                var location = video.recordingDetails.location;
+                var position = {lat: location.latitude, lng: location.longitude}
+                var title = video.snippet.title;
+
+                //Set as new position for weather/place queries
+                self.currentPosition( position );
+                self.getForecast();
+                self.show('prep-icons');
+
+                self.currentContent(new Content(position, title));
+                self.centerMap(self.currentContent().position);
+                self.zoom();
+            }
+            else {
+                alert('Content is not geo-tagged');
+                //(Find by tags, name, etc)
+            }
+
         })
         .error( function() {
             alert('AJAX youtubeSearch request failed');
         });
     };
 
-    //Place marker and call related functions
-    self.youtubeMarker = function(video) {
-        if (video.recordingDetails != null){
-            //set location
-            var location = video.recordingDetails.location;
-            var position = {lat: location.latitude, lng: location.longitude}
-            var title = video.snippet.title;
-
-            self.currentContent(new Content(position, title));
-            self.centerMap(self.currentContent().position);
-            self.zoom();
-
-            //search for tour companies
-            self.getForecast(location);
-            self.show('prep-icons');
-            self.show('forecast');
-
-            //find nearby trails
-            self.findTrails(self.currentContent().position);
-        }
-        else {
-            alert('Content is not geo-tagged');
-        }   
-    };
-
     //Query forcast by location
-    self.getForecast = function(location) {
+    self.getForecast = function() {
+
+        //Use currentPosition for query
+        var position = ( self.currentPosition() );
+        console.log(position);
 
         // FORECAST
         var xmlhttp = new XMLHttpRequest();
         //query OpenWeatherMap by geolocation
-        var url = "http://api.openweathermap.org/data/2.5/forecast/daily?lat="+location.latitude+"&lon="+location.longitude+"&mode=json&units=imperial&cnt=7&APPID=1088269cadd02d84dba9b274fc7bc097";
+        var url = "http://api.openweathermap.org/data/2.5/forecast/daily?lat="+position.lat()+"&lon="+position.lng()+"&mode=json&units=imperial&cnt=7&APPID=1088269cadd02d84dba9b274fc7bc097";
           
         xmlhttp.onreadystatechange=function() {
           if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -208,6 +214,9 @@ var ViewModel = function() {
               self.forecast.push( new Day(arr.list[i]) )
             };
         }
+
+        //Show forecast section
+        self.show('forecast');
     };
 
     //Use 'nearbySearch' to query est. near currentContent by iconButton type
@@ -227,7 +236,7 @@ var ViewModel = function() {
       
             var request = {
               keyword: iconButton.type,
-              location: self.currentContent().position,
+              location: self.currentPosition(),
               radius: 25000
             };
 
@@ -245,8 +254,8 @@ var ViewModel = function() {
                 //Fit map to results
                 bounds.extend(result.geometry.location);   
               }
-              //Include trailhead in map resize
-              map.fitBounds(bounds.extend(self.currentContent().position));
+              //Include currentPosition in map resize
+              map.fitBounds(bounds.extend(self.currentPosition()));
             }
         }
     };
@@ -296,7 +305,7 @@ var ViewModel = function() {
 
             console.log(data);
 
-            var place = data.Place;
+            var park = new Park( data.Place );
             //self.switchPlace( place );
 
             data.Trails.forEach( function(trail) {
@@ -310,8 +319,9 @@ var ViewModel = function() {
 
             self.filteredList( self.trailList() );
 
-            self.show('forecast');
-            self.getForecast({'latitude': place.lat, 'longitude': place.lon});
+            //Use park location until specific trail is selected
+            self.currentPosition( park.position );
+            self.getForecast();
         })
         .error( function() {
             alert('Trails AJAX request failed');
@@ -369,6 +379,9 @@ var ViewModel = function() {
         }
         
         //bound map to beginning/end/and middle of trail
+
+        //Set as new position for weather/place queries
+        self.currentPosition( trail.position );
 
         //Set selected trail as currentTrail for binding
         self.currentTrail(trail);
@@ -563,6 +576,8 @@ var Trail = function(data, park_id) {
     });
 
     this.highlight = function(){
+        marker.setOptions({})
+
         trail.setOptions({strokeColor: 'gray'});
         trail.setOptions({strokeWeight: 5});
     };
@@ -603,15 +618,16 @@ var Park = function(data) {
     var self = this;
 
     self.id = data.id;
-    self.type = data.type;
-    self.address = "http://localhost:8080/parks/" + data.id;
+    self.place_id = data.place_id;
     self.name = ko.observable(data.name);
     self.position = new google.maps.LatLng(data.lat, data.lon);
-    self.activities = ko.observableArray(data.activities);
     self.state = data.state;
+    self.type = 'State Park';//data.type;
+    //self.activities = ko.observableArray(data.activities);
+    //self.address = "http://localhost:8080/parks/" + data.id;
 
     var markerUrl;
-    switch (data.type ) {
+    switch (self.type ) {
         case 'State Park':
             markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
             break;
@@ -628,7 +644,7 @@ var Park = function(data) {
     var marker = new google.maps.Marker({
         position: self.position,
         map: map,
-        title: data.name,
+        title: self.name(),
         icon: {
           url: markerUrl
         },
@@ -637,28 +653,11 @@ var Park = function(data) {
 
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() { 
-        VM.switchPlace(self);
-    });
-
-    //Current Weather
-    self.current_img = ko.observable();
-    self.current_avg = ko.observable();
-    self.current_conditions = ko.observable();
-    self.current_wind = ko.observable();
-
-    //Query Current Weather
-    var weather_query = "http://api.openweathermap.org/data/2.5/weather?lat="+data.lat+"&lon="+data.lon+"&APPID=1088269cadd02d84dba9b274fc7bc097&units=imperial";
-    $.getJSON( weather_query, {
-      format: "json"
-    })
-    .done(function( data ) {
-      self.current_img =  "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
-      self.current_avg = Math.round(data.main.temp)+'°F'; 
-      self.current_conditions = data.weather[0].description;
-      self.current_wind = "Wind " + data.wind.speed + " MPH";
-    })
-    .error( function() {
-        alert('AJAX weather request failed');
+        VM.currentPosition( self.position );
+        VM.getForecast();
+        self.center();
+        self.bounce();
+        //VM.switchPlace(self);
     });
 
     this.bounce = function() {
@@ -697,6 +696,10 @@ var Content = function(position, title){
 
     self.clear = function() {
       marker.setMap(null);
+    };
+
+    self.set = function() {
+        marker.setMap(map);
     };
 }
 
