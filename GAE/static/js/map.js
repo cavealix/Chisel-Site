@@ -191,9 +191,12 @@ var ViewModel = function() {
     //Query forcast by location
     self.getForecast = function() {
 
+        //Reset forecast
+        //self.hide('forecast');
+        self.forecast.removeAll();
+
         //Use currentPosition for query
         var position = ( self.currentPosition() );
-        console.log(position);
 
         // FORECAST
         var xmlhttp = new XMLHttpRequest();
@@ -230,9 +233,6 @@ var ViewModel = function() {
         else{
             //Clear previous results
             self.clearSearchResults();
-
-            //Create bounds object for scaling map to search results
-            var bounds = new google.maps.LatLngBounds;
       
             var request = {
               keyword: iconButton.type,
@@ -243,6 +243,9 @@ var ViewModel = function() {
             //Perform Nearby Search
             service = new google.maps.places.PlacesService(map);
             service.nearbySearch(request, callback);
+
+            //Create bounds object for scaling map to search results
+            var bounds = new google.maps.LatLngBounds;
       
             function callback(results, status) {
               if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -258,6 +261,10 @@ var ViewModel = function() {
               map.fitBounds(bounds.extend(self.currentPosition()));
             }
         }
+
+        //FOR NOW - clear trails and show results in relation to park
+        self.clearTrails();
+        
     };
 
     //Clear and remove previous search results
@@ -271,7 +278,7 @@ var ViewModel = function() {
     };
 
     //Use gmaps 'Radar' Search to find tour companies
-    self.guideSearch =function(video,) {
+    self.guideSearch =function(content) {
         var location = video.recordingDetails.location;
         var request = {
           location: {lat: location.latitude, lng: location.longitude},
@@ -294,6 +301,7 @@ var ViewModel = function() {
 
     //Query DB for trails with place id
     self.listTrails = function(place_id) {
+
         self.clearTrails();
         //Query and show trails within park
         url = "http://localhost:8080/parkAPI/" + place_id;//.id;
@@ -326,6 +334,16 @@ var ViewModel = function() {
         .error( function() {
             alert('Trails AJAX request failed');
         });
+    };
+
+    //Clear all trails on map
+    self.clearTrails = function() {
+        // Remove trail markers and paths from map
+        for (var i = 0; i < self.trailList().length; i++) {
+            self.trailList()[i].clear();
+        }
+
+        self.trailList( [] );
     };
 
 // VIEW //////////////////////////////////////////////
@@ -363,8 +381,8 @@ var ViewModel = function() {
         self.centerMap(place.position)
         place.bounce();
         if (place.type != 'Trail') {
-            self.clearTrails();
-            self.listTrails(place);
+            //self.clearTrails();
+            //self.listTrails(place);
         }
         if (place.type == 'Trail') {
             self.zoom();
@@ -454,16 +472,6 @@ var ViewModel = function() {
     //Hide (collapse) div by entered id
     self.hide = function(id){
         $('#'+id).collapse('hide');
-    };
-
-    //Clear all trails on map
-    self.clearTrails = function() {
-        // Remove trail markers and paths from map
-        for (var i = 0; i < self.trailList().length; i++) {
-            self.trailList()[i].clear();
-        }
-
-        self.trailList( [] );
     };
 
     //Clear map of park location icons
@@ -655,9 +663,13 @@ var Park = function(data) {
     google.maps.event.addListener(marker, 'click', function() { 
         VM.currentPosition( self.position );
         VM.getForecast();
-        self.center();
-        self.bounce();
+        
         //VM.switchPlace(self);
+
+        VM.closeMenu();
+        VM.hide('trail-info');
+        VM.listTrails( self.place_id );
+        self.bounce();
     });
 
     this.bounce = function() {
@@ -736,6 +748,7 @@ var Photo = function(photo, platform) {
 var Video = function(video) {
   var self = this;
 
+  self.position = ko.observable( video.recordingDetails.location );
   self.title = ko.observable(video.title);
   self.url = ko.observable(video.url);
   self.description = ko.observable(video.description);
@@ -823,6 +836,8 @@ document.getElementById('search_submit').onclick = function() {
 //Event listener for finding content from map page
 document.getElementById('submit_park_id').onclick = function() {
     VM.listTrails(document.getElementById('park_id').value);
+    //Clear all previous search results
+    VM.clearSearchResults();
 
     VM.show('prep-icons');
 };
@@ -936,7 +951,6 @@ function instaLocationSearch(place) {
       console.log(data); // send the error notifications to console
     }
   });
-
 }
 
 function mapError() {
