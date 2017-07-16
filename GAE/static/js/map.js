@@ -123,22 +123,25 @@ var ViewModel = function() {
                 data = data.replace('jsonFlickrApi(', '');
                 data = data.replace(')','');
                 data = JSON.parse(data);
+                console.log(data);
 
                 if (data.photo.location != null) {
                     var location = data.photo.location;
-                    var position = {lat: parseFloat(location.latitude), lng: parseFloat(location.longitude)}; 
+                    var position = new google.maps.LatLng( location.latitude, location.longitude );
+                    //(Need to get photo caption/description for use as title)
+                    var title = 'Flickr Photo';
 
                     //Set as new position for weather/place queries
                     self.currentPosition( position );
                     self.getForecast();
                     self.show('prep-icons');
 
-                    self.currentContent(new Content(position, 'photo'));
+                    self.currentContent(new Content(position, title));
                     self.centerMap(self.currentContent().position);
                     self.zoom();
 
                     //find nearby trails
-                    self.findTrails(self.currentContent().position);
+
                 }
                 else {
                     alert('Content is not geo-tagged');
@@ -165,7 +168,7 @@ var ViewModel = function() {
             if (video.recordingDetails != null){
                 //set location
                 var location = video.recordingDetails.location;
-                var position = {lat: location.latitude, lng: location.longitude}
+                var position = new google.maps.LatLng( location.latitude, location.longitude );
                 var title = video.snippet.title;
 
                 //Set as new position for weather/place queries
@@ -264,7 +267,8 @@ var ViewModel = function() {
 
         //FOR NOW - clear trails and show results in relation to park
         self.clearTrails();
-        
+        self.hide('trail-info');
+
     };
 
     //Clear and remove previous search results
@@ -527,7 +531,6 @@ var ViewModel = function() {
 }
 
 // Trail //////////////////////////////////////////////////////
-
 var Trail = function(data, park_id) {
     var self = this;
 
@@ -543,6 +546,7 @@ var Trail = function(data, park_id) {
     self.total_elevation_change = ko.observable(data.total_elevation_change);
     self.start_elevation = ko.observable(data.start_elevation);
     self.end_elevation = ko.observable(data.end_elevation);
+    self.activities = ko.observable(data.activities);
 
     //Create Marker object
     var marker = new google.maps.Marker({
