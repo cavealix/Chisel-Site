@@ -36,7 +36,8 @@
 
       <!-- Map -->
       <div class="section" id="map_container">
-        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+        <!-- When nearly all parks covered, allow user to search park by name -->
+        <!-- <input id="pac-input" class="controls" type="text" placeholder="Search Box"> -->
         <div class="canvas" id="map"></div>
       </div>
   </div>
@@ -103,7 +104,7 @@
   </div>
 
   <!-- Park List -->
-  <div class="list">
+  <div class="section collapse" id="list">
       <ul class="park" data-bind="foreach: filteredList">
         <li>
           <a href="#"><h2 data-bind="text: name, click: $parent.switchPlace"></h2></a>
@@ -129,8 +130,9 @@
   <script onload="initMap()" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI&libraries=places,visualization" 
     async defer ></script>
 
-  {% if video_id != None %}
+  <!-- Auto search content if entered on homepage -->
+  <!-- {% if video_id != None %}
     <script>VM.youtubeSearch('{{ video_id }}');</script>
-  {% endif %}
+  {% endif %} -->
 
 {% endblock %}

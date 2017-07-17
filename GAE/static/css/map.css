@@ -68,16 +68,16 @@
 }
 
 /* List */
-.list ul{
+#list ul{
     list-style: none;
 }
-.list a{
+#list a{
     text-decoration: none;
 }
-.list a:link {
+#list a:link {
     color: gray;
 }
-.list a:hover {
+#list a:hover {
     color: orange;
 }
 

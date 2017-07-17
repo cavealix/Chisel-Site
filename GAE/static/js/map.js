@@ -54,34 +54,21 @@ var ViewModel = function() {
     //Position for forecast and place search queries for content/trails/parks
     self.currentPosition = ko.observable();
 
-    self.placeArray = ko.observableArray([]);
+    self.resultArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
-    self.videos = ko.observableArray([]);
     
     self.forecast = ko.observableArray([]);
-    self.park_types = ['Nat\'l Park', 'State Park', 'BLM', 'Nat\'l Forrest', 'City Park'];
-    self.states = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MI","MA","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-    //self.activities = ['Hike', 'Bike', 'Camp', 'Pets', 'Climb', 'Swim', 'Offroad', 'Ski', 'Sail'];
+    self.park_types = ko.observableArray(['Nat\'l Park', 'State Park', 
+        'BLM', 'Nat\'l Forrest', 'City Park']);
+    self.states = ko.observableArray(["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI",
+        "ID","IL","IN","IA","KS","KY","LA","ME","MD","MI","MA","MN","MS","MO","MT","NE","NV",
+        "NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+        "VA","WA","WV","WI","WY"]);
+    self.activities = ['Hike', 'Bike', 'Camp', 'Pets', 'Climb', 'Swim', 'Offroad', 'Ski', 'Sail'];
 
     var infoWindow = new google.maps.InfoWindow();
     var service = new google.maps.places.PlacesService(map);
 
-    //Query parks in DB
-    /*$.getJSON( "http://localhost:8080/parksJSON", {
-      format: "json"
-    })
-    .done(function( data ) {
-
-      data.Parks.forEach( function(park){
-        self.parkList.push( new Park(park) );
-        });
-
-      //Display initial park list below map
-      self.filteredList( self.parkList() );
-    })
-    .error( function() {
-        alert('parks AJAX request failed');
-    });*/
 
 // API CALLS //////////////////////////////////////////
 
@@ -256,7 +243,7 @@ var ViewModel = function() {
                 return;
               }
               for (var i = 0, result; result = results[i]; i++) {
-                self.placeArray().push( new Place(result) );
+                self.resultArray().push( new Result(result) );
                 //Fit map to results
                 bounds.extend(result.geometry.location);   
               }
@@ -268,16 +255,15 @@ var ViewModel = function() {
         //FOR NOW - clear trails and show results in relation to park
         self.clearTrails();
         self.hide('trail-info');
-
     };
 
     //Clear and remove previous search results
     self.clearSearchResults = function() {
-      for (var i = 0; i < self.placeArray().length; i++) {
-          self.placeArray()[i].clear();
+      for (var i = 0; i < self.resultArray().length; i++) {
+          self.resultArray()[i].clear();
       }
       //empty list to save memory
-      self.placeArray.removeAll();
+      self.resultArray.removeAll();
       self.closeMenu();
     };
 
@@ -309,7 +295,7 @@ var ViewModel = function() {
         self.clearTrails();
         //Query and show trails within park
         url = "http://localhost:8080/parkAPI/" + place_id;//.id;
-        console.log(url);
+        //console.log(url);
         $.getJSON( url, {
           format: "json"
         })
@@ -337,6 +323,28 @@ var ViewModel = function() {
         })
         .error( function() {
             alert('Trails AJAX request failed');
+        });
+
+        self.show('list');
+    };
+
+    //Query parks according to filter criteria
+    self.queryParks = function(park_type, state) {
+        //Query parks in DB
+        $.getJSON( "http://localhost:8080/parksJSON", {
+          format: "json"
+        })
+        .done(function( data ) {
+
+        data.Parks.forEach( function(park){
+          self.parkList.push( new Park(park) );
+          });
+
+          //Display initial park list below map
+          self.filteredList( self.parkList() );
+        })
+        .error( function() {
+            alert('parks AJAX request failed');
         });
     };
 
@@ -377,20 +385,13 @@ var ViewModel = function() {
     };
 
     //User clicks on park marker
-    self.switchPlace = function(place) {
-        self.currentPlace(place);
+    self.selectResult = function(search_result) {
+        self.currentPlace(search_result);
         self.openMenu();
         //self.zoom();
         //self.bounds();
-        self.centerMap(place.position)
-        place.bounce();
-        if (place.type != 'Trail') {
-            //self.clearTrails();
-            //self.listTrails(place);
-        }
-        if (place.type == 'Trail') {
-            self.zoom();
-        }
+        self.centerMap(search_result.position)
+        search_result.bounce();
     };
 
     //Highlight trail to distinguish from the rest
@@ -567,7 +568,7 @@ var Trail = function(data, park_id) {
         path.push(new google.maps.LatLng(coord.lat, coord.lon));
     }
 
-    //Set Trail
+    //Define Trail path
     var trail = new google.maps.Polyline({
         path: path,
         map: map,
@@ -580,32 +581,39 @@ var Trail = function(data, park_id) {
     //Trigger 'Set Path' KO event
     google.maps.event.addListener(marker, 'click', function() { 
         VM.selectTrail(self);
+        //Hide list of other trails
+        VM.hide('list');
     });
 
     //Trigger 'Set Path' KO event
     google.maps.event.addListener(trail, 'click', function() { 
         VM.selectTrail(self);
+        //Hide list of other trails
+        VM.hide('list');
     });
 
+    //Set highlight options
     this.highlight = function(){
-        marker.setOptions({})
+        //marker.setOptions({})
 
         trail.setOptions({strokeColor: 'gray'});
         trail.setOptions({strokeWeight: 5});
     };
 
+    //Reset trail to original options
     this.reset = function(){
         trail.setOptions({strokeColor: 'orange'});
         trail.setOptions({strokeWeight: 3});
     };
 
+    //Remove trail path and marker
     this.clear = function() {
         marker.setMap(null);
         trail.setMap(null);
     };
 
+    //Set trail path
     this.set = function() {
-        //marker.setMap(map);
         trail.setMap(map);
     };
 
@@ -668,11 +676,11 @@ var Park = function(data) {
         VM.currentPosition( self.position );
         VM.getForecast();
         
-        //VM.switchPlace(self);
-
         VM.closeMenu();
         VM.hide('trail-info');
         VM.listTrails( self.place_id );
+        //Show list of relevant trails
+        VM.show('list');
         self.bounce();
     });
 
@@ -719,70 +727,20 @@ var Content = function(position, title){
     };
 }
 
-// Photo Object ///////////////////////////////////////////////
-var Photo = function(photo, platform) {
-    var self = this;
-
-    self.platform = ko.observable(platform);
-    var location = photo.location;
-    self.position = ko.observable({lat: location.latitude, lng: location.longitude});
-
-    var marker = new google.maps.Marker({
-        position: position,
-        map: map,
-        title: title,
-        icon: { url: 'http://maps.gstatic.com/mapfiles/circle.png' },
-        animation: google.maps.Animation.DROP
-    });
-
-    self.clear = function() {
-      marker.setMap(null);
-    };
-
-    self.currentIcon = function(){
-        marker.setIcon('/static/imgs/google_icons/ic_room_black_36dp/web/ic_room_black_36dp_1x.png');
-    };
-
-    self.resultIcon = function(){
-        marker.setIcon('http://maps.gstatic.com/mapfiles/circle.png');
-    };  
-}
-
-// Video Object ///////////////////////////////////////////////
-var Video = function(video) {
+// Search Result Object ///////////////////////////////////////
+var Result = function(search_result) {
   var self = this;
 
-  self.position = ko.observable( video.recordingDetails.location );
-  self.title = ko.observable(video.title);
-  self.url = ko.observable(video.url);
-  self.description = ko.observable(video.description);
-  self.thumbnails = ko.observable(video.thumbnails.medium);
-}
-
-// Day Object /////////////////////////////////////////////////
-var Day = function(day) {
-  var self = this;
-
-  self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
-  self.avg   =  ko.observable(day.temp.day + '°F');
-  self.range =  ko.observable(day.temp.max + ' - ' + day.temp.min + '°F');
-  self.desc  =  ko.observable(day.weather[0].description);
-}
-
-// Place Object ///////////////////////////////////////////////
-var Place = function(place) {
-  var self = this;
-
-  self.name = ko.observable(place.name);
-  self.id = ko.observable(place.place_id);
-  self.rating = ko.observable(place.rating);
-  self.address = ko.observable(place.formatted_address);
-  self.phone = ko.observable(place.formatted_phone_number);
+  self.name = ko.observable(search_result.name);
+  self.id = ko.observable(search_result.place_id);
+  self.rating = ko.observable(search_result.rating);
+  self.address = ko.observable(search_result.formatted_address);
+  self.phone = ko.observable(search_result.formatted_phone_number);
 
   var marker = new google.maps.Marker({
       map: map,
-      title: place.name,
-      position: place.geometry.location,
+      title: search_result.name,
+      position: search_result.geometry.location,
       icon: {
         url: 'http://maps.gstatic.com/mapfiles/circle.png',
         anchor: new google.maps.Point(12, 12),
@@ -791,12 +749,12 @@ var Place = function(place) {
   });
 
   var infowindow = new google.maps.InfoWindow({
-    content: place.name
+    content: search_result.name
   });
 
   //Trigger 'Select Place' KO event
   google.maps.event.addListener(marker, 'click', function() { 
-      VM.switchPlace(self);
+      VM.selectResult(self);
   });
 
   self.clear = function() {
@@ -809,6 +767,16 @@ var Place = function(place) {
           marker.setAnimation(null); 
       }, 1500);
   };
+}
+
+// Day Object /////////////////////////////////////////////////
+var Day = function(day) {
+  var self = this;
+
+  self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
+  self.avg   =  ko.observable(day.temp.day + '°F');
+  self.range =  ko.observable(day.temp.max + ' - ' + day.temp.min + '°F');
+  self.desc  =  ko.observable(day.weather[0].description);
 }
 
 // Circle Object //////////////////////////////////////////////
@@ -837,7 +805,7 @@ document.getElementById('search_submit').onclick = function() {
     VM.stripURL(document.getElementById('url').value);
 };
 
-//Event listener for finding content from map page
+//Event listener for finding park from map page
 document.getElementById('submit_park_id').onclick = function() {
     VM.listTrails(document.getElementById('park_id').value);
     //Clear all previous search results
@@ -845,117 +813,6 @@ document.getElementById('submit_park_id').onclick = function() {
 
     VM.show('prep-icons');
 };
-
-function initAutocomplete() {
-
-  // Create the search box and link it to the UI element.
-  var input = document.getElementById('pac-input');
-  var searchBox = new google.maps.places.SearchBox(input);
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-  // Bias the SearchBox results towards current map's viewport.
-  map.addListener('bounds_changed', function() {
-    searchBox.setBounds(map.getBounds());
-  });
-
-  var markers = [];
-  // Listen for the event fired when the user selects a prediction and retrieve
-  // more details for that place.
-  searchBox.addListener('places_changed', function() {
-    var places = searchBox.getPlaces();
-    if (places.length == 0) {
-      return;
-    }
-
-    var place = places[0];
-    console.log('place = '+place);
-    //Get place details
-    var service = new google.maps.places.PlacesService(map);
-
-    service.getDetails({
-      placeId: place.id
-    }, function(place, status) {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        var marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location
-        });
-        console.log(place);
-      }
-    });
-
-    //save place to global variable
-    document.getElementById('place').value = JSON.stringify(places[0]);
-
-    //Get Instagram place id
-    //var fid = instaLocationSearch(places[0]);
-    //document.getElementById('fid').value = fid;
-
-    // Clear out the old markers.
-    markers.forEach(function(marker) {
-      marker.setMap(null);
-    });
-    markers = [];
-
-    // For each place, get the icon, name and location.
-    var bounds = new google.maps.LatLngBounds();
-    places.forEach(function(place) {
-      if (!place.geometry) {
-        console.log("Returned place contains no geometry");
-        return;
-      }
-      var icon = {
-        url: place.icon,
-        size: new google.maps.Size(71, 71),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(25, 25)
-      };
-
-      // Create a marker for each place.
-      markers.push(new google.maps.Marker({
-        map: map,
-        icon: icon,
-        title: place.name,
-        position: place.geometry.location
-      }));
-
-      if (place.geometry.viewport) {
-        // Only geocodes have viewport.
-        bounds.union(place.geometry.viewport);
-      } else {
-        bounds.extend(place.geometry.location);
-      }
-    });
-
-    map.fitBounds(bounds);
-  });
-}
-
-function instaLocationSearch(place) {
-  
-  var location = JSON.parse(JSON.stringify(place.geometry.location));
-  $.ajax({
-    url: 'https://api.instagram.com/v1/locations/search?lat='+location.lat+'&lng='+location.lng, // or /users/self/media/recent for Sandbox
-    dataType: 'jsonp',
-    type: 'GET',
-    data: {access_token: instagram_access_token},
-    success: function(data){
-      for( x in data.data ){
-        //console.log('xname = '+data.data[x].name+' placename = '+place.name);
-        if(data.data[x].name == place.name){
-          //console.log(data.data[x].id);
-          console.log(data.data[x]);
-          return JSON.stringify(data.data[x].place_id);
-        }
-      }
-      return 'null';
-    },
-    error: function(data){
-      console.log(data); // send the error notifications to console
-    }
-  });
-}
 
 function mapError() {
     alert('Google Maps failed to load');
