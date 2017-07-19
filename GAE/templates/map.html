@@ -44,7 +44,7 @@
 
   <!-- Info Btns -->
   <div class="icon_bar collapse " id="prep-icons">
-      <ul class="btns" data-bind="foreach:prep_icons">
+      <ul class="btns" data-bind="foreach: prep_icons">
           <li class="info-btn"><img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search"></li>
           <li>|</li>
       </ul>
@@ -54,7 +54,7 @@
   <div class="mini-section collapse" id="trail-info" data-bind="with: currentTrail">
     <div class="col-lg-4 col-md-4 col-xs-6" id="stats">
       <ul>
-        <li>Distance:  <span data-bind="text: total_distance"></span>(mi)</li>
+        <li>Distance: <span data-bind="text: total_distance"></span>(mi)</li>
         <li>Start Elevation: <span data-bind="text: start_elevation"></span>(ft)</li>
         <li>End Elevation: <span data-bind="text: end_elevation"></span>(ft)</li>
         <li>Elevation Change: <span data-bind="text: total_elevation_change"></span>(ft)</li>
@@ -103,26 +103,21 @@
     </ul>
   </div>
 
-  <!-- Park List -->
-  <div class="section collapse" id="list">
+  <!-- Park/Trail List -->
+  <!-- <div class="section collapse" id="list">
       <ul class="park" data-bind="foreach: filteredList">
         <li>
-          <a href="#"><h2 data-bind="text: name, click: $parent.switchPlace"></h2></a>
+          <a href="#"><h2 data-bind="text: name, click: $parent.selectTrail(self)"></h2></a>
           <hr>
         </li>
       </ul>
-  </div>
+  </div> -->
 
   
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/static/css/map.css">
-  <!-- JQuery -->
-  <script src="/static/js/jquery/jquery.js"></script>
-  <!-- Bootstrap -->
-  <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.6/css/bootstrap.min.css">
-  <script src="/static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
   <!-- Knockout -->
-  <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
   <!-- Map JS -->
   <script src="/static/js/map.js"></script>
 

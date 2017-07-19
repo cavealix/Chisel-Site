@@ -398,7 +398,7 @@ var ViewModel = function() {
     self.selectTrail = function(trail){
         //reset previous selected trail
         if (self.currentTrail() != null){
-            self.currentTrail().reset();    
+            self.currentTrail().reset();
         }
         
         //bound map to beginning/end/and middle of trail
@@ -708,6 +708,7 @@ var Park = function(data) {
 var Content = function(position, title){
     var self = this;
 
+    self.name = ko.observable( title );
     self.position = position;
 
     var marker = new google.maps.Marker({
@@ -803,7 +804,7 @@ var Circle = function(position, radius){
 //Event listener for finding content from map page
 document.getElementById('search_submit').onclick = function() {
     VM.stripURL(document.getElementById('url').value);
-};
+}
 
 //Event listener for finding park from map page
 document.getElementById('submit_park_id').onclick = function() {
@@ -812,7 +813,7 @@ document.getElementById('submit_park_id').onclick = function() {
     VM.clearSearchResults();
 
     VM.show('prep-icons');
-};
+}
 
 function mapError() {
     alert('Google Maps failed to load');
