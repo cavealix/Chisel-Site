@@ -48,11 +48,13 @@ var ViewModel = function() {
     self.parkList = ko.observableArray([]);
     self.trailList = ko.observableArray([]);
 
+    self.destination = ko.observable();
+
     self.currentContent = ko.observable();
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
     //Position for forecast and place search queries for content/trails/parks
-    self.currentPosition = ko.observable();
+    //self.currentPosition = ko.observable();
 
     self.resultArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
@@ -119,13 +121,14 @@ var ViewModel = function() {
                     var title = 'Flickr Photo';
 
                     //Set as new position for weather/place queries
-                    self.currentPosition( position );
+                    //self.currentPosition( position );
+
+                    self.destination(new Content(position, title));
+                    self.centerMap(self.destination.position);
+                    self.zoom();
+
                     self.getForecast();
                     self.show('prep-icons');
-
-                    self.currentContent(new Content(position, title));
-                    self.centerMap(self.currentContent().position);
-                    self.zoom();
 
                     //find nearby trails
 
@@ -158,14 +161,14 @@ var ViewModel = function() {
                 var position = new google.maps.LatLng( location.latitude, location.longitude );
                 var title = video.snippet.title;
 
-                //Set as new position for weather/place queries
-                self.currentPosition( position );
-                self.getForecast();
-                self.show('prep-icons');
+                //Set as new position for weather/place queries                
 
-                self.currentContent(new Content(position, title));
+                self.destination(new Content(position, title));
                 self.centerMap(self.currentContent().position);
                 self.zoom();
+
+                self.getForecast();
+                self.show('prep-icons');
             }
             else {
                 alert('Content is not geo-tagged');
@@ -186,7 +189,7 @@ var ViewModel = function() {
         self.forecast.removeAll();
 
         //Use currentPosition for query
-        var position = ( self.currentPosition() );
+        var position = ( self.destination().position );
 
         // FORECAST
         var xmlhttp = new XMLHttpRequest();
@@ -223,10 +226,10 @@ var ViewModel = function() {
         else{
             //Clear previous results
             self.clearSearchResults();
-      
+
             var request = {
               keyword: iconButton.type,
-              location: self.currentPosition(),
+              location: self.destination().position,
               radius: 25000
             };
 
@@ -236,7 +239,7 @@ var ViewModel = function() {
 
             //Create bounds object for scaling map to search results
             var bounds = new google.maps.LatLngBounds;
-      
+            
             function callback(results, status) {
               if (status !== google.maps.places.PlacesServiceStatus.OK) {
                 console.error(status);
@@ -248,7 +251,8 @@ var ViewModel = function() {
                 bounds.extend(result.geometry.location);   
               }
               //Include currentPosition in map resize
-              map.fitBounds(bounds.extend(self.currentPosition()));
+              map.fitBounds(bounds.extend( self.destination().position ));
+              self.destination(  );
             }
         }
 
@@ -318,7 +322,7 @@ var ViewModel = function() {
             self.filteredList( self.trailList() );
 
             //Use park location until specific trail is selected
-            self.currentPosition( park.position );
+            self.destination( park );
             self.getForecast();
         })
         .error( function() {
@@ -404,7 +408,7 @@ var ViewModel = function() {
         //bound map to beginning/end/and middle of trail
 
         //Set as new position for weather/place queries
-        self.currentPosition( trail.position );
+        self.destination( trail );
 
         //Set selected trail as currentTrail for binding
         self.currentTrail(trail);
@@ -673,7 +677,7 @@ var Park = function(data) {
 
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() { 
-        VM.currentPosition( self.position );
+        VM.destination( self );
         VM.getForecast();
         
         VM.closeMenu();
