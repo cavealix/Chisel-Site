@@ -127,6 +127,8 @@ var ViewModel = function() {
                     self.centerMap(self.destination().position);
                     self.zoom();
 
+                    self.queryTrails(self.destination().position);
+
                     self.getForecast();
                     self.show('prep-icons');
 
@@ -383,6 +385,33 @@ var ViewModel = function() {
         self.show('list');
     };
 
+    //Query Mashape trailsapi
+    self.queryTrails = function(position) {
+        $.ajax({
+            url: 'https://trailapi-trailapi.p.mashape.com/', // The URL to the API. You can get this in the API page of the API you intend to consume
+            type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
+            data: {
+                lat: position.lat,
+                limit:15,
+                lon: position.lng
+            }, // Additional parameters here
+            dataType: 'json',
+            success: function(data) { 
+                console.log((data));
+
+                data.places.forEach( function(trail) {
+                    self.trailList.push( new Content(new google.maps.LatLng(trail.lat, trail.lon), trail.name) );
+                }); 
+            },
+            error: function(err) { 
+                alert(err); 
+            },
+            beforeSend: function(xhr) {
+            xhr.setRequestHeader("X-Mashape-Authorization", "50DlSbXy5Pmsh3OljMdfWI6ApsNHp1DQYKEjsnf77ATvEBikmb"); // Enter here your Mashape key
+            }
+        });
+    };
+
     //Query parks according to filter criteria
     self.queryParks = function(park_type, state) {
         //Query parks in DB
@@ -601,7 +630,7 @@ var ViewModel = function() {
 }
 
 // Trail //////////////////////////////////////////////////////
-var Trail = function(data, park_id) {
+var Trail = function(data) {
     var self = this;
 
     self.id = data.id;
@@ -786,6 +815,12 @@ var Content = function(position, title){
         title: title,
         icon: { url: '/static/imgs/google_icons/ic_room_black_36dp/web/ic_room_black_36dp_1x.png' },
         animation: google.maps.Animation.DROP
+    });
+
+    //Trigger 'Switch Park' KO event
+    google.maps.event.addListener(marker, 'click', function() { 
+        VM.centerMap( position );
+        VM.closeMenu();
     });
 
     self.clear = function() {
