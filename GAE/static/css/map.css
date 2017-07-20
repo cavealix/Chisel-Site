@@ -58,7 +58,7 @@
     font-family: Raleway, 400;
 }
 .icon_bar ul li {
-    padding: 0.5em 1em;
+    padding: 0.5em .75em;
     display: inline-block;
     text-align: center;
 }

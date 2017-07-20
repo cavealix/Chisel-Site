@@ -50,7 +50,6 @@ var ViewModel = function() {
 
     self.destination = ko.observable();
 
-    self.currentContent = ko.observable();
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
     //Position for forecast and place search queries for content/trails/parks
@@ -414,6 +413,16 @@ var ViewModel = function() {
         self.trailList( [] );
     };
 
+    //Clear all Parks on map
+    self.clearParks = function() {
+        // Remove trail markers and paths from map
+        for (var i = 0; i < self.parkList().length; i++) {
+            self.parkList()[i].clear();
+        }
+
+        self.parkList().removeAll();
+    };
+
 // VIEW //////////////////////////////////////////////
 
     //Add marker for each result from guideSearch
@@ -446,7 +455,7 @@ var ViewModel = function() {
         self.openMenu();
         //self.zoom();
         //self.bounds();
-        self.centerMap(search_result.position)
+        //self.centerMap(search_result.position)
         search_result.bounce();
     };
 
@@ -545,20 +554,24 @@ var ViewModel = function() {
 
     //Clear all icons and set to initial state
     self.resetMap = function() {
-        //reset map position
+        //Clear all content on map
         self.clearMap();
         self.clearTrails();
-        self.filteredList( self.parkList() );
-        self.setMarkers(self.filteredList());
+        self.clearParks();
+
+        //clear destination variable
+        self.destination().clear();
+        self.destination(null);
+
+        //Reset to intial map view
         self.closeMenu();
         map.setCenter({lat: 38.9776681,lng: -96.847185});
         map.setZoom(4);
 
-        //clear content variable
-        self.currentContent(null);
         //hide geo-specific location
         self.hide('prep-icons');
         self.hide('forecast');
+
         //empty previous results
         self.forecast.removeAll();
         self.clearSearchResults();
