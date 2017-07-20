@@ -85,9 +85,9 @@ var ViewModel = function() {
         }
         //check if flickr photo
         else if (url.includes('flickr')){
-            var parts = url.split('/');
+            //var parts = url.split('/');
             //console.log(parts);
-            var photo_id = parts[parts.length-1];
+            var photo_id = /[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/.exec(url);
             //console.log(photo_id);
 
             self.flickrSearch(photo_id);
@@ -97,7 +97,8 @@ var ViewModel = function() {
     //Query Flickr by photo_id
     self.flickrSearch = function(photo_id){
         
-        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation&api_key=3affae96f735ec3e200682d77d67eadb&photo_id='+photo_id;
+        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation'+
+            '&api_key=3affae96f735ec3e200682d77d67eadb&photo_id='+photo_id;
         //console.log(url);
         
         $.getJSON( url, {
@@ -124,7 +125,7 @@ var ViewModel = function() {
                     //self.currentPosition( position );
 
                     self.destination(new Content(position, title));
-                    self.centerMap(self.destination.position);
+                    self.centerMap(self.destination().position);
                     self.zoom();
 
                     self.getForecast();
@@ -141,6 +142,26 @@ var ViewModel = function() {
             else{
                 alert('AJAX flickrSearch request failed');
             } 
+        });
+    };
+
+    //Query Flickr by for neaby photos
+    //Requires OAuth sign-in
+    self.flickrQueryByLocation = function( position ){
+        
+        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.photosForLocation'+
+            '&api_key=3affae96f735ec3e200682d77d67eadb&lat='+position.lat+'&lon='+position.lng;
+        console.log(url);
+        
+        $.getJSON( url, {
+          format: "json"
+        })
+        .done(function( data ) {
+            console.log(data);
+        })
+        .error( function(data) {
+            alert('flickrQueryByLocation failed');
+            console.log(data);
         });
     };
 
@@ -220,7 +241,8 @@ var ViewModel = function() {
 
         //if photo btn, query Flickr
         if (iconButton.type == 'photos'){
-
+            //query flickr photos near currently selected destination
+            self.flickrQueryByLocation( self.destination().position );
         } 
         //else search Google places
         else{
@@ -239,7 +261,7 @@ var ViewModel = function() {
 
             //Create bounds object for scaling map to search results
             var bounds = new google.maps.LatLngBounds;
-            
+
             function callback(results, status) {
               if (status !== google.maps.places.PlacesServiceStatus.OK) {
                 console.error(status);
