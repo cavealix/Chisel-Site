@@ -283,6 +283,36 @@ var ViewModel = function() {
         self.hide('trail-info');
     };
 
+    self.getDistance = function( result ) {
+        var origin1 = result.position;
+        var destinationA = self.destination().position;
+
+        var service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+          {
+            origins: [origin1],
+            destinations: [destinationA],
+            travelMode: 'DRIVING',
+            //transitOptions: TransitOptions,
+            //drivingOptions: DrivingOptions,
+            unitSystem: google.maps.UnitSystem.IMPERIAL, //google.maps.UnitSystem.METRIC
+            avoidHighways: false,
+            avoidTolls: false,
+          }, callback);
+
+        function callback(response, status) {
+          // See Parsing the Results for
+          // the basics of a callback function.
+
+          var distance = response.rows[0].elements[0].distance.text;
+          var duration = response.rows[0].elements[0].duration.text;
+          
+          //Place distance and duration into result object observable
+          result.distanceFromDestination(distance);
+          result.durationFromDestination(duration);
+        }
+    };
+
     //Clear and remove previous search results
     self.clearSearchResults = function() {
       for (var i = 0; i < self.resultArray().length; i++) {
@@ -759,10 +789,13 @@ var Result = function(search_result) {
   var self = this;
 
   self.name = ko.observable(search_result.name);
+  self.position = search_result.geometry.location;
   self.id = ko.observable(search_result.place_id);
   self.rating = ko.observable(search_result.rating);
   self.address = ko.observable(search_result.formatted_address);
   self.phone = ko.observable(search_result.formatted_phone_number);
+  self.distanceFromDestination = ko.observable();
+  self.durationFromDestination = ko.observable();
 
   var marker = new google.maps.Marker({
       map: map,
@@ -782,6 +815,7 @@ var Result = function(search_result) {
   //Trigger 'Select Place' KO event
   google.maps.event.addListener(marker, 'click', function() { 
       VM.selectResult(self);
+      VM.getDistance( self );
   });
 
   self.clear = function() {
