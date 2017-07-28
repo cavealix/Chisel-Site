@@ -132,7 +132,7 @@ var ViewModel = function() {
                     self.getForecast();
                     self.show('prep-icons');
 
-                    //find nearby trails
+                    //self.videosByLocation();
 
                 }
                 else {
@@ -203,7 +203,28 @@ var ViewModel = function() {
         });
     };
 
-    //Query forcast by location
+    self.videosByLocation = function() {
+      var url = 'https://www.googleapis.com/youtube/v3/search';
+      var position = ( self.destination().position );
+
+      $.getJSON( url, {
+          format: "json",
+          type: 'video',
+          q: 'camping',
+          lactionRadius: '10mi',
+          location: toString(position.lat)+','+toString(position.lng)
+        })
+        .done(function( data ) {
+            console.log(data);
+
+        })
+        .error( function() {
+            alert('AJAX videoSearch request failed');
+            console.log(data);
+        });
+    };
+
+    //Query forecast by location
     self.getForecast = function() {
 
         //Reset forecast
@@ -326,14 +347,13 @@ var ViewModel = function() {
 
     //Use gmaps 'Radar' Search to find tour companies
     self.guideSearch =function(content) {
-        var location = video.recordingDetails.location;
-        var request = {
-          location: {lat: location.latitude, lng: location.longitude},
-          radius: 50000,
-          keyword: 'tour'
-        };
-        service.radarSearch(request, callback);
-      
+      var location = video.recordingDetails.location;
+      var request = {
+        location: {lat: location.latitude, lng: location.longitude},
+        radius: 50000,
+        keyword: 'tour'
+      };
+      service.radarSearch(request, callback);
 
       function callback(results, status) {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -397,7 +417,7 @@ var ViewModel = function() {
             }, // Additional parameters here
             dataType: 'json',
             success: function(data) { 
-                console.log((data));
+                //console.log((data));
 
                 data.places.forEach( function(trail) {
                     self.trailList.push( new Content(new google.maps.LatLng(trail.lat, trail.lon), trail.name) );
