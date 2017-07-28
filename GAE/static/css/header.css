@@ -1,0 +1,53 @@
+/* Containers ////////////////////////////////////////////*/
+.wrapper {
+	max-width: 1200px;
+    height: 100%;
+    overflow: hidden;
+}
+.section {
+  height: 500px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.mini-section{
+    height: 'auto';
+    max-height: 200px;
+    width: 100%;
+}
+.canvas {
+    height: 100%;
+    width: 100%;
+}
+
+
+.navbar .navbar-default {
+    margin-bottom: 0px;
+}
+
+.head-title {
+	font-size: 1em;
+	text-decoration: none;
+	color: gray;
+	text-align: center;
+	display: inline;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
+
+
+
+@media screen and (min-width: 999px){
+	.wrapper {
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	.head-title{
+		font-size: 4em;
+	}
+}

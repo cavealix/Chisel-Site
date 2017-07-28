@@ -1,0 +1,27 @@
+youtube: https://www.youtube.com/watch?v=3oKx56Gqqa4
+
+flickr: https://www.flickr.com/photos/127114259@N08/35593972541
+
+3b7ba87a8bc0cd6a6138753042f
+ChIJy3fDkuG1W4YR9-VS9tDaND8 
+
+{"address_components":[{"long_name":"Enchanted Rock","short_name":"Enchanted Rock","types":["natural_feature","establishment"]},
+{"long_name":"Llano County","short_name":"Llano County","types":["administrative_area_level_2","political"]},
+{"long_name":"Texas","short_name":"TX","types":["administrative_area_level_1","political"]},
+{"long_name":"United States","short_name":"US","types":["country","political"]},
+{"long_name":"78643","short_name":"78643","types":["postal_code"]}],
+
+"adr_address":"Enchanted Rock, <span class=\"region\">Texas</span> <span class=\"postal-code\">78643</span>, <span class=\"country-name\">USA</span>",
+"formatted_address":"Enchanted Rock, Texas 78643, USA",
+"geometry":{"location":{"lat":30.5065789,"lng":-98.8189304},
+"viewport":{"south":30.5052299197085,"west":-98.82027938029148,"north":30.5079278802915,"east":-98.81758141970852}},
+"icon":"https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png",
+"id":"3b7ba87a8bc0cd6a6138753042f76bd1170bfb06",
+"name":"Enchanted Rock",
+"photos":[{"height":1931,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/105932171137393684493/photos\">Jessica Myer</a>"],"width":1931},{"height":2592,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/117561492058428329597/photos\">Tyler Lentz</a>"],"width":4608},{"height":608,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/102876949165530926926/photos\">Ronan Padhye</a>"],"width":1216},{"height":2592,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/108691220594277662596/photos\">Eduardo Garces</a>"],"width":4608},{"height":2448,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/105932171137393684493/photos\">Jessica Myer</a>"],"width":3264},{"height":3264,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/113798524186058964063/photos\">Ben Carlton</a>"],"width":4928},{"height":2506,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/101376639204651547793/photos\">Chris Núñez</a>"],"width":3744},{"height":1944,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/108965172504272002396/photos\">Pete Newton</a>"],"width":2592},{"height":2592,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/108691220594277662596/photos\">Eduardo Garces</a>"],"width":4608},
+{"height":2592,"html_attributions":["<a href=\"https://maps.google.com/maps/contrib/117561492058428329597/photos\">Tyler Lentz</a>"],"width":4608}],
+"place_id":"ChIJy3fDkuG1W4YR9-VS9tDaND8",
+"reference":"CmRbAAAAJROU56hTr46-EVSGu81FxCJEf6A4OgYLNpKSJA6_I8HohlQcCcpH19Q6lAgXwIjQw764yexl-Vvo_d600_R3S2pItMUb4fyYO2V31-PXrj4OyUssxhwVebUx6-ymkMyDEhAc5mvAFgvml4bqVkdAQoYHGhTSs-uT4927Pcv-G9Cqf5Qv5KAWHA",
+"scope":"GOOGLE","types":["natural_feature","establishment"],
+"url":"https://maps.google.com/?q=Enchanted+Rock&ftid=0x865bb5e192c377cb:0x3f34dad0f652e5f7",
+"utc_offset":-300,"html_attributions":[]}

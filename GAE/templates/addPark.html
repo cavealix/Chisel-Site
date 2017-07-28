@@ -1,0 +1,105 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <form method="post" action="{{ url_for('addPark') }}">
+        <h1>Add new Park</h1>
+        <input type="text" name="name" placeholder="Park Name">
+        <input type="text" name="lat" placeholder="latitude">
+        <input type="text" name="lon" placeholder="longitude">
+        <select name="type">
+          <option value="Nat'l Park">Nat'l Park</option>
+          <option value="State Park">State Park</option>
+          <option value="BLM">BLM</option>
+          <!-- <option value="Nat'l Forrest">Nat'l Forrest</option> -->
+          <option value="City Park">City Park</option>
+        </select>
+            
+        <select name="state">
+            <option value="AL">AL</option>
+            <option value="AK">AK</option>
+            <option value="AZ">AZ</option>
+            <option value="AR">AR</option>
+            <option value="CA">CA</option>
+            <option value="CO">CO</option>
+            <option value="CT">CT</option>
+            <option value="DE">DE</option>
+            <option value="FL">FL</option>
+            <option value="GA">GA</option>
+            <option value="HI">HI</option>
+            <option value="ID">ID</option>
+            <option value="IL">IL</option>
+            <option value="IN">IN</option>
+            <option value="IA">IA</option>
+            <option value="KS">KS</option>
+            <option value="KY">KY</option>
+            <option value="LA">LA</option>
+            <option value="ME">ME</option>
+            <option value="MD">MD</option>
+            <option value="MI">MI</option>
+            <option value="MA">MA</option>
+            <option value="MN">MN</option>
+            <option value="MS">MS</option>
+            <option value="MO">MO</option>
+            <option value="MT">MT</option>
+            <option value="NE">NE</option>
+            <option value="NV">NV</option>
+            <option value="NH">NH</option>
+            <option value="NJ">NJ</option>
+            <option value="NM">NM</option>
+            <option value="NY">NY</option>
+            <option value="NC">NC</option>
+            <option value="ND">ND</option>
+            <option value="OH">OH</option>
+            <option value="OK">OK</option>
+            <option value="OR">OR</option>
+            <option value="PA">PA</option>
+            <option value="RI">RI</option>
+            <option value="SC">SC</option>
+            <option value="SD">SD</option>
+            <option value="TN">TN</option>
+            <option value="TX">TX</option>
+            <option value="UT">UT</option>
+            <option value="VT">VT</option>
+            <option value="VA">VA</option>
+            <option value="WA">WA</option>
+            <option value="WV">WV</option>
+            <option value="WI">WI</option>
+            <option value="WY">WY</option>
+        </select>
+
+        <!-- <h2>Points of Interest</h2>
+
+        <div class="container">
+            <div class="row">
+                <input type="hidden" name="count" value="1" />
+                <div class="control-group" id="fields">
+                    <label class="control-label" for="field1">Nice Multiple Form Fields</label>
+                    <div class="controls" id="profs"> 
+                        <div id="field">
+                            <select>
+                                <option>Park</option>
+                                <option>Bathroom</option>
+                                <option>Water</option>
+                                <option>View</option>
+                                <option>Campsite</option>
+                            </select>
+                            <input autocomplete="off" class="input" id="lat1" name="lat1" type="text" placeholder="Lat" data-items="8"/>
+                            <input autocomplete="off" class="input" id="lon1" name="lon1" type="text" placeholder="Lon" data-items="8"/>
+                            <button id="b1" class="btn add-more" type="button">+</button>
+                        </div>
+                    <small>Press + to add point of interest (POI)</small>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <input type="submit" value="Add">
+        <a href="{{ url_for('parks') }}">Cancel</a>
+    </form>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/addPark.css">
+
+    <script src="/static/js/addPark.js"></script>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+h1, h2 {
+  text-align: center;
+  color: orange;
+}
+
+/* BS Carousel */
+iframe, .item {
+  width: 100%;
+  height: 100%;
+}
+
+#close-btn {
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+/* Weather */
+#forecast-week {
+  
+}
+.day {
+  display: inline-block;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+#elevation {
+  box-sizing: border-box;
+  height: auto;
+  max-height: 200px;
+  width: auto;
+}
+
+
+/* Pop In Menu */
+.menu {
+    background-color: #333;
+    opacity: .85;
+    left: -285px;  /* start off behind the scenes */
+    height: inherit;
+    position: absolute;
+    width: 285px;
+    z-index: 1;
+    color: white;
+    display: inline-block;
+}
+.menu h1 {
+    text-align: center;
+}
+.menu ul {
+  border-top: 1px solid #636366;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  border-bottom: 1px solid #636366;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 45px;
+  padding-bottom: 3px;
+  padding-left: 20px;
+  padding-top: 3px;
+}
+
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+    width: 70%;
+    margin: auto;
+}
+
+/* Icon Bar */
+.icon_bar {
+    width: 100%;
+    font-size: 1.25em;
+    margin-bottom: 20px;
+}
+.icon_bar ul {
+    text-align: center;
+    font-family: Raleway, 400;
+}
+.icon_bar ul li {
+    padding: 0.5em 1em;
+    display: inline-block;
+    text-align: center;
+}
+.icon_bar img {
+    max-height: 25px;
+    max-width: 25px;
+}
+

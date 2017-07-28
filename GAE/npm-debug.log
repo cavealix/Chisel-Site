@@ -1,0 +1,97 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'flask_cors' ]
+2 info using npm@2.15.9
+3 info using node@v4.5.0
+4 verbose config Skipping project config: /Users/Alix/.npmrc. (matches userconfig)
+5 verbose install initial load of /Users/Alix/package.json
+6 verbose installManyTop reading scoped package data from /Users/Alix/node_modules/mongodb/package.json
+7 verbose installManyTop reading scoped package data from /Users/Alix/node_modules/normalize.css/package.json
+8 info package.json mongodb@2.1.18 No README data
+9 verbose readDependencies loading dependencies from /Users/Alix/package.json
+10 silly cache add args [ 'flask_cors', null ]
+11 verbose cache add spec flask_cors
+12 silly cache add parsed spec Result {
+12 silly cache add   raw: 'flask_cors',
+12 silly cache add   scope: null,
+12 silly cache add   name: 'flask_cors',
+12 silly cache add   rawSpec: '',
+12 silly cache add   spec: 'latest',
+12 silly cache add   type: 'tag' }
+13 silly addNamed flask_cors@latest
+14 verbose addNamed "latest" is being treated as a dist-tag for flask_cors
+15 info addNameTag [ 'flask_cors', 'latest' ]
+16 silly mapToRegistry name flask_cors
+17 silly mapToRegistry using default registry
+18 silly mapToRegistry registry https://registry.npmjs.org/
+19 silly mapToRegistry data Result {
+19 silly mapToRegistry   raw: 'flask_cors',
+19 silly mapToRegistry   scope: null,
+19 silly mapToRegistry   name: 'flask_cors',
+19 silly mapToRegistry   rawSpec: '',
+19 silly mapToRegistry   spec: 'latest',
+19 silly mapToRegistry   type: 'tag' }
+20 silly mapToRegistry uri https://registry.npmjs.org/flask_cors
+21 verbose addNameTag registry:https://registry.npmjs.org/flask_cors not in flight; fetching
+22 verbose request uri https://registry.npmjs.org/flask_cors
+23 verbose request no auth needed
+24 info attempt registry request try #1 at 6:14:27 PM
+25 verbose request id cf7ced382971a04f
+26 http request GET https://registry.npmjs.org/flask_cors
+27 http 404 https://registry.npmjs.org/flask_cors
+28 verbose headers { 'content-type': 'application/json',
+28 verbose headers   'cache-control': 'max-age=0',
+28 verbose headers   'content-length': '2',
+28 verbose headers   'accept-ranges': 'bytes',
+28 verbose headers   date: 'Sat, 25 Feb 2017 00:14:27 GMT',
+28 verbose headers   via: '1.1 varnish',
+28 verbose headers   age: '0',
+28 verbose headers   connection: 'keep-alive',
+28 verbose headers   'x-served-by': 'cache-dfw1834-DFW',
+28 verbose headers   'x-cache': 'MISS',
+28 verbose headers   'x-cache-hits': '0',
+28 verbose headers   'x-timer': 'S1487981667.316679,VS0,VE285',
+28 verbose headers   vary: 'Accept-Encoding' }
+29 silly get cb [ 404,
+29 silly get   { 'content-type': 'application/json',
+29 silly get     'cache-control': 'max-age=0',
+29 silly get     'content-length': '2',
+29 silly get     'accept-ranges': 'bytes',
+29 silly get     date: 'Sat, 25 Feb 2017 00:14:27 GMT',
+29 silly get     via: '1.1 varnish',
+29 silly get     age: '0',
+29 silly get     connection: 'keep-alive',
+29 silly get     'x-served-by': 'cache-dfw1834-DFW',
+29 silly get     'x-cache': 'MISS',
+29 silly get     'x-cache-hits': '0',
+29 silly get     'x-timer': 'S1487981667.316679,VS0,VE285',
+29 silly get     vary: 'Accept-Encoding' } ]
+30 verbose stack Error: Registry returned 404 for GET on https://registry.npmjs.org/flask_cors
+30 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+30 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:242:14)
+30 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+30 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:200:22)
+30 verbose stack     at emitTwo (events.js:87:13)
+30 verbose stack     at Request.emit (events.js:172:7)
+30 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1067:10)
+30 verbose stack     at emitOne (events.js:82:20)
+30 verbose stack     at Request.emit (events.js:169:7)
+30 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:988:12)
+31 verbose statusCode 404
+32 verbose pkgid flask_cors
+33 verbose cwd /Users/Alix/Documents/Chisel/Chisel-Site/GAE
+34 error Darwin 14.5.0
+35 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install" "flask_cors"
+36 error node v4.5.0
+37 error npm  v2.15.9
+38 error code E404
+39 error 404 Registry returned 404 for GET on https://registry.npmjs.org/flask_cors
+39 error 404
+39 error 404 'flask_cors' is not in the npm registry.
+39 error 404 You should bug the author to publish it (or use the name yourself!)
+39 error 404
+39 error 404 Note that you can also install from a
+39 error 404 tarball, folder, http url, or git url.
+40 verbose exit [ 1, true ]
