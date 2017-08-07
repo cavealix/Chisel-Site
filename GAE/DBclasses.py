@@ -61,6 +61,10 @@ class Trail(db.Model):
             pt = {'lat': coord.lat, 'lon': coord.lon}
             path.append(pt)
 
+        spheres = []
+        for photo in self.photo_spheres:
+            spheres.append(photo.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
@@ -76,5 +80,25 @@ class Trail(db.Model):
             'total_elevation_change' : self.total_elevation_change,
             'start_elevation' : self.start_elevation,
             'end_elevation' : self.end_elevation,
-            'activities' : self.activities
+            'activities' : self.activities,
+            'photo_spheres' : spheres
         }
+
+class Sphere(db.Model):
+    trail = db.ReferenceProperty(Trail, collection_name='photo_spheres')
+    embed_code = db.StringProperty()
+    position = db.GeoPtProperty()
+
+    @property
+    def serialize(self):
+        return {
+            'embed_code' : self.embed_code,
+            'position' : {'lat': self.position.lat, 'lng': self.position.lon}
+        }
+
+
+class POI(db.Model):
+    type = db.StringProperty()
+    position = db.GeoPtProperty()
+    url = db.StringProperty()
+    description = db.StringProperty()

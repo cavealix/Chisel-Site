@@ -31,13 +31,17 @@ var info_icons = [
 function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: 38.9776681,lng: -96.847185},
+      //center: {lat: 38.9776681,lng: -96.847185},
+      //Texas
+      center:{lat: 31.4082791, lng: -99.3872106},
       scrollwheel: false,
-      zoom: 4
+      zoom: 6
     });
 
     VM = new ViewModel();
     ko.applyBindings(VM);
+
+    VM.queryParks('State', 'TX');
 }
 
 // View Model /////////////////////////////////////////////////
@@ -47,6 +51,7 @@ var ViewModel = function() {
 
     self.parkList = ko.observableArray([]);
     self.trailList = ko.observableArray([]);
+    self.photoSphereList = ko.observableArray([]);
 
     self.destination = ko.observable();
 
@@ -366,45 +371,6 @@ var ViewModel = function() {
       }
     };
 
-    //Query DB for trails with place id
-    self.listTrails = function(place_id) {
-
-        self.clearTrails();
-        //Query and show trails within park
-        url = "http://localhost:8080/parkAPI/" + place_id;//.id;
-        //console.log(url);
-        $.getJSON( url, {
-          format: "json"
-        })
-        .done(function( data ) {
-
-            console.log(data);
-
-            var park = new Park( data.Place );
-            //self.switchPlace( place );
-
-            data.Trails.forEach( function(trail) {
-                self.trailList.push( new Trail(trail, place_id) );
-                });
-
-            //Before trailList is reset, fit map to Park and Trails
-            var bounds = self.trailList();
-            //bounds.push(park);
-            self.bounds(bounds);
-
-            self.filteredList( self.trailList() );
-
-            //Use park location until specific trail is selected
-            self.destination( park );
-            self.getForecast();
-        })
-        .error( function() {
-            alert('Trails AJAX request failed');
-        });
-
-        self.show('list');
-    };
-
     //Query Mashape trailsapi
     self.queryTrails = function(position) {
         $.ajax({
@@ -508,6 +474,64 @@ var ViewModel = function() {
         search_result.bounce();
     };
 
+    //Query DB for trails with place id
+    self.selectPark = function(place_id) {
+
+        //clear search results
+        self.clearList(self.resultArray());
+        self.resultArray.removeAll();
+
+        //hide photo sphere canvas
+        self.hide('photo_sphere_canvas');
+        //remove photo spheres from map
+        for (var i = 0; i < self.photoSphereList().length; i++) {
+          self.photoSphereList()[i].clear();
+        };
+        self.photoSphereList.removeAll();
+
+        //clear previous forecast
+        self.forecast.removeAll();
+
+        //clear previous trails
+        self.clearTrails();
+
+        //Query and show trails within selected park
+        url = "http://localhost:8080/parkAPI/" + place_id;//.id;
+        //console.log(url);
+        $.getJSON( url, {
+          format: "json"
+        })
+        .done(function( data ) {
+
+            //console.log(data);
+
+            var park = new Park( data.Place );
+            //self.switchPlace( place );
+
+            data.Trails.forEach( function(trail) {
+                self.trailList.push( new Trail(trail, place_id) );
+                });
+
+            //Before trailList is reset, fit map to Park and Trails
+            var bounds = self.trailList();
+            bounds.push(park);
+            self.bounds(bounds);
+
+            self.filteredList( self.trailList() );
+
+            //Use park location until specific trail is selected
+            self.destination( park );
+            //self.getForecast();
+        })
+        .error( function() {
+            alert('Trails AJAX request failed');
+        });
+
+        //self.show('list');
+
+        self.show('prep-icons');
+    };
+
     //Highlight trail to distinguish from the rest
     self.selectTrail = function(trail){
         //reset previous selected trail
@@ -524,10 +548,41 @@ var ViewModel = function() {
         self.currentTrail(trail);
         self.currentTrail().highlight();
         self.currentTrail().bounce();
+
+        //Close photo sphere canvas
+        self.hide('photo_sphere_canvas');
+
+        //remove photo spheres from map
+        for (var i = 0; i < self.photoSphereList().length; i++) {
+          self.photoSphereList()[i].clear();
+        };
+        self.photoSphereList.removeAll();
+
+        //Create photo sphere markers
+        for (var i = 0; i < trail.photo_spheres.length; i++) {
+          self.photoSphereList().push( new Photo_Sphere(trail.photo_spheres[i]) );
+        };
         
         //Show trail data
         self.show('trail-info');
         self.show('elevation');
+
+        //fit map to trail bounds, self.bounds designed for 
+        //  taking parks and trails
+        map.fitBounds(trail.bounds);
+    };
+
+    //Reveal Photo Sphere
+    self.selectPhotoSphere = function(photo_sphere) {
+      self.show('photo_sphere_canvas');
+      document.getElementById('photo_sphere').src = photo_sphere.embed_code;
+      //console.log('set-src');
+    };
+
+    self.clearList = function(list) {
+      for (var i = 0; i < list.length; i++) {
+        list[i].clear();
+      };
     };
 
     //Center Map around entered position
@@ -547,7 +602,7 @@ var ViewModel = function() {
         
         var bounds = new google.maps.LatLngBounds;
         for (var i = 0; i < list.length; i++) {
-            bounds.extend(list[i].bound);
+            bounds.extend(list[i].position);
         }
         //fit map to bounds
         map.fitBounds(bounds);
@@ -647,6 +702,7 @@ var ViewModel = function() {
           left: "-285px"
         }, 200);
     };
+
 }
 
 // Trail //////////////////////////////////////////////////////
@@ -659,13 +715,18 @@ var Trail = function(data) {
     self.place_id = data.place_id;
     //self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
     self.position = new google.maps.LatLng(data.lat, data.lon);
-    self.bound = new google.maps.LatLng(data.lat, data.lon);
+
+    var end = data.coords[data.coords.length-1];
+    end = new google.maps.LatLng(end.lat, end.lon);
+    var bounds = [self.position, end];
+
     self.cumulative_distance = ko.observable(data.cumulative_distance);
     self.total_distance = ko.observable(data.total_distance);
     self.total_elevation_change = ko.observable(data.total_elevation_change);
     self.start_elevation = ko.observable(data.start_elevation);
     self.end_elevation = ko.observable(data.end_elevation);
     self.activities = ko.observable(data.activities);
+    self.photo_spheres = data.photo_spheres;
 
     //Create Marker object
     var marker = new google.maps.Marker({
@@ -751,6 +812,39 @@ var Trail = function(data) {
     };
 }
 
+var Photo_Sphere = function(data) {
+  var self = this;
+
+  self.embed_code = data.embed_code;
+  self.position = data.position;
+
+  var marker = new google.maps.Marker({
+        position: self.position,
+        map: map,
+        title: 'photo_sphere',
+        icon: {
+          url: 'http://maps.gstatic.com/mapfiles/circle.png',
+          anchor: new google.maps.Point(12, 12),
+          scaledSize: new google.maps.Size(10, 17)
+        }
+        //animation: google.maps.Animation.DROP
+    });
+
+    //Trigger 'Photo Sphere' pop up
+    google.maps.event.addListener(marker, 'click', function() { 
+        //alert(self.embed_code);
+        VM.selectPhotoSphere(self);
+    });
+
+    this.clear = function() {
+        marker.setMap(null);
+    };
+
+    this.set = function() {
+        marker.setMap(map);
+    };
+}
+
 // Park ///////////////////////////////////////////////////////
 var Park = function(data) {
     var self = this;
@@ -796,7 +890,7 @@ var Park = function(data) {
         
         VM.closeMenu();
         VM.hide('trail-info');
-        VM.listTrails( self.place_id );
+        VM.selectPark( self.place_id );
         //Show list of relevant trails
         VM.show('list');
         self.bounce();
@@ -936,7 +1030,7 @@ document.getElementById('search_submit').onclick = function() {
 
 //Event listener for finding park from map page
 document.getElementById('submit_park_id').onclick = function() {
-    VM.listTrails(document.getElementById('park_id').value);
+    VM.selectPark(document.getElementById('park_id').value);
     //Clear all previous search results
     VM.clearSearchResults();
 

@@ -37,6 +37,14 @@
   padding-top: 10px;
 }
 
+#photo_sphere_canvas {
+}
+
+#photo_sphere {
+  width: 100%;
+  height: 100%;
+}
+
 /* Weather */
 #forecast-week {
 }
