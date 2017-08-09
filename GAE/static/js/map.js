@@ -569,7 +569,7 @@ var ViewModel = function() {
 
         //fit map to trail bounds, self.bounds designed for 
         //  taking parks and trails
-        map.fitBounds(trail.bounds);
+        //map.fitBounds(trail.bounds);
     };
 
     //Reveal Photo Sphere

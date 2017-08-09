@@ -273,18 +273,22 @@ def addTrail():
         newTrail.put()
 
         #Save Photo Sphere
-        sphere_url = request.form['sphere_url']
-        string = sphere_url.split('@')[1]
-        string = string.split(',')
-        lat = string[0]
-        lng = string[1]
-        position = db.GeoPt(float(lat), float(lng))
-        sphere = Sphere(
-            trail = newTrail,
-            embed_code = request.form['embed_code'].split('"')[1],
-            position = position
-        )
-        sphere.put()
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        for x in xrange(len(urls)):
+            string = urls[x].split('@')[1]
+            string = string.split(',')
+            lat = string[0]
+            lng = string[1]
+            position = db.GeoPt(float(lat), float(lng))
+            sphere = Sphere(
+                trail = newTrail,
+                embed_code = embeds[x].split('"')[1],
+                position = position
+            )
+            print sphere
+            sphere.put()
 
         return redirect( url_for('map') )
     #Get

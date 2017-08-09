@@ -28,8 +28,13 @@
         <br>
 
         <!-- Add photo spheres -->
-        <input type="text" name="sphere_url" placeholder="sphere url">
-        <input type="text" name="embed_code" placeholder="embed code">
+        <div id="dynamicInput">
+            <input type="text" name="sphere_url" placeholder="sphere url">
+            <input type="text" name="embed_code" placeholder="embed code">
+            <br>
+        </div>
+        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
+
         <br>
 
         <input type="submit" value="Add">
