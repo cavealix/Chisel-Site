@@ -22,7 +22,6 @@ class Place(db.Model):
     abr_state = db.StringProperty()
     country = db.StringProperty()
     abr_country = db.StringProperty()
-    pois = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -36,6 +35,24 @@ class Place(db.Model):
             'state': self.state,
             'abr_state': self.abr_state,
             'country': self.country
+        }
+
+class POI(db.Model):
+    park = db.ReferenceProperty(Place, collection_name='pois')
+    type = db.StringProperty()
+    position = db.GeoPtProperty()
+    icon_url = db.StringProperty()
+    sphere_embed = db.StringProperty()
+    description = db.StringProperty()
+
+    @property 
+    def serialize(self):
+        return { 
+            'type': self.type,
+            'position': {'lat': self.position.lat, 'lng': self.position.lon},
+            'icon_url': self.icon_url,
+            'sphere_embed': self.sphere_embed,
+            'description': db.StringProperty()            
         }
 
 
@@ -95,10 +112,3 @@ class Sphere(db.Model):
             'embed_code' : self.embed_code,
             'position' : {'lat': self.position.lat, 'lng': self.position.lon}
         }
-
-
-class POI(db.Model):
-    type = db.StringProperty()
-    position = db.GeoPtProperty()
-    url = db.StringProperty()
-    description = db.StringProperty()

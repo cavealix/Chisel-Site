@@ -72,4 +72,41 @@
         <a href="{{ url_for('park', park_id=park.key().id()) }}">Cancel</a>
     </form>
 
+    <div class="mini-section" id="newpoi">
+        <select id="poi_type">
+            <option value="info">Info</option>
+            <option value="restroom">Restroom</option>
+            <option value="outhouse">Outhouse</option>
+            <option value="showers">Showers</option>
+            <option value="campsite">Campsite</option>
+            <option value="group_campsite">Group Campsite</option>
+            <option value="overlook">Scenic Overlook</option>
+            <option value="historical_marker">Historical Marker</option>
+            <option value="water">Water</option>
+            <option value="picnic_area">Picnic Area</option>
+            <option value="playground">Playground</option>
+            <option value="dog_station">Dog Station</option>
+            <option value="parking">Parking</option>
+        </select>
+    </div>
+
+    <div class="section" id="map">
+    </div>
+
+    <!-- Knockout -->
+    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+
+    <script>var park_json = JSON.parse('{{park_json|safe}}');</script>
+    <script src="/static/js/editPark.js"></script>
+
+    <!-- Google Maps API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script>
+    <!--  1. Load the JavaScript client library. -->
+    <script></script>
+     
+
+    <!-- Google Maps -->
+    <script onload="main( park_json )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" async defer></script>
+
 {% endblock %}

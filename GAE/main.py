@@ -151,8 +151,9 @@ def editPark(park_id):
         return redirect( url_for('park', park_id=park.key().id() ))
     #Get
     else:
-        park = Park.get_by_id(park_id)
-        return render_template('editPark.html', park=park)
+        park = Place.get_by_id(park_id)
+        park_json = json.dumps(park.serialize)
+        return render_template('editPark.html', park=park, park_json=park_json)
 
 #Delete Park
 @app.route('/parks/<int:park_id>/delete', methods=['Get', 'Post'])
