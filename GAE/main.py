@@ -195,6 +195,9 @@ def addPoi():
     poi.put()
 
     return json.dumps({ 'status':'OK' });
+
+
+
     
 
 

@@ -716,6 +716,7 @@ var Trail = function(data) {
     //self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
     self.position = new google.maps.LatLng(data.lat, data.lon);
 
+    //set bounds to include all of trail
     var end = data.coords[data.coords.length-1];
     end = new google.maps.LatLng(end.lat, end.lon);
     var bounds = [self.position, end];
@@ -757,14 +758,14 @@ var Trail = function(data) {
         strokeWeight: 3
     });
 
-    //Trigger 'Set Path' KO event
+    //Select trail
     google.maps.event.addListener(marker, 'click', function() { 
         VM.selectTrail(self);
         //Hide list of other trails
         VM.hide('list');
     });
 
-    //Trigger 'Set Path' KO event
+    //Select trail
     google.maps.event.addListener(trail, 'click', function() { 
         VM.selectTrail(self);
         //Hide list of other trails

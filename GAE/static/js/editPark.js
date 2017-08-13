@@ -20,12 +20,17 @@ var main = function(park_json) {
 var ViewModel = function(park_json) {
   var self = this;
 
-  self.pois = ko.observableArray([]);
+  self.poiList = ko.observableArray([]);
 
   var park = new Park(park_json);
 
+  //Create/show saved POIs 
+  for (var i = 0; i < park.pois.length; i++) {
+    var poi = park.pois[i];
+    self.poiList().push( new POI(park, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+  };
   
-
+  //create new POI
   map.addListener('click', function(e) {
     var poi_type = document.getElementById('poi_type');
     var type = poi_type.options[poi_type.selectedIndex].value;
@@ -69,7 +74,7 @@ var ViewModel = function(park_json) {
     }
 
     var poi = new POI(park, e.latLng, type, icon, '', '' );
-    self.pois.push( poi );
+    self.poiList.push( poi );
 
     //save 
     $.ajax({
@@ -84,15 +89,7 @@ var ViewModel = function(park_json) {
           console.log(error);
       }
     });
-
   });
-
-  //self.newPoi = function(latLng, map) {
-  //  var marker = new google.maps.Marker({
-  //    position: latLng,
-  //    map: map
-  //  });
-  //}
 
 }
 
@@ -105,6 +102,7 @@ var Park = function(park_json) {
   self.name = ko.observable(park_json.name);
   self.place_id = park_json.place_id;
   self.position = new google.maps.LatLng(park_json.lat, park_json.lon);
+  self.pois = park_json.pois;
 
   var marker = new google.maps.Marker({
       map: map,
@@ -116,15 +114,9 @@ var Park = function(park_json) {
     content: self.name
   });
 
-  //Trigger 'Select Place' KO event
-  google.maps.event.addListener(marker, 'click', function() { 
-      
-  });
-
   self.clear = function() {
     marker.setMap(null);
   };
-
 }
 
 // POI Object ///////////////////////////////////////////
@@ -146,6 +138,8 @@ var POI = function(park, position, type, icon, sphere_embed, description) {
       url: icon
     }
   });
+
+
 
   self.clear = function() {
     marker.setMap(null);

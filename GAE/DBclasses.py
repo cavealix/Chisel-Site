@@ -26,6 +26,11 @@ class Place(db.Model):
     @property 
     def serialize(self):
         #returns data in serializable format
+
+        pois = []
+        for poi in self.pois:
+            pois.append(poi.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
@@ -34,7 +39,8 @@ class Place(db.Model):
             'lon' : self.location.lon,
             'state': self.state,
             'abr_state': self.abr_state,
-            'country': self.country
+            'country': self.country,
+            'pois': pois
         }
 
 class POI(db.Model):
@@ -50,9 +56,9 @@ class POI(db.Model):
         return { 
             'type': self.type,
             'position': {'lat': self.position.lat, 'lng': self.position.lon},
-            'icon_url': self.icon_url,
+            'icon': self.icon_url,
             'sphere_embed': self.sphere_embed,
-            'description': db.StringProperty()            
+            'description': self.description            
         }
 
 
