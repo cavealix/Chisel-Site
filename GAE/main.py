@@ -169,6 +169,35 @@ def deletePark(park_id):
         return render_template('deletePark.html', park=park)
 
 
+#POIs-------------------------------------------------
+@app.route('/pois/add', methods=['Post'])
+def addPoi():
+
+    print(request.json['data'])
+
+    data = request.json['data']
+
+    park = Place.get_by_id(data['park_id'])
+
+    position = data['position']
+    position = db.GeoPt( position['lat'], position['lng'] )
+
+    
+    #for poi in data:
+    poi = POI(
+        park = park,
+        type = data['type'],
+        position = position,
+        icon_url = data['icon'],
+        sphere_embed = data['sphere_embed'],
+        description = data['description']
+    )
+    poi.put()
+
+    return json.dumps({ 'status':'OK' });
+    
+
+
 #Trail Page -------------------------------------------------
 @app.route('/parks/<int:park_id>/<int:trail_id>', methods=['Get'])
 def trail(park_id, trail_id):
@@ -277,19 +306,23 @@ def addTrail():
         urls = request.form.getlist('sphere_url')
         embeds = request.form.getlist('embed_code')
 
-        for x in xrange(len(urls)):
-            string = urls[x].split('@')[1]
-            string = string.split(',')
-            lat = string[0]
-            lng = string[1]
-            position = db.GeoPt(float(lat), float(lng))
-            sphere = Sphere(
-                trail = newTrail,
-                embed_code = embeds[x].split('"')[1],
-                position = position
-            )
-            print sphere
-            sphere.put()
+        print(urls)
+
+        #Store spheres if present
+        if urls == []:
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+                position = db.GeoPt(float(lat), float(lng))
+                sphere = Sphere(
+                    trail = newTrail,
+                    embed_code = embeds[x].split('"')[1],
+                    position = position
+                )
+                print sphere
+                sphere.put()
 
         return redirect( url_for('map') )
     #Get

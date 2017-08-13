@@ -1,17 +1,8 @@
-
+var map;
 
 // Main ////////////////////////////////////////////////////
 var main = function(park_json) {
 
-  // Instantiate Knockout VM
-  VM = new ViewModel(park_json);
-  ko.applyBindings(VM);
-}
-
-var ViewModel = function(park_json) {
-  var self = this;
-
-  self.pois = ko.observableArray([]);
 
   map = new google.maps.Map(document.getElementById('map'), {
     center: new google.maps.LatLng(park_json.lat, park_json.lon),
@@ -19,12 +10,25 @@ var ViewModel = function(park_json) {
     scrollwheel: false
   });
 
+  // Instantiate Knockout VM
+  VM = new ViewModel(park_json);
+  ko.applyBindings(VM);
+
+
+}
+
+var ViewModel = function(park_json) {
+  var self = this;
+
+  self.pois = ko.observableArray([]);
+
+  var park = new Park(park_json);
+
+  
+
   map.addListener('click', function(e) {
     var poi_type = document.getElementById('poi_type');
     var type = poi_type.options[poi_type.selectedIndex].value;
-
-    console.log(type);
-
     var icon;
     switch(type) {
       case "info":
@@ -64,9 +68,23 @@ var ViewModel = function(park_json) {
         icon = "/static/imgs/google_icons/ic_pets_black_36dp/web/ic_pets_black_36dp_1x.png";
     }
 
-    console.log(icon);
+    var poi = new POI(park, e.latLng, type, icon, '', '' );
+    self.pois.push( poi );
 
-    self.pois.push( new POI(e.latLng, type, icon ))
+    //save 
+    $.ajax({
+      url: '/pois/add',
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
+      data: JSON.stringify({'data': poi}),
+      success: function(response) {
+          console.log(response);
+      },
+      error: function(error) {
+          console.log(error);
+      }
+    });
+
   });
 
   //self.newPoi = function(latLng, map) {
@@ -76,8 +94,6 @@ var ViewModel = function(park_json) {
   //  });
   //}
 
-  var park = new Park(park_json);
-
 }
 
 
@@ -85,6 +101,7 @@ var ViewModel = function(park_json) {
 var Park = function(park_json) {
   var self = this;
 
+  self.id = park_json.id;
   self.name = ko.observable(park_json.name);
   self.place_id = park_json.place_id;
   self.position = new google.maps.LatLng(park_json.lat, park_json.lon);
@@ -111,15 +128,15 @@ var Park = function(park_json) {
 }
 
 // POI Object ///////////////////////////////////////////
-var POI = function(position, type, icon) {
+var POI = function(park, position, type, icon, sphere_embed, description) {
   var self = this;
 
+  self.park_id = park.id;
   self.type = type;
   self.position = position;
-  //self.icon = poi.icon_url;
-  //self.description = poi.description;
-
-
+  self.icon = icon;
+  self.sphere_embed = sphere_embed;
+  self.description = description;
 
   var marker = new google.maps.Marker({
     map: map,
@@ -133,4 +150,15 @@ var POI = function(position, type, icon) {
   self.clear = function() {
     marker.setMap(null);
   };
+
+  self.serialize = function() {
+    return {
+      'park_id': self.park_id,
+      'type': self.type, 
+      'position': self.position,
+      'icon': self.icon,
+      'sphere_embed': self.sphere_embed,
+      'description': self.description
+    }
+  }
 }
