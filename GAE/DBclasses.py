@@ -54,6 +54,7 @@ class POI(db.Model):
     @property 
     def serialize(self):
         return { 
+            'id': self.key().id(),
             'type': self.type,
             'position': {'lat': self.position.lat, 'lng': self.position.lon},
             'icon': self.icon_url,

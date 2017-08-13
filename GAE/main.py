@@ -194,10 +194,21 @@ def addPoi():
     )
     poi.put()
 
+    return json.dumps({ 'status':'OK', 'id': poi.key().id() });
+
+
+@app.route('/pois/delete', methods=['Post'])
+def deletePoi():
+
+    print(request.json['data'])
+
+    poi_id = request.json['data']
+
+    poi = POI.get_by_id(poi_id)
+
+    db.delete(poi)
+
     return json.dumps({ 'status':'OK' });
-
-
-
     
 
 

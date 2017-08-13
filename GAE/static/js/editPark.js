@@ -27,7 +27,7 @@ var ViewModel = function(park_json) {
   //Create/show saved POIs 
   for (var i = 0; i < park.pois.length; i++) {
     var poi = park.pois[i];
-    self.poiList().push( new POI(park, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+    self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
   };
   
   //create new POI
@@ -73,7 +73,7 @@ var ViewModel = function(park_json) {
         icon = "/static/imgs/google_icons/ic_pets_black_36dp/web/ic_pets_black_36dp_1x.png";
     }
 
-    var poi = new POI(park, e.latLng, type, icon, '', '' );
+    var poi = new POI(park, '', e.latLng, type, icon, '', '' );
     self.poiList.push( poi );
 
     //save 
@@ -84,12 +84,37 @@ var ViewModel = function(park_json) {
       data: JSON.stringify({'data': poi}),
       success: function(response) {
           console.log(response);
+          //Set db id 
+          console.log(response.id);
+          poi.id = JSON.parse(response).id;
+          console.log(poi);
       },
       error: function(error) {
           console.log(error);
       }
     });
   });
+
+  //Delete POI
+  self.deletePOI = function(poi) {
+    //delete from db
+    $.ajax({
+      url: '/pois/delete',
+      type: 'POST',
+      contentType: 'application/json;charset=UTF-8',
+      data: JSON.stringify({'data': poi.id}),
+      success: function(response) {
+          console.log(response);
+      },
+      error: function(error) {
+          console.log(error);
+      }
+    });
+
+    //remove from view
+    poi.clear();
+    self.poiList.remove(poi);
+  };
 
 }
 
@@ -120,9 +145,10 @@ var Park = function(park_json) {
 }
 
 // POI Object ///////////////////////////////////////////
-var POI = function(park, position, type, icon, sphere_embed, description) {
+var POI = function(park, id, position, type, icon, sphere_embed, description) {
   var self = this;
 
+  self.id = id;
   self.park_id = park.id;
   self.type = type;
   self.position = position;
@@ -139,7 +165,10 @@ var POI = function(park, position, type, icon, sphere_embed, description) {
     }
   });
 
-
+  //Select POI to delete
+  google.maps.event.addListener(marker, 'click', function() { 
+      VM.deletePOI(self);
+  });
 
   self.clear = function() {
     marker.setMap(null);
