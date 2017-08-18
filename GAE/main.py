@@ -4,6 +4,8 @@ import logging, json, urllib
 from flask import Flask, render_template, url_for, request, \
     redirect, flash, jsonify, make_response
 
+#from flask_oauth import OAuth
+
 # 3rd Party Modules
 from modules.gpxjson import gpxToJson
 from modules.getElevate import getElevate

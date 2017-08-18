@@ -20,7 +20,6 @@
     <iframe id="photo_sphere" src="" allowfullscreen></iframe>
   </div>
 
-
   <!-- Map Section -->
   <div class="section">
 
@@ -57,6 +56,12 @@
           <li>|</li>
       </ul>
   </div>
+
+  <!-- Flickr masterslider -->
+  <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
+
+
+    
 
   <!-- Trail Info -->
   <div class="mini-section collapse" id="trail-info" data-bind="with: currentTrail">
@@ -103,7 +108,7 @@
   <div class="mini-section collapse" id="forecast">
     <ul class="canvas" id="forecast-week" data-bind="foreach: forecast">
       <li class="day">
-        <img id="weather-img" src="" alt="weather forecast" data-bind="attr: {src: img}">
+        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
         <p data-bind="text: avg"></p>
         <p data-bind="text: range"></p>
         <p data-bind="text: desc"></p>
@@ -125,7 +130,9 @@
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/static/css/map.css">
   <!-- Knockout -->
-    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+  <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+  <!-- MasterSlider main JS file -->
+  <script src="/static/js/knockstrap/knockstrap.min.js"></script>
   <!-- Map JS -->
   <script src="/static/js/map.js"></script>
 
