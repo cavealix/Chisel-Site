@@ -22,11 +22,15 @@ class Place(db.Model):
     abr_state = db.StringProperty()
     country = db.StringProperty()
     abr_country = db.StringProperty()
-    pois = db.StringListProperty()
 
     @property 
     def serialize(self):
         #returns data in serializable format
+
+        pois = []
+        for poi in self.pois:
+            pois.append(poi.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
@@ -35,7 +39,27 @@ class Place(db.Model):
             'lon' : self.location.lon,
             'state': self.state,
             'abr_state': self.abr_state,
-            'country': self.country
+            'country': self.country,
+            'pois': pois
+        }
+
+class POI(db.Model):
+    park = db.ReferenceProperty(Place, collection_name='pois')
+    type = db.StringProperty()
+    position = db.GeoPtProperty()
+    icon_url = db.StringProperty()
+    sphere_embed = db.StringProperty()
+    description = db.StringProperty()
+
+    @property 
+    def serialize(self):
+        return { 
+            'id': self.key().id(),
+            'type': self.type,
+            'position': {'lat': self.position.lat, 'lng': self.position.lon},
+            'icon': self.icon_url,
+            'sphere_embed': self.sphere_embed,
+            'description': self.description            
         }
 
 
@@ -61,6 +85,10 @@ class Trail(db.Model):
             pt = {'lat': coord.lat, 'lon': coord.lon}
             path.append(pt)
 
+        spheres = []
+        for photo in self.photo_spheres:
+            spheres.append(photo.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
@@ -76,5 +104,18 @@ class Trail(db.Model):
             'total_elevation_change' : self.total_elevation_change,
             'start_elevation' : self.start_elevation,
             'end_elevation' : self.end_elevation,
-            'activities' : self.activities
+            'activities' : self.activities,
+            'photo_spheres' : spheres
+        }
+
+class Sphere(db.Model):
+    trail = db.ReferenceProperty(Trail, collection_name='photo_spheres')
+    embed_code = db.StringProperty()
+    position = db.GeoPtProperty()
+
+    @property
+    def serialize(self):
+        return {
+            'embed_code' : self.embed_code,
+            'position' : {'lat': self.position.lat, 'lng': self.position.lon}
         }

@@ -4,6 +4,8 @@ import logging, json, urllib
 from flask import Flask, render_template, url_for, request, \
     redirect, flash, jsonify, make_response
 
+#from flask_oauth import OAuth
+
 # 3rd Party Modules
 from modules.gpxjson import gpxToJson
 from modules.getElevate import getElevate
@@ -12,7 +14,7 @@ from modules.youtubeLocationSearch import youtube_search
 
 # import the db library from GAE
 from google.appengine.ext import db
-from DBclasses import Place, Trail, User
+from DBclasses import Place, Trail, User, Sphere, POI
 
 import googlemaps
 from googlemaps import elevation, places
@@ -39,7 +41,7 @@ def login():
 @app.route('/parksJSON')
 #@cross_origin()
 def parksJSON():
-    parks = db.GqlQuery("select * from Park")
+    parks = db.GqlQuery("select * from Place")
     return jsonify(Parks=[p.serialize for p in parks])
 
 #Park API 
@@ -59,6 +61,11 @@ def parkAPI(place_id):
 def trailAPI(trail_id):
     trail = Trail.get_by_id(trail_id)
     return jsonify(Trail=trail.serialize)
+
+@app.route('/sphereAPI/<int:sphere_id>')
+def sphereAPI(sphere_id):
+    sphere = Sphere.get_by_id(sphere_id)
+    return jsonify(sphere=sphere.serialize)
 
 #Add Video
 @app.route('/addVideo/<int:park_id>/<int:trail_id>', methods = ['Post'])
@@ -146,8 +153,9 @@ def editPark(park_id):
         return redirect( url_for('park', park_id=park.key().id() ))
     #Get
     else:
-        park = Park.get_by_id(park_id)
-        return render_template('editPark.html', park=park)
+        park = Place.get_by_id(park_id)
+        park_json = json.dumps(park.serialize)
+        return render_template('editPark.html', park=park, park_json=park_json)
 
 #Delete Park
 @app.route('/parks/<int:park_id>/delete', methods=['Get', 'Post'])
@@ -161,6 +169,49 @@ def deletePark(park_id):
     else:
         park = Park.get_by_id(park_id)
         return render_template('deletePark.html', park=park)
+
+
+#POIs-------------------------------------------------
+@app.route('/pois/add', methods=['Post'])
+def addPoi():
+
+    print(request.json['data'])
+
+    data = request.json['data']
+
+    park = Place.get_by_id(data['park_id'])
+
+    position = data['position']
+    position = db.GeoPt( position['lat'], position['lng'] )
+
+    
+    #for poi in data:
+    poi = POI(
+        park = park,
+        type = data['type'],
+        position = position,
+        icon_url = data['icon'],
+        sphere_embed = data['sphere_embed'],
+        description = data['description']
+    )
+    poi.put()
+
+    return json.dumps({ 'status':'OK', 'id': poi.key().id() });
+
+
+@app.route('/pois/delete', methods=['Post'])
+def deletePoi():
+
+    print(request.json['data'])
+
+    poi_id = request.json['data']
+
+    poi = POI.get_by_id(poi_id)
+
+    db.delete(poi)
+
+    return json.dumps({ 'status':'OK' });
+    
 
 
 #Trail Page -------------------------------------------------
@@ -179,27 +230,8 @@ def trail(park_id, trail_id):
     return render_template('trail.html', park=park, trail=trail, trail_json=trail_json, videos=videos)
 
 #Add Trail
-@app.route('/parks/<int:park_id>/addTrail', methods=['Get', 'Post'])
-def addTrail(park_id):
-    #Post
-    if request.method == 'POST':
-        lat=float(request.form['lat'])
-        lon=float(request.form['lon'])
-        newTrail = Trail(name=request.form['name'], 
-            park_id=park_id,
-            position=db.GeoPt(lat,lon),
-            coords= gpxToJson( request.files['gpx'])
-        )
-        newTrail.put()
-        return redirect( url_for('park', park_id=park_id) )
-    #Get
-    else:
-        park = Park.get_by_id(park_id)
-        return render_template('addTrail.html', park=park)
-
-#Add Treck
-@app.route('/addTreck', methods=['Get', 'Post'])
-def addTreck():
+@app.route('/addTrail', methods=['Get', 'Post'])
+def addTrail():
     #Post
     if request.method == 'POST':
 
@@ -270,7 +302,7 @@ def addTreck():
             leg = abs(elevation[i]-abs(elevation[i+1]))
             total_elevation_change = total_elevation_change + leg
 
-        #Save Treck
+        #Save Trail
         newTrail = Trail(
             name=request.form['name'], 
             place_id=place_id,
@@ -286,14 +318,36 @@ def addTreck():
         )
         newTrail.put()
 
+        #Save Photo Sphere
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        print(urls)
+
+        #Store spheres if present
+        if urls == []:
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+                position = db.GeoPt(float(lat), float(lng))
+                sphere = Sphere(
+                    trail = newTrail,
+                    embed_code = embeds[x].split('"')[1],
+                    position = position
+                )
+                print sphere
+                sphere.put()
+
         return redirect( url_for('map') )
     #Get
     else:
-        return render_template('addTreck.html')
+        return render_template('addTrail.html')
 
 #Edit Trail
-@app.route('/parks/<int:park_id>/<int:trail_id>/edit', methods=['Get', 'Post'])
-def editTrail(park_id, trail_id):
+@app.route('/editTrail/<int:trail_id>', methods=['Get', 'Post'])
+def editTrail(trail_id):
     #Post
     if request.method == 'POST':
         trail = Trail.get_by_id(trail_id)
@@ -301,12 +355,12 @@ def editTrail(park_id, trail_id):
         trail.lat = float(request.form['lat'])
         trail.lon = float(request.form['lon'])
         trail.put()
-        return redirect( url_for('trail', park_id=trail.park_id, trail_id=trail.key().id() ))
+        return redirect( url_for('map' ))
     #Get
     else:
-        park = Park.get_by_id(park_id)
+        #park = Park.get_by_id(park_id)
         trail = Trail.get_by_id(trail_id)
-        return render_template('editTrail.html', park=park, trail=trail)
+        return render_template('editTrail.html', trail=trail)
 
 #Delete Trail
 @app.route('/parks/<int:park_id>/<int:trail_id>/delete', methods=['Get', 'Post'])

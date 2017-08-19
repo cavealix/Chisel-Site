@@ -2,15 +2,17 @@
 
 {% block content %}
 
-    <form method="post" action="{{ url_for('editTrail', park_id=park.key().id(), trail_id=trail.key().id()) }}">
-    	<h1>Edit trail {{trail.name}} from {{park.name}}</h1>
+    <form method="post" action="{{ url_for('editTrail', trail_id=trail.key().id()) }}">
+    	<h1>Edit trail {{trail.name}} </h1>
     	<input type="text" name="name" value="{{ trail.name }}">
-        <input type="text" name="lat" value="{{ trail.lat }}">
-        <input type="text" name="lon" value="{{ trail.lon }}">
+
+        {% for sphere in trail.spheres %}
+            <input type="text" name="sphere" value="sphere"> 
+        {% endfor %}
         <!-- <input type="textarea" name="description" value="{{ trail.description }}">
         <input type="text" name="coords" value="{{ trail.coords }}"> -->
     	<input type="submit" value="Edit">
-    	<a href="{{ url_for('trail', park_id=trail.park_id, trail_id=trail.key().id()) }}">Cancel</a>
+    	<a href="{{ url_for('map') }}">Cancel</a>
     </form>
 
 {% endblock %}
