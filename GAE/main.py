@@ -67,21 +67,6 @@ def sphereAPI(sphere_id):
     sphere = Sphere.get_by_id(sphere_id)
     return jsonify(sphere=sphere.serialize)
 
-#Add Video
-@app.route('/addVideo/<int:park_id>/<int:trail_id>', methods = ['Post'])
-def addVideo(park_id, trail_id):
-    url = request.form['url']
-    if trail_id == None:
-        park = Park.get_by_id(park_id)
-        park.videos.append(db.Link(url))
-        park.put()
-        return redirect( url_for('park', park_id = park.key().id() ))
-    else:
-        trail = Trail.get_by_id(trail_id)
-        trail.videos.append(db.Link(url))
-        trail.put()
-        return redirect( url_for( 'trail', park_id=trail.park_id, trail_id=trail.key().id() ))
-
 
 #Home -------------------------------------------------
 @app.route('/', methods=['Get'])
@@ -198,7 +183,6 @@ def addPoi():
 
     return json.dumps({ 'status':'OK', 'id': poi.key().id() });
 
-
 @app.route('/pois/delete', methods=['Post'])
 def deletePoi():
 
@@ -302,6 +286,15 @@ def addTrail():
             leg = abs(elevation[i]-abs(elevation[i+1]))
             total_elevation_change = total_elevation_change + leg
 
+        #If needed query Google for elevation
+        #if 0 in elevation:
+        #    elevation = []
+        #    for pt in coords:
+        #        e = gmaps.elevation((pt.lat, pt.lon))
+        #        elevation.append(e)
+        #    #print elevation
+
+
         #Save Trail
         newTrail = Trail(
             name=request.form['name'], 
@@ -313,7 +306,7 @@ def addTrail():
             total_distance = round(total_distance, 2),
             total_elevation_change = total_elevation_change,
             start_elevation = elevation[0],
-            end_elevation = elevation[len(elevation)-1],
+            end_elevation = float(elevation[len(elevation)-1]),
             activities = activities
         )
         newTrail.put()
@@ -322,7 +315,7 @@ def addTrail():
         urls = request.form.getlist('sphere_url')
         embeds = request.form.getlist('embed_code')
 
-        print(urls)
+        #print(urls)
 
         #Store spheres if present
         if urls == []:

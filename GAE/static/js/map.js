@@ -266,7 +266,7 @@ var ViewModel = function() {
       $.ajax({
         url: 'https://api.flickr.com/services/rest/?method=flickr.photos.search'+
           '&api_key=3affae96f735ec3e200682d77d67eadb&text='+text(),
-        type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
+        type: 'GET', // The https Method, can be GET POST PUT DELETE etc
         data: {
         }, // Additional parameters here
         success: function(data) { 
@@ -357,17 +357,17 @@ var ViewModel = function() {
         var position = ( self.destination().position );
 
         // FORECAST
-        var xmlhttp = new XMLHttpRequest();
+        var xmlhttps = new XMLhttpsRequest();
         //query OpenWeatherMap by geolocation
-        var url = "http://api.openweathermap.org/data/2.5/forecast/daily?lat="+position.lat()+"&lon="+position.lng()+"&mode=json&units=imperial&cnt=7&APPID=1088269cadd02d84dba9b274fc7bc097";
+        var url = "https://api.openweathermap.org/data/2.5/forecast/daily?lat="+position.lat()+"&lon="+position.lng()+"&mode=json&units=imperial&cnt=7&APPID=1088269cadd02d84dba9b274fc7bc097";
           
-        xmlhttp.onreadystatechange=function() {
-          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            myFunction(xmlhttp.responseText);
+        xmlhttps.onreadystatechange=function() {
+          if (xmlhttps.readyState == 4 && xmlhttps.status == 200) {
+            myFunction(xmlhttps.responseText);
           }
         }
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
+        xmlhttps.open("GET", url, true);
+        xmlhttps.send();
     
         function myFunction(response) {
           var arr = JSON.parse(response);
@@ -492,7 +492,7 @@ var ViewModel = function() {
     self.queryTrails = function(position) {
         $.ajax({
             url: 'https://trailapi-trailapi.p.mashape.com/', // The URL to the API. You can get this in the API page of the API you intend to consume
-            type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
+            type: 'GET', // The https Method, can be GET POST PUT DELETE etc
             data: {
                 lat: position.lat,
                 limit:15,
@@ -518,7 +518,7 @@ var ViewModel = function() {
     //Query parks according to filter criteria
     self.queryParks = function(park_type, state) {
         //Query parks in DB
-        $.getJSON( "http://localhost:8080/parksJSON", {
+        $.getJSON( "/parksJSON", {
           format: "json"
         })
         .done(function( data ) {
@@ -531,7 +531,7 @@ var ViewModel = function() {
           self.filteredList( self.parkList() );
         })
         .error( function() {
-            alert('parks AJAX request failed');
+            alert('parks AJAX request failed.');
         });
     };
 
@@ -623,7 +623,7 @@ var ViewModel = function() {
         self.clearList( self.poiList() );
 
         //Query and show trails within selected park
-        url = "http://localhost:8080/parkAPI/" + place_id;//.id;
+        url = "/parkAPI/" + place_id;//.id;
         //console.log(url);
         $.getJSON( url, {
           format: "json"
@@ -858,7 +858,7 @@ var Trail = function(data) {
     self.name = ko.observable(data.name);
     self.type = ko.observable('Trail'); //Treck, Ski Route, Off Road
     self.place_id = data.place_id;
-    //self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
+    //self.address = "https://localhost:8080/parks/" + park_id + "/" + data.id;
     self.position = new google.maps.LatLng(data.lat, data.lon);
 
     //set bounds to include all of trail
@@ -881,7 +881,7 @@ var Trail = function(data) {
         title: data.name,
         animation: google.maps.Animation.DROP,
         icon: {
-            url: 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png'
+            url: 'https://maps.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png'
           }
     });
 
@@ -969,7 +969,7 @@ var Photo_Sphere = function(data) {
         map: map,
         title: 'photo_sphere',
         icon: {
-          url: 'http://maps.gstatic.com/mapfiles/circle.png',
+          url: 'https://maps.gstatic.com/mapfiles/circle.png',
           anchor: new google.maps.Point(12, 12),
           scaledSize: new google.maps.Size(10, 17)
         }
@@ -1004,21 +1004,21 @@ var Park = function(data) {
     self.pois = data.pois;
     //data.type;
     //self.activities = ko.observableArray(data.activities);
-    //self.address = "http://localhost:8080/parks/" + data.id;
+    //self.address = "https://localhost:8080/parks/" + data.id;
 
     var markerUrl;
     switch (self.type ) {
       case 'State Park':
-        markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
+        markerUrl = 'https://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
         break;
       case 'Nat\'l Park':
-        markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png';
+        markerUrl = 'https://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png';
         break;
       case 'BLM':
-        markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
+        markerUrl = 'https://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png';
         break;
       case 'City Park':
-        markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
+        markerUrl = 'https://maps.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
     }
 
     var marker = new google.maps.Marker({
@@ -1155,7 +1155,7 @@ var Result = function(search_result) {
       title: search_result.name,
       position: search_result.geometry.location,
       icon: {
-        url: 'http://maps.gstatic.com/mapfiles/circle.png',
+        url: 'https://maps.gstatic.com/mapfiles/circle.png',
         anchor: new google.maps.Point(12, 12),
         scaledSize: new google.maps.Size(10, 17)
       }
@@ -1187,7 +1187,7 @@ var Result = function(search_result) {
 var Day = function(day) {
   var self = this;
 
-  self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
+  self.img   =  ko.observable("https://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
   self.avg   =  ko.observable(day.temp.day + '°F');
   self.range =  ko.observable(day.temp.max + ' - ' + day.temp.min + '°F');
   self.desc  =  ko.observable(day.weather[0].description);
