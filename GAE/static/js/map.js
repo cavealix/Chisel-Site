@@ -489,36 +489,54 @@ var ViewModel = function() {
     };
 
     //Query Mashape trailsapi
-    self.queryTrails = function(position) {
-        $.ajax({
-            url: 'https://trailapi-trailapi.p.mashape.com/', // The URL to the API. You can get this in the API page of the API you intend to consume
-            type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
-            data: {
-                lat: position.lat,
-                limit:15,
-                lon: position.lng
-            }, // Additional parameters here
-            dataType: 'json',
-            success: function(data) { 
-                //console.log((data));
+    self.queryTrails = function( place_id ) {
+        //Query and show trails within selected park
+        url = "/parkAPI/" + place_id;//.id;
+        //console.log(url);
+        $.getJSON( url, {
+          format: "json"
+        })
+        .done(function( data ) {
 
-                data.places.forEach( function(trail) {
-                    self.trailList.push( new Content(new google.maps.LatLng(trail.lat, trail.lon), trail.name) );
-                }); 
-            },
-            error: function(err) { 
-                alert(err); 
-            },
-            beforeSend: function(xhr) {
-            xhr.setRequestHeader("X-Mashape-Authorization", "50DlSbXy5Pmsh3OljMdfWI6ApsNHp1DQYKEjsnf77ATvEBikmb"); // Enter here your Mashape key
-            }
+            //console.log(data);
+
+            park = new Park( data.Place );
+            //self.switchPlace( place );
+
+            data.Trails.forEach( function(trail) {
+              self.trailList.push( new Trail(trail, place_id) );
+            });
+
+            //Create/show saved POIs 
+            for (var i = 0; i < park.pois.length; i++) {
+              var poi = park.pois[i];
+              self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+            };
+
+            //Before trailList is reset, fit map to Park and Trails
+            var bounds = self.trailList();
+            bounds.push( park );
+            //bounds.push( self.poiList() );
+            self.bounds(bounds);
+
+            self.filteredList( self.trailList() );
+
+            //Use park location until specific trail is selected
+            self.destination( park );
+            //self.getForecast();
+
+            //query for nearby flickr photos
+            self.flickrPhotoSearch( park.name );
+        })
+        .error( function() {
+            alert('Trails AJAX request failed');
         });
     };
 
     //Query parks according to filter criteria
     self.queryParks = function(park_type, state) {
         //Query parks in DB
-        $.getJSON( "http://localhost:8080/parksJSON", {
+        $.getJSON( "/parksJSON", {
           format: "json"
         })
         .done(function( data ) {
@@ -622,47 +640,7 @@ var ViewModel = function() {
         //clear previous pois
         self.clearList( self.poiList() );
 
-        //Query and show trails within selected park
-        url = "http://localhost:8080/parkAPI/" + place_id;//.id;
-        //console.log(url);
-        $.getJSON( url, {
-          format: "json"
-        })
-        .done(function( data ) {
-
-            //console.log(data);
-
-            park = new Park( data.Place );
-            //self.switchPlace( place );
-
-            data.Trails.forEach( function(trail) {
-              self.trailList.push( new Trail(trail, place_id) );
-            });
-
-            //Create/show saved POIs 
-            for (var i = 0; i < park.pois.length; i++) {
-              var poi = park.pois[i];
-              self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
-            };
-
-            //Before trailList is reset, fit map to Park and Trails
-            var bounds = self.trailList();
-            bounds.push( park );
-            //bounds.push( self.poiList() );
-            self.bounds(bounds);
-
-            self.filteredList( self.trailList() );
-
-            //Use park location until specific trail is selected
-            self.destination( park );
-            //self.getForecast();
-
-            //query for nearby flickr photos
-            self.flickrPhotoSearch( park.name );
-        })
-        .error( function() {
-            alert('Trails AJAX request failed');
-        });
+        self.queryTrails( place_id );
 
         self.show('prep-icons');
     };
