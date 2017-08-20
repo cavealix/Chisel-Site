@@ -10,15 +10,18 @@
     <input class="btn btn-success" type="submit" id="submit_park_id" value="Find park!"></input> -->
   </div>
 
+
   <!-- Selection Header -->
   <div class='mini-section' data-bind='with: destination'>
     <h1 data-bind='text: name'>Destination</h1>
   </div>
 
+
   <!-- Photo Sphere -->
   <div class="section collapse" id="photo_sphere_canvas">
     <iframe id="photo_sphere" src="" allowfullscreen></iframe>
   </div>
+
 
   <!-- Map Section -->
   <div class="section">
@@ -49,19 +52,17 @@
       </div>
   </div>
 
+
   <!-- Info Btns -->
   <div class="icon_bar collapse " id="prep-icons">
       <ul class="btns" data-bind="foreach: prep_icons">
-          <li class="info-btn"><img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search"></li>
+          <li class="info-btn">
+            <img data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search">
+          </li>
           <li>|</li>
       </ul>
   </div>
 
-  <!-- Flickr masterslider -->
-  <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
-
-
-    
 
   <!-- Trail Info -->
   <div class="mini-section collapse" id="trail-info" data-bind="with: currentTrail">
@@ -98,11 +99,15 @@
     </div>
   </div>
 
+
   <!-- Elevation -->
   <div class="mini-section collapse" id="elevation">
-    <!-- <div class="canvas " id="elevation">
-    </div> -->
   </div>
+
+
+  <!-- Flickr masterslider -->
+  <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
+
 
   <!-- Forecast -->
   <div class="mini-section collapse" id="forecast">
@@ -115,6 +120,7 @@
       </li>
     </ul>
   </div>
+
 
   <!-- Park/Trail List -->
   <!-- <div class="section collapse" id="list">
@@ -131,8 +137,10 @@
   <link rel="stylesheet" type="text/css" href="/static/css/map.css">
   <!-- Knockout -->
   <script src="/static/js/knockout/knockout-3.4.0.js"></script>
-  <!-- MasterSlider main JS file -->
+  <!-- Knockstrap -->
   <script src="/static/js/knockstrap/knockstrap.min.js"></script>
+  <!-- Google Graph -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <!-- Map JS -->
   <script src="/static/js/map.js"></script>
 

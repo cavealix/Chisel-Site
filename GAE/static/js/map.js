@@ -1,5 +1,6 @@
 var map, google, VM, parksData, content_url;
 
+//List of btns for querying nearby places and park info
 var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
   "title": "Food", "alt": "food-btn", "type": "restaurant"},
@@ -12,21 +13,16 @@ var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_local_gas_station_black_36dp/web/ic_local_gas_station_black_36dp_2x.png",
   "title": "Gas", "alt": "gas-btn", "type": "gas_station"},
   {"img": "/static/imgs/google_icons/ic_flight_black_36dp/web/ic_flight_black_36dp_2x.png",
-  "title": "airfare", "alt": "airfare-btn", "type": "airport"},
+  "title": "Airfare", "alt": "airfare-btn", "type": "airport"},
   {"img": "/static/imgs/google_icons/ic_change_history_black_36dp/web/ic_change_history_black_36dp_2x.png",
   "title": "Camp", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
   "title": "Hospital", "alt": "hospital-btn", "type": "hospital"},
+  {"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
+  "title": "POIs", "alt": "pois-btn", "type": "pois"},
   {"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
   "title": "Photos", "alt": "photos-btn", "type": "photos"}];
-var info_icons = [
-  {"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
-  "title": "Info", "alt": "info-icon", "id": "info"},
-  {"img": "/static/imgs/google_icons/ic_show_chart_black_36dp/web/ic_show_chart_black_36dp_2x.png",
-  "title": "Elevation", "alt": "elevation-icon", "id": "elevation"},
-  {"img": "/static/imgs/google_icons/ic_cloud_black_36dp/web/ic_cloud_black_36dp_2x.png",
-  "title": "Forecast", "alt": "forecast-icon", "id": "forecast"}
-  ];
+
 
 function initMap() {
 
@@ -37,16 +33,6 @@ function initMap() {
       scrollwheel: false,
       zoom: 6
     });
-
-    //Instantiate Flickr Masterslider 
-    //var slider = new MasterSlider();
-    //slider.setup('flickr-slider' , {
-    //     width:800,    // slider standard width
-    //     height:350,   // slider standard height
-    //     space:5
-    //});
-    //// adds Arrows navigation control to the slider.
-    //slider.control('arrows');
 
     VM = new ViewModel();
     ko.applyBindings(VM);
@@ -67,13 +53,13 @@ var ViewModel = function() {
     self.photoList = ko.observableArray([]);
     self.photoIndex = 0;
 
+    //Currently selected location (Parks/Trails)
     self.destination = ko.observable();
 
+    //Current model selections
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
     self.currentPhoto = ko.observable();
-    //Position for forecast and place search queries for content/trails/parks
-    //self.currentPosition = ko.observable();
 
     self.resultArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
@@ -89,22 +75,6 @@ var ViewModel = function() {
 
     var infoWindow = new google.maps.InfoWindow();
     var service = new google.maps.places.PlacesService(map);
-
-    self.itemsFirst = ko.observableArray([
-        {
-            src: 'holder.js/900x200/text:First image',
-            alt: 'First image',
-            content: 'First caption'
-        }, {
-            src: 'holder.js/900x200/text:Second image',
-            alt: 'Second image',
-            content: 'Second caption'
-        }, {
-            src: 'holder.js/900x200/text:Third image',
-            alt: 'Third image',
-            content: 'Third caption'
-        }
-    ]);
 
 // API CALLS //////////////////////////////////////////
 
@@ -387,7 +357,13 @@ var ViewModel = function() {
         if (iconButton.type == 'photos'){
             //show flickr photos
             self.show('myCarousel');
-        } 
+        }
+        //toggle park pois
+        else if (iconButton.type == 'pois'){
+            self.poiList().forEach(function(poi){
+              poi.toggle();
+            });
+        }
         //else search Google places
         else{
             //Clear previous results
@@ -553,6 +529,67 @@ var ViewModel = function() {
         });
     };
 
+    self.queryElevation = function( trail ){
+      var elevator = new google.maps.ElevationService;
+
+      elevator.getElevationAlongPath({
+        'path': trail.path,
+        'samples': 512
+      }, function(results, status) {
+        if (status === 'OK') {
+          // Retrieve the first result
+          if (results) {
+            // Open the infowindow indicating the elevation at the clicked position.
+            console.log(results);
+            var elevation = new Array();
+            results.forEach(function(e){
+              elevation.push(e.elevation);
+            });
+
+            //console.log(elevation);
+
+            google.charts.load('current', {packages: ['corechart', 'line']});
+            google.charts.setOnLoadCallback(drawBasic);
+
+            function drawBasic() {
+              var data = new google.visualization.DataTable();
+              data.addColumn('number', 'X');
+              data.addColumn('number', 'Elevation (m)');
+
+              var interval = trail.total_distance() / 512;
+              console.log('interval = ' + interval);
+
+              elevation.forEach(function(e,i){
+                data.addRows([[i*interval, e*3.28084]]);
+              });
+
+
+              var options = {
+                hAxis: {
+                  title: 'Distance (mi)'
+                },
+                vAxis: {
+                  title: 'Elevation (ft)'
+                }
+              };
+
+              var chart = new google.visualization.LineChart(document.getElementById('elevation'));
+              chart.draw(data, options);
+            }
+
+
+          } else {
+            alert('No results found');
+          }
+        } else {
+          alert('Elevation service failed due to: ' + status);
+        }
+      });
+    };
+
+
+// VIEW //////////////////////////////////////////////
+
     //Clear all trails on map
     self.clearTrails = function() {
         // Remove trail markers and paths from map
@@ -579,8 +616,6 @@ var ViewModel = function() {
 
       self.poiList( [] );
     };
-
-// VIEW //////////////////////////////////////////////
 
     //Add marker for each result from guideSearch
     self.addMarker = function(place) {
@@ -643,6 +678,7 @@ var ViewModel = function() {
         self.queryTrails( place_id );
 
         self.show('prep-icons');
+        self.hide('elevation');
     };
 
     //Highlight trail to distinguish from the rest
@@ -675,6 +711,8 @@ var ViewModel = function() {
         for (var i = 0; i < trail.photo_spheres.length; i++) {
           self.photoSphereList().push( new Photo_Sphere(trail.photo_spheres[i]) );
         };
+
+        self.queryElevation( trail );
         
         //Show trail data
         self.show('trail-info');
@@ -844,14 +882,14 @@ var Trail = function(data) {
     end = new google.maps.LatLng(end.lat, end.lon);
     var bounds = [self.position, end];
 
-    self.cumulative_distance = ko.observable(data.cumulative_distance);
+    self.cumulative_distance = ko.observableArray(data.cumulative_distance);
     self.total_distance = ko.observable(data.total_distance);
     self.total_elevation_change = ko.observable(data.total_elevation_change);
-    self.start_elevation = ko.observable(data.start_elevation);
-    self.end_elevation = ko.observable(data.end_elevation);
+    self.start_elevation = ko.observable(data.elevation[0]);
+    self.end_elevation = ko.observable(data.elevation[data.elevation.length-1]);
     self.activities = ko.observable(data.activities);
     self.photo_spheres = data.photo_spheres;
-
+    
     //Create Marker object
     var marker = new google.maps.Marker({
         position: self.position,
@@ -870,6 +908,8 @@ var Trail = function(data) {
         coord = data.coords[i];
         path.push(new google.maps.LatLng(coord.lat, coord.lon));
     }
+
+    self.path = path;
 
     //Define Trail path
     var trail = new google.maps.Polyline({
@@ -1054,6 +1094,7 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
   self.icon = icon;
   self.sphere_embed = sphere_embed;
   self.description = description;
+  self.markerState = true;
 
   var marker = new google.maps.Marker({
     map: map,
@@ -1071,6 +1112,18 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
 
   self.clear = function() {
     marker.setMap(null);
+  };
+
+  self.toggle = function() {
+    //console.log(marker.setMap);
+    if (self.markerState) {
+      marker.setMap(null);
+      self.markerState = false;
+    }
+    else {
+      marker.setMap('map');
+      self.markerState = true;
+    }
   };
 
   self.serialize = function() {

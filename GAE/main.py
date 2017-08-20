@@ -11,6 +11,7 @@ from modules.gpxjson import gpxToJson
 from modules.getElevate import getElevate
 from modules.haversine import haversine
 from modules.youtubeLocationSearch import youtube_search
+from modules.allEqual import allEqual
 
 # import the db library from GAE
 from google.appengine.ext import db
@@ -139,14 +140,12 @@ def addPark():
         return render_template('addPark.html')
 
 #Edit Park
-@app.route('/parks/<int:park_id>/edit', methods=['Get', 'Post'])
+@app.route('/editPark/<int:park_id>', methods=['Get', 'Post'])
 def editPark(park_id):
     #Post
     if request.method == 'POST':
-        park = Park.get_by_id(park_id)
+        park = Place.get_by_id(park_id)
         park.name = request.form['name']
-        park.lat = float(request.form['lat'])
-        park.lon = float(request.form['lon'])
         park.type = request.form['type']
         park.state = request.form['state']
         park.put()
@@ -302,6 +301,10 @@ def addTrail():
             leg = abs(elevation[i]-abs(elevation[i+1]))
             total_elevation_change = total_elevation_change + leg
 
+        #if all elevation = 0, set = [] and query via js if found []
+        if allEqual(elevation):
+            elevation = []
+
         #Save Trail
         newTrail = Trail(
             name=request.form['name'], 
@@ -312,8 +315,6 @@ def addTrail():
             cumulative_distance = cumulative_distance,
             total_distance = round(total_distance, 2),
             total_elevation_change = total_elevation_change,
-            start_elevation = elevation[0],
-            end_elevation = elevation[len(elevation)-1],
             activities = activities
         )
         newTrail.put()
