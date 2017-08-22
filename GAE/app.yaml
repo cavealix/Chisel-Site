@@ -18,6 +18,3 @@ libraries:
 
 - name: ssl
   version: latest
-
-- name: requests
-  version: 2.3

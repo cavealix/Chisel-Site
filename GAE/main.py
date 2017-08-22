@@ -58,10 +58,7 @@ def parkAPI(place_id):
     return jsonify(Place=place.serialize, Trails=[t.serialize for t in trails])
 
 #Trail API
-@app.route('/trailAPI/<int:trail_id>')
-def trailAPI(trail_id):
-    trail = Trail.get_by_id(trail_id)
-    return jsonify(Trail=trail.serialize)
+
 
 @app.route('/sphereAPI/<int:sphere_id>')
 def sphereAPI(sphere_id):
@@ -174,7 +171,7 @@ def deletePark(park_id):
 @app.route('/pois/add', methods=['Post'])
 def addPoi():
 
-    print(request.json['data'])
+    #print(request.json['data'])
 
     data = request.json['data']
 
@@ -197,7 +194,6 @@ def addPoi():
 
     return json.dumps({ 'status':'OK', 'id': poi.key().id() });
 
-
 @app.route('/pois/delete', methods=['Post'])
 def deletePoi():
 
@@ -214,6 +210,27 @@ def deletePoi():
 
 
 #Trail Page -------------------------------------------------
+@app.route('/trailAPI/<int:trail_id>', methods=['Get', 'Post'])
+def trailAPI(trail_id):
+    if request.method == 'Post':
+        trail = Trail.get_by_id(trail_id)
+    
+        #edit data
+        data = request.json['data']
+    
+        total_elevation_change = 0
+        for i in range(0,len(data['elevation'])-1):
+            leg = abs(data['elevation'][i]-abs(data['elevation'][i+1]))
+            total_elevation_change = total_elevation_change + leg
+    
+        trail.elevation = data['elevation']
+        trail.total_elevation_change = total_elevation_change
+    
+        #save changes
+        trail.put()
+
+    return redirect( url_for('map'))
+
 @app.route('/parks/<int:park_id>/<int:trail_id>', methods=['Get'])
 def trail(park_id, trail_id):
     park = Park.get_by_id(park_id)
@@ -341,7 +358,7 @@ def addTrail():
                 print sphere
                 sphere.put()
 
-        return redirect( url_for('map') )
+        return redirect( url_for('editTrail', trail_id=newTrail.key().id()) )
     #Get
     else:
         return render_template('addTrail.html')
@@ -351,17 +368,34 @@ def addTrail():
 def editTrail(trail_id):
     #Post
     if request.method == 'POST':
+
+        #edit data
+        elev = json.loads(request.form['elev'])
+        print elev
+
+        #old trail info
         trail = Trail.get_by_id(trail_id)
-        trail.name = request.form['name']
-        trail.lat = float(request.form['lat'])
-        trail.lon = float(request.form['lon'])
+        elevation = trail.elevation
+        total_elevation_change = trail.total_elevation_change
+
+        #if elevation being added, analize
+        if elevation == []:
+            total_elevation_change = 0
+            for i in range(0,len(elev)-1):
+                leg = abs(elev[i]-abs(elev[i+1]))
+                total_elevation_change = total_elevation_change + leg
+            trail.elevation = elev
+            trail.total_elevation_change = round(total_elevation_change)
+
         trail.put()
+
         return redirect( url_for('map' ))
     #Get
     else:
         #park = Park.get_by_id(park_id)
         trail = Trail.get_by_id(trail_id)
-        return render_template('editTrail.html', trail=trail)
+        trail_json = json.dumps(trail.serialize)
+        return render_template('editTrail.html', trail=trail, trail_json=trail_json)
 
 #Delete Trail
 @app.route('/parks/<int:park_id>/<int:trail_id>/delete', methods=['Get', 'Post'])

@@ -338,11 +338,20 @@ var ViewModel = function() {
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
+
+        var d = new Date();
+        var weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
         function myFunction(response) {
           var arr = JSON.parse(response);
             for (var i = 0; i < arr.list.length; i++) {
-              self.forecast.push( new Day(arr.list[i]) )
+
+              var index = d.getDay() + i;
+              if (index >= 7){
+                index -= 7;
+              }
+              self.forecast.push( new Day(arr.list[i], weekday[index] ));
+            
             };
         }
 
@@ -401,6 +410,8 @@ var ViewModel = function() {
         //FOR NOW - clear trails and show results in relation to park
         self.clearTrails();
         self.hide('trail-info');
+        self.hide('elevation');
+        self.hide('myCarousel');
     };
 
     self.getDistance = function( result ) {
@@ -529,62 +540,37 @@ var ViewModel = function() {
         });
     };
 
-    self.queryElevation = function( trail ){
-      var elevator = new google.maps.ElevationService;
+    self.chartElevation = function( trail ){
+        var elevation = trail.elevation;
 
-      elevator.getElevationAlongPath({
-        'path': trail.path,
-        'samples': 512
-      }, function(results, status) {
-        if (status === 'OK') {
-          // Retrieve the first result
-          if (results) {
-            // Open the infowindow indicating the elevation at the clicked position.
-            console.log(results);
-            var elevation = new Array();
-            results.forEach(function(e){
-              elevation.push(e.elevation);
-            });
+        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.setOnLoadCallback(drawBasic);
 
-            //console.log(elevation);
+        function drawBasic() {
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Distance (mi)');
+          data.addColumn('number', 'Elevation (m)');
 
-            google.charts.load('current', {packages: ['corechart', 'line']});
-            google.charts.setOnLoadCallback(drawBasic);
+          var interval = trail.total_distance() / 512;
+          console.log('interval = ' + interval);
 
-            function drawBasic() {
-              var data = new google.visualization.DataTable();
-              data.addColumn('number', 'X');
-              data.addColumn('number', 'Elevation (m)');
-
-              var interval = trail.total_distance() / 512;
-              console.log('interval = ' + interval);
-
-              elevation.forEach(function(e,i){
-                data.addRows([[i*interval, e*3.28084]]);
-              });
+          elevation.forEach(function(e,i){
+            data.addRows([[i*interval, e*3.28084]]);
+          });
 
 
-              var options = {
-                hAxis: {
-                  title: 'Distance (mi)'
-                },
-                vAxis: {
-                  title: 'Elevation (ft)'
-                }
-              };
-
-              var chart = new google.visualization.LineChart(document.getElementById('elevation'));
-              chart.draw(data, options);
+          var options = {
+            hAxis: {
+              title: 'Distance (mi)'
+            },
+            vAxis: {
+              title: 'Elevation (ft)'
             }
+          };
 
-
-          } else {
-            alert('No results found');
-          }
-        } else {
-          alert('Elevation service failed due to: ' + status);
+          var chart = new google.visualization.LineChart(document.getElementById('elevation'));
+          chart.draw(data, options);
         }
-      });
     };
 
 
@@ -712,11 +698,14 @@ var ViewModel = function() {
           self.photoSphereList().push( new Photo_Sphere(trail.photo_spheres[i]) );
         };
 
-        self.queryElevation( trail );
+        self.chartElevation( trail );
+
+        console.log(trail);
         
         //Show trail data
-        self.show('trail-info');
         self.show('elevation');
+        self.show('trail-info');
+        
 
         //fit map to trail bounds, self.bounds designed for 
         //  taking parks and trails
@@ -884,10 +873,12 @@ var Trail = function(data) {
 
     self.cumulative_distance = ko.observableArray(data.cumulative_distance);
     self.total_distance = ko.observable(data.total_distance);
+    
+    self.elevation = data.elevation;
     self.total_elevation_change = ko.observable(data.total_elevation_change);
-    self.start_elevation = ko.observable(data.elevation[0]);
-    self.end_elevation = ko.observable(data.elevation[data.elevation.length-1]);
-    self.activities = ko.observable(data.activities);
+    self.start_elevation = ko.observable(Math.round(data.elevation[0]));
+    self.end_elevation = ko.observable(Math.round(data.elevation[data.elevation.length-1]));
+    self.activities = ko.observableArray(data.activities);
     self.photo_spheres = data.photo_spheres;
     
     //Create Marker object
@@ -1105,9 +1096,12 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
     }
   });
 
-  //Select POI to delete
+  //Select POI to display photoSphere if present
   google.maps.event.addListener(marker, 'click', function() { 
+    if (self.sphere_embed != '' && self.sphere_embed != null){
       VM.selectPhotoSphere(self.sphere_embed);
+      VM.show('photo_sphere_canvas');
+    }
   });
 
   self.clear = function() {
@@ -1215,9 +1209,10 @@ var Result = function(search_result) {
 }
 
 // Day Object /////////////////////////////////////////////////
-var Day = function(day) {
+var Day = function(day, weekday) {
   var self = this;
 
+  self.weekday = ko.observable(weekday);
   self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
   self.avg   =  ko.observable(day.temp.day + '°F');
   self.range =  ko.observable(day.temp.max + ' - ' + day.temp.min + '°F');

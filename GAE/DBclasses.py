@@ -73,8 +73,6 @@ class Trail(db.Model):
     cumulative_distance = db.ListProperty(float)
     total_distance = db.FloatProperty()
     total_elevation_change = db.FloatProperty()
-    start_elevation = db.FloatProperty()
-    end_elevation = db.FloatProperty()
     activities = db.StringListProperty()
 
     @property 
@@ -102,8 +100,6 @@ class Trail(db.Model):
             'total_distance' : self.total_distance,
             'elevation' : self.elevation,
             'total_elevation_change' : self.total_elevation_change,
-            'start_elevation' : self.start_elevation,
-            'end_elevation' : self.end_elevation,
             'activities' : self.activities,
             'photo_spheres' : spheres
         }

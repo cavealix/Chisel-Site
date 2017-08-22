@@ -3,7 +3,7 @@
 {% block content %}
 
     <form method="post" action="{{ url_for('editTrail', trail_id=trail.key().id()) }}">
-    	<h1>Edit trail {{trail.name}} </h1>
+    	<h1>Edit {{trail.name}} </h1>
     	<input type="text" name="name" value="{{ trail.name }}">
 
         {% for sphere in trail.spheres %}
@@ -11,8 +11,32 @@
         {% endfor %}
         <!-- <input type="textarea" name="description" value="{{ trail.description }}">
         <input type="text" name="coords" value="{{ trail.coords }}"> -->
+        <input type="text" name="elev" id="elev" value="" style="">
     	<input type="submit" value="Edit">
     	<a href="{{ url_for('map') }}">Cancel</a>
     </form>
+
+    <!-- Map -->
+    <div class="section" id="map">
+    </div>
+
+    <!-- Elevation -->
+    <div class="mini-section" id="elevation">
+    </div>
+
+    <!-- Knockout -->
+    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+    <!-- Google Graph -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>var trail_json = JSON.parse('{{trail_json|safe}}');</script>
+    <script src="/static/js/editTrail.js"></script>
+
+    <!-- Google Maps API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script>
+
+    <!-- Google Maps -->
+    <script onload="main( trail_json )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" async defer></script>
 
 {% endblock %}
