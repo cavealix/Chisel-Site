@@ -52,33 +52,36 @@
                   <ul class="nav navbar-nav navbar-right">
 
                     <!-- <li><a href="/parks">Parks</a></li> -->
-                    <li id="search-bar">
-                        <input type="text" id="url" placeholder="Content URL">
-                        <input class="btn btn-success" type="submit" id="search_submit" value="Go There!"></input>
-                    </li>
-
+                    
                     <li><a href="/addTrail">+Trail</a></li>
                     <!-- only show 'map' link on other pages -->
                     {% if page != 'map' %}
                     <li><a href="/map">Map</a></li>
                     {% else %}
+                    <!-- Search Bar -->
+                    <li id="search-bar">
+                        <input type="text" id="url" placeholder="Content URL">
+                        <input class="btn btn-success" type="submit" id="search_submit" value="Go There!"></input>
+                    </li>
                     <!-- only show 'reset' and 'filter' on map page -->
                     <li><a href="#" data-bind="click: resetMap">Reset</a></li>
 
                     <!-- Filter by State -->
+                    <!-- 
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">State<span class="caret"></span></a>
                         <ul class="dropdown-menu scrollable-menu" data-bind="foreach: states" role="menu">
                             <li><a href="#" data-bind="click: $parent.filterState, text:$data"></a></li>
                         </ul>
-                    </li>
+                    </li> -->
                     <!-- Filter by Park type (Area) -->
+                    <!-- 
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Areas<span class="caret"></span></a>
                         <ul class="dropdown-menu" data-bind="foreach: park_types">
                             <li><a href="#" data-bind="click: $parent.filterType, text:$data"></a></li>
                         </ul>
-                    </li>
+                    </li> -->
                     
                     {% endif %}
 

@@ -51,7 +51,6 @@ var ViewModel = function() {
     self.photoSphereList = ko.observableArray([]);
     self.poiList = ko.observableArray([]);
     self.photoList = ko.observableArray([]);
-    self.photoIndex = 0;
 
     //Currently selected location (Parks/Trails)
     self.destination = ko.observable();
@@ -412,6 +411,8 @@ var ViewModel = function() {
         self.hide('trail-info');
         self.hide('elevation');
         self.hide('myCarousel');
+        self.clearList(self.poiList());
+        self.clearList(self.photoSphereList());
     };
 
     self.getDistance = function( result ) {
@@ -476,29 +477,23 @@ var ViewModel = function() {
     };
 
     //Query Mashape trailsapi
-    self.queryTrails = function( place_id ) {
+    self.queryTrails = function( park ) {
         //Query and show trails within selected park
-        url = "/parkAPI/" + place_id;//.id;
+        url = "/parkAPI/" + park.place_id;//.id;
         //console.log(url);
         $.getJSON( url, {
           format: "json"
         })
         .done(function( data ) {
 
-            //console.log(data);
+            console.log(data);
 
-            park = new Park( data.Place );
+            //park = new Park( data.Place );
             //self.switchPlace( place );
 
             data.Trails.forEach( function(trail) {
-              self.trailList.push( new Trail(trail, place_id) );
+              self.trailList.push( new Trail(trail, park.place_id) );
             });
-
-            //Create/show saved POIs 
-            for (var i = 0; i < park.pois.length; i++) {
-              var poi = park.pois[i];
-              self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
-            };
 
             //Before trailList is reset, fit map to Park and Trails
             var bounds = self.trailList();
@@ -596,10 +591,7 @@ var ViewModel = function() {
       self.parkList( [] );
 
       // Remove POIs from map
-      for (var i = 0; i < self.poiList().length; i++) {
-          self.poiList()[i].clear();
-      }
-
+      self.clearList(self.poiList);
       self.poiList( [] );
     };
 
@@ -638,7 +630,7 @@ var ViewModel = function() {
     };
 
     //Query DB for trails with place id
-    self.selectPark = function(place_id) {
+    self.selectPark = function(park) {
 
         //clear search results
         self.clearList(self.resultArray());
@@ -661,7 +653,16 @@ var ViewModel = function() {
         //clear previous pois
         self.clearList( self.poiList() );
 
-        self.queryTrails( place_id );
+        //Create/show saved POIs 
+        for (var i = 0; i < park.pois.length; i++) {
+          var poi = park.pois[i];
+          self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+        };
+
+        //console.log(self.poiList());
+
+        //query trails for park
+        self.queryTrails( park );
 
         self.show('prep-icons');
         self.hide('elevation');
@@ -807,6 +808,11 @@ var ViewModel = function() {
         self.clearTrails();
         self.clearParks();
 
+        self.poiList().forEach(function(poi){
+          poi.clear;
+        });
+        self.clearList(self.poiList());
+
         //clear destination variable
         self.destination().clear();
         self.destination(null);
@@ -823,6 +829,9 @@ var ViewModel = function() {
         //hide geo-specific location
         self.hide('prep-icons');
         self.hide('forecast');
+        self.hide('trail-info');
+        self.hide('elevation');
+        self.hide('myCarousel');
 
         //empty previous results
         self.forecast.removeAll();
@@ -1048,7 +1057,7 @@ var Park = function(data) {
       
       VM.closeMenu();
       VM.hide('trail-info');
-      VM.selectPark( self.place_id );
+      VM.selectPark( self );
       //Show list of relevant trails
       VM.show('list');
       self.bounce();

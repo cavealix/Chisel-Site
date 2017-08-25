@@ -48,18 +48,14 @@ def parksJSON():
 #Park API 
 @app.route('/parkAPI/<place_id>')
 def parkAPI(place_id):
-    place = Place.gql('WHERE place_id = :place_id', place_id=place_id).get() #Park.get_by_id(park_id)
     trails = Trail.gql(
             "where place_id = :place_id",
             place_id=place_id).fetch(limit=None)
-    logging.info(place)
     logging.info(trails)
     logging.info('HI')
-    return jsonify(Place=place.serialize, Trails=[t.serialize for t in trails])
+    return jsonify( Trails=[t.serialize for t in trails] )
 
 #Trail API
-
-
 @app.route('/sphereAPI/<int:sphere_id>')
 def sphereAPI(sphere_id):
     sphere = Sphere.get_by_id(sphere_id)
@@ -343,7 +339,7 @@ def addTrail():
         print(urls)
 
         #Store spheres if present
-        if urls == []:
+        if urls != [] and urls != ['']:
             for x in xrange(len(urls)):
                 string = urls[x].split('@')[1]
                 string = string.split(',')
@@ -375,11 +371,9 @@ def editTrail(trail_id):
 
         #old trail info
         trail = Trail.get_by_id(trail_id)
-        elevation = trail.elevation
-        total_elevation_change = trail.total_elevation_change
 
         #if elevation being added, analize
-        if elevation == []:
+        if trail.elevation == []:
             total_elevation_change = 0
             for i in range(0,len(elev)-1):
                 leg = abs(elev[i]-abs(elev[i+1]))
