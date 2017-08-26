@@ -32,10 +32,10 @@
       <h2 data-bind="text: name"></h2>
       <ul id="current_place">
           <li>Rating: <span data-bind="text: rating"></span></li>
-          <li>Addres: <span data-bind="text: address"></span></li>
+          <li>Directions: <a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
           <li>Phone: <span data-bind="text: phone"></span></li>
-          <li>Distance: <span data-bind="text: distanceFromDestination"></span></li>
-          <li>Approx. Drive Time: <span data-bind="text: durationFromDestination"></span></li>
+          <li title="Distance by road between park/trail and establishment">Distance: <span data-bind="text: distanceFromDestination"></span></li>
+          <li title="Approximate drive time between park/trail and establishment">Approx. Drive Time: <span data-bind="text: durationFromDestination"></span></li>
       </ul>  
     </div>
 

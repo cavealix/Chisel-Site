@@ -1,5 +1,6 @@
 var map, google, VM, parksData, content_url;
 
+
 //List of btns for querying nearby places and park info
 var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
@@ -75,7 +76,9 @@ var ViewModel = function() {
     self.activities = ['Hike', 'Bike', 'Camp', 'Pets', 'Climb', 'Swim', 'Offroad', 'Ski', 'Sail'];
 
     var infoWindow = new google.maps.InfoWindow();
+    //Google Map Service for nearbySearch and placeDetails
     var service = new google.maps.places.PlacesService(map);
+
 
 // API CALLS //////////////////////////////////////////
 
@@ -370,7 +373,6 @@ var ViewModel = function() {
             };
 
             //Perform Nearby Search
-            service = new google.maps.places.PlacesService(map);
             service.nearbySearch(request, callback);
 
             //Create bounds object for scaling map to search results
@@ -388,7 +390,6 @@ var ViewModel = function() {
               }
               //Include currentPosition in map resize
               map.fitBounds(bounds.extend( self.destination().position ));
-              //self.destination(  );
             }
         }
 
@@ -399,6 +400,29 @@ var ViewModel = function() {
         self.hide('myCarousel');
         self.clearList(self.poiList());
         self.clearList(self.photoSphereList());   
+    };
+
+    self.placeDetails = function( search_result ) {
+      //query for place details
+      var request = {
+        placeId: search_result.place_id()
+      };
+      service.getDetails(request, callback);
+
+      //handle result
+      function callback(place, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          //account for places with no number listed
+          if (place.formatted_phone_number == null || place.formatted_phone_number == ''){
+            search_result.phone('No number listed');
+          }
+          else{
+            search_result.phone(place.formatted_phone_number);            
+          }
+          search_result.address(place.formatted_address);
+          search_result.mapUrl(place.url);
+        }
+      }
     };
 
     self.getDistance = function( result ) {
@@ -602,7 +626,9 @@ var ViewModel = function() {
 
     //User clicks on park marker
     self.selectResult = function(search_result) {
-        self.currentPlace(search_result);
+        self.currentPlace( search_result );
+        self.getDistance( search_result );
+        self.placeDetails( search_result );
         self.openMenu();
         search_result.bounce();
     };
@@ -1159,10 +1185,17 @@ var Result = function(search_result) {
 
   self.name = ko.observable(search_result.name);
   self.position = search_result.geometry.location;
-  self.id = ko.observable(search_result.place_id);
-  self.rating = ko.observable(search_result.rating);
-  self.address = ko.observable(search_result.formatted_address);
-  self.phone = ko.observable(search_result.formatted_phone_number);
+  self.place_id = ko.observable(search_result.place_id);
+  if (search_result.rating == '' || search_result == null){
+    self.rating = ko.observable('No rating available');
+  }
+  else{
+    self.rating = ko.observable(search_result.rating + '/5');    
+  }
+
+  self.address = ko.observable(search_result.vicinity);
+  self.phone = ko.observable();
+  self.mapUrl = ko.observable();
   self.distanceFromDestination = ko.observable();
   self.durationFromDestination = ko.observable();
 
@@ -1184,7 +1217,6 @@ var Result = function(search_result) {
   //Trigger 'Select Place' KO event
   google.maps.event.addListener(marker, 'click', function() { 
       VM.selectResult(self);
-      VM.getDistance( self );
   });
 
   self.clear = function() {
