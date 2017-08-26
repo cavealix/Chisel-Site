@@ -99,6 +99,11 @@
   </div>
 
 
+  <!-- Current Weather -->
+  <div id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">
+    <h4>Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}">, between <span data-bind="text: range"></span></h4>
+  </div>
+
   <!-- Forecast -->
   <div class="mini-section collapse container-fluid" id="forecast">
       <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
