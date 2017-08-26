@@ -866,7 +866,7 @@ var ViewModel = function() {
     //Close info menu
     self.closeMenu = function() {
         $('.menu').animate({
-          left: "-285px"
+          left: "-300px"
         }, 200);
     };
 
@@ -1186,7 +1186,7 @@ var Result = function(search_result) {
   self.name = ko.observable(search_result.name);
   self.position = search_result.geometry.location;
   self.place_id = ko.observable(search_result.place_id);
-  if (search_result.rating == '' || search_result == null){
+  if (search_result.rating == undefined ){
     self.rating = ko.observable('No rating available');
   }
   else{

@@ -8,10 +8,10 @@
 .menu {
     background-color: #333;
     opacity: .85;
-    left: -285px;  /* start off behind the scenes */
+    left: -300px;  /* start off behind the scenes */
     height: inherit;
     position: absolute;
-    width: 285px;
+    width: 300px;
     z-index: 1;
     color: white;
     display: inline-block;
