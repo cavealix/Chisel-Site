@@ -4,6 +4,7 @@
   height: 100%;
   overflow: hidden;
 }
+/* Large Sections */
 .section {
   height: 500px;
   width: 100%;
@@ -13,9 +14,12 @@
 .mini-section{
   height: 'auto';
   max-height: 200px;
+  min-height: 150px;
   width: 100%;
   display: block;
 }
+
+/* However big it needs to be */
 .canvas {
   height: 100%;
   width: 100%;

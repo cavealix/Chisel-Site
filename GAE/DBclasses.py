@@ -74,6 +74,7 @@ class Trail(db.Model):
     total_distance = db.FloatProperty()
     total_elevation_change = db.FloatProperty()
     activities = db.StringListProperty()
+    seasons = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -101,6 +102,7 @@ class Trail(db.Model):
             'elevation' : self.elevation,
             'total_elevation_change' : self.total_elevation_change,
             'activities' : self.activities,
+            'seasons' : self.seasons,
             'photo_spheres' : spheres
         }
 

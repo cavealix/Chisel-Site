@@ -3,7 +3,7 @@
 {% block content %}
 
   <!-- Selection Header -->
-  <div class='mini-section' data-bind='with: destination'>
+  <div class='canvas' data-bind='with: destination'>
     <h1 id="destination" data-bind='text: name'>Destination</h1>
   </div>
 
@@ -12,6 +12,10 @@
   <div class="section collapse" id="photo_sphere_canvas">
     <iframe id="photo_sphere" src="" allowfullscreen></iframe>
   </div>
+
+
+  <!-- Flickr masterslider -->
+  <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
 
 
   <!-- Map Section -->
@@ -56,53 +60,61 @@
 
 
   <!-- Trail Info -->
-  <div class="mini-section collapse" id="trail-info" data-bind="with: currentTrail">
-    <div class="col-lg-4 col-md-4 col-xs-4 .offset-lg-1 .offset-md-1 .offset-sm-1" id="stats">
-      <ul>
-        <li>Distance: <span data-bind="text: total_distance"></span>(mi)</li>
-        <li>Start Elevation: <span data-bind="text: start_elevation"></span>(ft)</li>
-        <li>End Elevation: <span data-bind="text: end_elevation"></span>(ft)</li>
-        <li>Elevation Change: <span data-bind="text: total_elevation_change"></span>(ft)</li>
-      </ul>
-    </div>
+  <div class="mini-section collapse container-fluid" id="trail-info" data-bind="with: currentTrail">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-4 " id="stats">
+        <h5>The Basics</h5>
+        <ul>
+        <li>Distance: <span data-bind="text: total_distance"></span> mi</li>
+        <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
+        <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
+        <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
+        </ul>
+      </div>
 
-    <div class="col-lg-3 col-md-3 col-xs-4" id="activities">
+      <div class="col-lg-3 col-md-3 col-sm-4" id="what_to_expect">
+      <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day." trigger="hover" delay="0">What to Expect</h5>
+      <ul>
+          <li>Avg. Grade: %<span data-bind="text: avgGrade"></span></li>
+          <li>Elevation as stairs : <span data-bind="text: flights"></span> flights</li>
+          <li>Work Ratio: <span data-bind="text: workRatio"></span></li>
+          <li>Flat Equivalent: <span data-bind="text: flat_equivalent"></span> mi</li>
+      </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-2 col-sm-2" id="activities">
+      <h5>Activities</h5>
       <ul data-bind="foreach: activities">
           <li><span data-bind="text: $data"></span></li>
       </ul>
-    </div>
+      </div>
 
-    <div class="col-lg-4 col-md-4 col-xs-4" id="cell">
-      <ul>
-          <li>Popularity: Low</li>
-          <li>Best Season: Fall</li>
-          <li>Requires Permit?: Yes</li>
-          <li></li>
+      <div class="col-lg-3 col-md-3 col-sm-2" id="seasons">
+      <h5>Best Seasons</h5>
+      <ul data-bind="foreach: seasons">
+          <li><span data-bind="text: $data"></span></li>
       </ul>
+      </div>
     </div>
+  </div>
+
+
+  <!-- Forecast -->
+  <div class="mini-section collapse container-fluid" id="forecast">
+      <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
+        <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
+          <p data-bind="text: weekday"></p>
+          <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
+          <p data-bind="text: avg"></p>
+          <p data-bind="text: range"></p>
+          <p data-bind="text: desc"></p>
+        </li>
+      </ul>
   </div>
 
 
   <!-- Elevation -->
-  <div class="mini-section collapse" id="elevation">
-  </div>
-
-
-  <!-- Flickr masterslider -->
-  <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
-
-
-  <!-- Forecast -->
-  <div class="mini-section collapse" id="forecast">
-    <ul class="canvas" id="forecast-week" data-bind="foreach: forecast">
-      <li class="day">
-        <p data-bind="text: weekday"></p>
-        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
-        <p data-bind="text: avg"></p>
-        <p data-bind="text: range"></p>
-        <p data-bind="text: desc"></p>
-      </li>
-    </ul>
+  <div class="canvas collapse" id="elevation">
   </div>
 
 

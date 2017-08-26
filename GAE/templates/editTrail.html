@@ -13,6 +13,13 @@
         <input type="text" name="coords" value="{{ trail.coords }}"> -->
         <input type="text" name="elev" id="elev" value="" style="">
     	<input type="submit" value="Edit">
+
+        <!-- Season -->
+        <input type='checkbox' name='season' value='Spring'>Spring
+        <input type='checkbox' name='season' value='Summer'>Summer
+        <input type='checkbox' name='season' value='Fall'>Fall
+        <input type='checkbox' name='season' value='Winter'>Winter
+
     	<a href="{{ url_for('map') }}">Cancel</a>
     </form>
 

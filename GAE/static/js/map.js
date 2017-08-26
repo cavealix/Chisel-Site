@@ -18,8 +18,8 @@ var prep_icons = [
   "title": "Camp", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
   "title": "Hospital", "alt": "hospital-btn", "type": "hospital"},
-  {"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
-  "title": "POIs", "alt": "pois-btn", "type": "pois"},
+  //{"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
+  //"title": "POIs", "alt": "pois-btn", "type": "pois"},
   {"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
   "title": "Photos", "alt": "photos-btn", "type": "photos"}];
 
@@ -63,6 +63,7 @@ var ViewModel = function() {
     self.resultArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
     
+    self.currentWeather = ko.observable();
     self.forecast = ko.observableArray([]);
     self.park_types = ko.observableArray(['Nat\'l Park', 'State Park', 
         'BLM', 'Nat\'l Forrest', 'City Park']);
@@ -210,27 +211,6 @@ var ViewModel = function() {
     };
 
     self.flickrPhotoSearch = function( text ){
-      //var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.search'+
-      //    '&api_key=3affae96f735ec3e200682d77d67eadb&text='+text();
-      //console.log(url);
-      //  
-      //$.getJSON( url, {
-      //  format: "json"
-      //})
-      //.success(function( data ) {
-      //    console.log(data);
-      //})
-      //.error( function(data) {
-      //    if (data.status == 200) {
-      //      var response = (data.responseText.replace('jsonFlickrApi(', ''));
-      //      response.slice(0, response.length);
-      //      response = JSON.parse(response);
-      //      console.log(response.photos);
-      //    }
-      //    else {
-      //      alert('flickr Photo Search failed');
-      //    }
-      //});
 
       $.ajax({
         url: 'https://api.flickr.com/services/rest/?method=flickr.photos.search'+
@@ -349,8 +329,13 @@ var ViewModel = function() {
               if (index >= 7){
                 index -= 7;
               }
-              self.forecast.push( new Day(arr.list[i], weekday[index] ));
-            
+              //seperate current weather
+              if (i == 0) {
+                self.currentWeather( new Day(arr.list[i], weekday[index] ));
+              }
+              else{
+                self.forecast.push( new Day(arr.list[i], weekday[index] ));
+              }
             };
         }
 
@@ -402,17 +387,18 @@ var ViewModel = function() {
               }
               //Include currentPosition in map resize
               map.fitBounds(bounds.extend( self.destination().position ));
-              self.destination(  );
+              //self.destination(  );
             }
-        }
+          }
 
-        //FOR NOW - clear trails and show results in relation to park
-        self.clearTrails();
-        self.hide('trail-info');
-        self.hide('elevation');
-        self.hide('myCarousel');
-        self.clearList(self.poiList());
-        self.clearList(self.photoSphereList());
+          //FOR NOW - clear trails and show results in relation to park
+          self.clearTrails();
+          self.hide('trail-info');
+          self.hide('elevation');
+          self.hide('myCarousel');
+          self.clearList(self.poiList());
+          self.clearList(self.photoSphereList());
+        
     };
 
     self.getDistance = function( result ) {
@@ -476,7 +462,7 @@ var ViewModel = function() {
       }
     };
 
-    //Query Mashape trailsapi
+    //Trails by park.place_id
     self.queryTrails = function( park ) {
         //Query and show trails within selected park
         url = "/parkAPI/" + park.place_id;//.id;
@@ -664,8 +650,8 @@ var ViewModel = function() {
         //query trails for park
         self.queryTrails( park );
 
-        self.show('prep-icons');
         self.hide('elevation');
+        self.show('prep-icons');
     };
 
     //Highlight trail to distinguish from the rest
@@ -872,7 +858,6 @@ var Trail = function(data) {
     self.name = ko.observable(data.name);
     self.type = ko.observable('Trail'); //Treck, Ski Route, Off Road
     self.place_id = data.place_id;
-    //self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
     self.position = new google.maps.LatLng(data.lat, data.lon);
 
     //set bounds to include all of trail
@@ -887,6 +872,17 @@ var Trail = function(data) {
     self.total_elevation_change = ko.observable(data.total_elevation_change);
     self.start_elevation = ko.observable(Math.round(data.elevation[0]));
     self.end_elevation = ko.observable(Math.round(data.elevation[data.elevation.length-1]));
+    self.flights = ko.observable(Math.round(data.total_elevation_change/10));
+    
+    //Calculations
+    var avgGrade = data.total_elevation_change/(data.total_distance*5280/2);
+    self.avgGrade = ko.observable((avgGrade*100).toFixed(1));
+    var work = (280.5 * Math.pow(avgGrade,5) - 58.7 * Math.pow(avgGrade,4) - 76.8 * Math.pow(avgGrade,3) + 51.9 * Math.pow(avgGrade,2) + 19.6 * avgGrade + 2.5)/2.5;
+    self.workRatio = ko.observable(work.toFixed(2));
+    self.flat_equivalent = ko.observable((work*self.total_distance()).toFixed(2));
+
+    self.seasons = ko.observableArray(data.seasons);
+
     self.activities = ko.observableArray(data.activities);
     self.photo_spheres = data.photo_spheres;
     
@@ -1098,7 +1094,7 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
 
   var marker = new google.maps.Marker({
     map: map,
-    title: self.type,
+    title: self.description,
     position: position,
     icon: {
       url: icon
@@ -1223,8 +1219,8 @@ var Day = function(day, weekday) {
 
   self.weekday = ko.observable(weekday);
   self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
-  self.avg   =  ko.observable(day.temp.day + '°F');
-  self.range =  ko.observable(day.temp.max + ' - ' + day.temp.min + '°F');
+  self.avg   =  ko.observable(Math.round(day.temp.day) + '°F');
+  self.range =  ko.observable(Math.round(day.temp.min) + ' - ' + Math.round(day.temp.max) + '°F');
   self.desc  =  ko.observable(day.weather[0].description);
 }
 

@@ -24,6 +24,14 @@
         <input class="btn btn-success" type="submit" value="Go There!">
       </form>
     </div>
+
+  <!-- Park/Trail List -->
+  {% for park in parks %}
+  <button class="accordion">{{ park.name }}</button>
+  <div class="section panel">
+    <p>Lorem ipsum...</p>
+  </div>
+  {% endfor %}
     
 
     
@@ -44,5 +52,6 @@
 
   End Welcome container -->
 <link rel="stylesheet" type="text/css" href="/static/css/home.css">
+<script src="/static/js/home.js"></script>
 
 {% endblock %}

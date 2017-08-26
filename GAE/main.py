@@ -80,7 +80,8 @@ def addVideo(park_id, trail_id):
 #Home -------------------------------------------------
 @app.route('/', methods=['Get'])
 def home():
-    return render_template('home.html')
+    parks = db.GqlQuery("select * from Place")
+    return render_template('home.html', parks=parks)
 
 #List Parks
 @app.route('/parks', methods=['Get'])
@@ -367,10 +368,11 @@ def editTrail(trail_id):
 
         #edit data
         elev = json.loads(request.form['elev'])
-        print elev
 
         #old trail info
         trail = Trail.get_by_id(trail_id)
+
+        trail.seasons = request.form.getlist('season')
 
         #if elevation being added, analize
         if trail.elevation == []:

@@ -21,14 +21,9 @@ var ViewModel = function(park_json) {
   var self = this;
 
   self.poiList = ko.observableArray([]);
+  self.trailList = ko.observableArray([]);
 
   var park = new Park(park_json);
-
-  //Create/show saved POIs 
-  for (var i = 0; i < park.pois.length; i++) {
-    var poi = park.pois[i];
-    self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
-  };
   
   //create new POI
   map.addListener('click', function(e) {
@@ -95,6 +90,45 @@ var ViewModel = function(park_json) {
     });
   });
 
+  //Trails by park.place_id
+  self.queryTrails = function( park ) {
+        //Query and show trails within selected park
+        url = "/parkAPI/" + park.place_id;//.id;
+        //console.log(url);
+        $.getJSON( url, {
+          format: "json"
+        })
+        .done(function( data ) {
+
+            //console.log(data);
+
+            //park = new Park( data.Place );
+            //self.switchPlace( place );
+
+            data.Trails.forEach( function(trail) {
+              self.trailList.push( new Trail(trail, park.place_id) );
+            });
+
+            //Before trailList is reset, fit map to Park and Trails
+            var bounds = self.trailList();
+            bounds.push( park );
+            //bounds.push( self.poiList() );
+            self.bounds(bounds);
+
+            //self.filteredList( self.trailList() );
+
+            //Use park location until specific trail is selected
+            //self.destination( park );
+            //self.getForecast();
+
+            //query for nearby flickr photos
+            //self.flickrPhotoSearch( park.name );
+        })
+        .error( function() {
+            alert('Trails AJAX request failed');
+        });
+  };
+
   //Delete POI
   self.deletePOI = function(poi) {
     //delete from db
@@ -115,6 +149,27 @@ var ViewModel = function(park_json) {
     poi.clear();
     self.poiList.remove(poi);
   };
+
+  //For each location in list, extend bounds
+  self.bounds = function(list) {
+        
+        var bounds = new google.maps.LatLngBounds;
+        for (var i = 0; i < list.length; i++) {
+            bounds.extend(list[i].position);
+        }
+        //fit map to bounds
+        map.fitBounds(bounds);
+  };
+
+
+  //Create/show saved POIs 
+  for (var i = 0; i < park.pois.length; i++) {
+    var poi = park.pois[i];
+    self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+  };
+
+  //query for existing trails
+  self.queryTrails( park );
 
 }
 
@@ -142,6 +197,73 @@ var Park = function(park_json) {
   self.clear = function() {
     marker.setMap(null);
   };
+}
+
+// Trail //////////////////////////////////////////////////////
+var Trail = function(data) {
+    var self = this;
+
+    self.id = data.id;
+    self.name = ko.observable(data.name);
+    self.type = ko.observable('Trail'); //Treck, Ski Route, Off Road
+    self.place_id = data.place_id;
+    //self.address = "http://localhost:8080/parks/" + park_id + "/" + data.id;
+    self.position = new google.maps.LatLng(data.lat, data.lon);
+
+    var seasons = '';
+    //put season list into 1 line
+    data.seasons.forEach(function(season){
+      seasons = seasons + ', ' + season;
+    });
+
+    self.seasons= ko.observable( seasons );
+
+    //set bounds to include all of trail
+    var end = data.coords[data.coords.length-1];
+    end = new google.maps.LatLng(end.lat, end.lon);
+    var bounds = [self.position, end];
+
+    self.cumulative_distance = ko.observableArray(data.cumulative_distance);
+    self.total_distance = ko.observable(data.total_distance);
+    
+    self.elevation = data.elevation;
+    self.total_elevation_change = ko.observable(data.total_elevation_change);
+    self.start_elevation = ko.observable(Math.round(data.elevation[0]));
+    self.end_elevation = ko.observable(Math.round(data.elevation[data.elevation.length-1]));
+    self.activities = ko.observableArray(data.activities);
+    self.photo_spheres = data.photo_spheres;
+    
+    //Create Marker object
+    var marker = new google.maps.Marker({
+        position: self.position,
+        map: map,
+        title: data.name,
+        animation: google.maps.Animation.DROP,
+        icon: {
+            url: 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png'
+          }
+    });
+
+    //Create polyline from JSON data
+    var path = new Array();
+    for(var i=0; i < data.coords.length; i++){
+        //Tokenise the coordinates
+        coord = data.coords[i];
+        path.push(new google.maps.LatLng(coord.lat, coord.lon));
+    }
+
+    self.path = path;
+
+    //Define Trail path
+    var trail = new google.maps.Polyline({
+        path: path,
+        map: map,
+        geodesic: true,
+        strokeColor: 'orange',
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    });
+
 }
 
 // POI Object ///////////////////////////////////////////
