@@ -55,6 +55,7 @@ var ViewModel = function() {
     //Currently selected location (Parks/Trails)
     self.destination = ko.observable();
 
+
     //Current model selections
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
@@ -296,14 +297,14 @@ var ViewModel = function() {
     };
 
     //Query forecast by location
-    self.getForecast = function() {
+    self.getForecast = function( destination ) {
 
         //Reset forecast
         //self.hide('forecast');
         self.forecast.removeAll();
 
         //Use currentPosition for query
-        var position = ( self.destination().position );
+        var position = destination.position;
 
         // FORECAST
         var xmlhttp = new XMLHttpRequest();
@@ -354,8 +355,8 @@ var ViewModel = function() {
         //toggle park pois
         else if (iconButton.type == 'pois'){
             self.poiList().forEach(function(poi){
-              poi.toggle();
-            });
+            poi.toggle();
+          });
         }
         //else search Google places
         else{
@@ -389,16 +390,15 @@ var ViewModel = function() {
               map.fitBounds(bounds.extend( self.destination().position ));
               //self.destination(  );
             }
-          }
+        }
 
-          //FOR NOW - clear trails and show results in relation to park
-          self.clearTrails();
-          self.hide('trail-info');
-          self.hide('elevation');
-          self.hide('myCarousel');
-          self.clearList(self.poiList());
-          self.clearList(self.photoSphereList());
-        
+        //FOR NOW - clear trails and show results in relation to park
+        self.clearTrails();
+        self.hide('trail-info');
+        self.hide('elevation');
+        self.hide('myCarousel');
+        self.clearList(self.poiList());
+        self.clearList(self.photoSphereList());   
     };
 
     self.getDistance = function( result ) {
@@ -472,26 +472,21 @@ var ViewModel = function() {
         })
         .done(function( data ) {
 
-            console.log(data);
-
-            //park = new Park( data.Place );
-            //self.switchPlace( place );
-
             data.Trails.forEach( function(trail) {
               self.trailList.push( new Trail(trail, park.place_id) );
             });
 
-            //Before trailList is reset, fit map to Park and Trails
-            var bounds = self.trailList();
+            //Show park and trail markers
+            var bounds = [];
+            bounds.push.apply(bounds,self.trailList());
             bounds.push( park );
-            //bounds.push( self.poiList() );
+            //adjust map bounds
             self.bounds(bounds);
 
             self.filteredList( self.trailList() );
 
             //Use park location until specific trail is selected
             self.destination( park );
-            //self.getForecast();
 
             //query for nearby flickr photos
             self.flickrPhotoSearch( park.name );
@@ -609,49 +604,50 @@ var ViewModel = function() {
     self.selectResult = function(search_result) {
         self.currentPlace(search_result);
         self.openMenu();
-        //self.zoom();
-        //self.bounds();
-        //self.centerMap(search_result.position)
         search_result.bounce();
     };
 
     //Query DB for trails with place id
     self.selectPark = function(park) {
 
-        //clear search results
-        self.clearList(self.resultArray());
-        self.resultArray.removeAll();
+      //clear all previous info
+      self.clearList(self.resultArray());
+      self.resultArray.removeAll();
+      
+      //remove photo spheres from map
+      for (var i = 0; i < self.photoSphereList().length; i++) {
+        self.photoSphereList()[i].clear();
+      };
+      self.photoSphereList.removeAll();
+      //clear previous forecast
+      self.forecast.removeAll();
+      //clear previous trails
+      self.clearTrails();
+      //clear previous pois
+      self.clearList( self.poiList() );
 
-        //hide photo sphere canvas
-        self.hide('photo_sphere_canvas');
-        //remove photo spheres from map
-        for (var i = 0; i < self.photoSphereList().length; i++) {
-          self.photoSphereList()[i].clear();
-        };
-        self.photoSphereList.removeAll();
+      //query trails for park
+      self.queryTrails( park );
+      //query weather
+      self.getForecast( park );
+      
+      //Create/show saved POIs 
+      for (var i = 0; i < park.pois.length; i++) {
+        var poi = park.pois[i];
+        self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+      };
 
-        //clear previous forecast
-        self.forecast.removeAll();
+      //set park as selected destination
+      self.destination( self );
+      park.bounce();
 
-        //clear previous trails
-        self.clearTrails();
-
-        //clear previous pois
-        self.clearList( self.poiList() );
-
-        //Create/show saved POIs 
-        for (var i = 0; i < park.pois.length; i++) {
-          var poi = park.pois[i];
-          self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
-        };
-
-        //console.log(self.poiList());
-
-        //query trails for park
-        self.queryTrails( park );
-
-        self.hide('elevation');
-        self.show('prep-icons');
+      //adjust UI
+      self.hide('elevation');
+      self.hide('trail-info');
+      self.hide('photo_sphere_canvas');
+      self.show('prep-icons');
+      self.show('list');
+      self.closeMenu();
     };
 
     //Highlight trail to distinguish from the rest
@@ -1016,7 +1012,6 @@ var Park = function(data) {
     self.state = data.state;
     self.type = 'State Park';
     self.pois = data.pois;
-    //data.type;
     //self.activities = ko.observableArray(data.activities);
     //self.address = "http://localhost:8080/parks/" + data.id;
 
@@ -1046,17 +1041,8 @@ var Park = function(data) {
     });
 
     //Trigger 'Switch Park' KO event
-    google.maps.event.addListener(marker, 'click', function() { 
-      self.clear;
-      VM.destination( self );
-      VM.getForecast();
-      
-      VM.closeMenu();
-      VM.hide('trail-info');
+    google.maps.event.addListener(marker, 'click', function() {       
       VM.selectPark( self );
-      //Show list of relevant trails
-      VM.show('list');
-      self.bounce();
     });
 
     this.bounce = function() {
@@ -1258,6 +1244,9 @@ var Circle = function(position, radius){
 document.getElementById('search_submit').onclick = function() {
     VM.stripURL(document.getElementById('url').value);
 }
+
+//Enable Bootstrap Tool Tips
+
 
 //Event listener for finding park from map page
 //document.getElementById('submit_park_id').onclick = function() {

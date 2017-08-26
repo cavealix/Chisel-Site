@@ -65,47 +65,44 @@
       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="stats">
         <h5>The Basics</h5>
         <ul>
-        <li>Distance: <span data-bind="text: total_distance"></span> mi</li>
-        <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
-        <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
-        <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
+          <li>Distance: <span data-bind="text: total_distance"></span> mi</li>
+          <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
+          <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
+          <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
         </ul>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-4" id="what_to_expect">
-      <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day." trigger="hover" delay="0">What to Expect</h5>
-      <ul>
+        <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
+        <ul>
           <li>Avg. Grade: %<span data-bind="text: avgGrade"></span></li>
           <li>Elevation as stairs : <span data-bind="text: flights"></span> flights</li>
           <li>Work Ratio: <span data-bind="text: workRatio"></span></li>
           <li>Flat Equivalent: <span data-bind="text: flat_equivalent"></span> mi</li>
-      </ul>
+        </ul>
       </div>
 
       <div class="col-lg-2 col-md-2 col-sm-2" id="activities">
-      <h5>Activities</h5>
-      <ul data-bind="foreach: activities">
-          <li><span data-bind="text: $data"></span></li>
-      </ul>
+        <h5>Activities</h5>
+        <ul data-bind="foreach: activities">
+            <li><span data-bind="text: $data"></span></li>
+        </ul>
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-2" id="seasons">
-      <h5>Best Seasons</h5>
-      <ul data-bind="foreach: seasons">
-          <li><span data-bind="text: $data"></span></li>
-      </ul>
+        <h5>Best Seasons</h5>
+          <ul data-bind="foreach: seasons">
+              <li><span data-bind="text: $data"></span></li>
+          </ul>
       </div>
     </div>
   </div>
 
 
-  <!-- Current Weather -->
-  <div id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">
-    <h4>Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}">, between <span data-bind="text: range"></span></h4>
-  </div>
-
   <!-- Forecast -->
   <div class="mini-section collapse container-fluid" id="forecast">
+    <!-- Current Weather -->
+  <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: range"></span></h4>
       <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
         <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
           <p data-bind="text: weekday"></p>
@@ -148,6 +145,13 @@
   <!-- Google Maps -->
   <script onload="initMap()" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI&libraries=places,visualization" 
     async defer ></script>
+
+  <!-- Initialize Tooltips -->
+  <script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
+    });
+  </script>
 
   <!-- Auto search content if entered on homepage -->
   <!-- {% if video_id != None %}
