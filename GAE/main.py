@@ -89,16 +89,9 @@ def parks():
     parks = db.GqlQuery("select * from Park")
     return render_template('parks.html', parks=parks)
 
-@app.route('/map', methods=['Get', 'Post'])
+@app.route('/map', methods=['Get'])
 def map():
-    if request.method == 'POST':
-        #parse url to get video id
-        url = str(request.form['url'])
-        video_id = url.split('watch?v=')[1]
-        video_id = video_id.split('&')[0]
-        return render_template('map.html', page='map', video_id=video_id)
-    else:
-        return render_template('map.html', page='map', url=None)
+    return render_template('map.html', page='map')
 
 
 #Park Page-------------------------------------------------
@@ -142,6 +135,7 @@ def editPark(park_id):
         park.name = request.form['name']
         park.type = request.form['type']
         park.state = request.form['state']
+        park.photo = request.form['photo']
         park.put()
         return redirect( url_for('park', park_id=park.key().id() ))
     #Get

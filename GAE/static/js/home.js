@@ -1,18 +1,44 @@
-var acc = document.getElementsByClassName("accordion");
-var i;
 
-for (i = 0; i < acc.length; i++) {
-    acc[i].onclick = function(){
-        /* Toggle between adding and removing the "active" class,
-        to highlight the button that controls the panel */
-        this.classList.toggle("active");
+function init() {
 
-        /* Toggle between hiding and showing the active panel */
-        var panel = this.nextElementSibling;
-        if (panel.style.display === "block") {
-            panel.style.display = "none";
-        } else {
-            panel.style.display = "block";
-        }
-    }
+  VM = new ViewModel();
+  ko.applyBindings(VM);
+    
+}
+
+var ViewModel = function() {
+  var self = this;
+
+  self.photoList = ko.observableArray([]);
+
+  //Query parks according to filter criteria
+  self.queryParks = function() {
+      //Query parks in DB
+      $.getJSON( "/parksJSON", {
+        format: "json"
+      })
+      .done(function( data ) {
+
+        data.Parks.forEach( function(park){
+          self.photoList.push( new Photo(park) );
+        });
+        
+      })
+      .error( function() {
+          alert('parks AJAX request failed');
+      });
+  };
+
+    self.queryParks();
+
+}
+
+
+// Photo Object /////////////////////////////////////////////////
+var Photo = function(park){
+  self = this;
+
+  self.src = park.photo;
+  self.alt = photo.name;
+  self.content = photo.name;
 }

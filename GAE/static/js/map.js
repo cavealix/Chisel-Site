@@ -38,7 +38,8 @@ function initMap() {
     VM = new ViewModel();
     ko.applyBindings(VM);
 
-    VM.queryParks('State', 'TX');
+    //query all parks
+    VM.queryParks();
     
 }
 
@@ -521,7 +522,7 @@ var ViewModel = function() {
     };
 
     //Query parks according to filter criteria
-    self.queryParks = function(park_type, state) {
+    self.queryParks = function( place_id ) {
         //Query parks in DB
         $.getJSON( "/parksJSON", {
           format: "json"
@@ -670,6 +671,7 @@ var ViewModel = function() {
       //adjust UI
       self.hide('elevation');
       self.hide('trail-info');
+      self.hide('reccommendations');
       self.hide('photo_sphere_canvas');
       self.show('prep-icons');
       self.show('list');
@@ -714,7 +716,7 @@ var ViewModel = function() {
         //Show trail data
         self.show('elevation');
         self.show('trail-info');
-        
+        self.show('reccommendations');
 
         //fit map to trail bounds, self.bounds designed for 
         //  taking parks and trails
@@ -838,6 +840,7 @@ var ViewModel = function() {
         self.hide('prep-icons');
         self.hide('forecast');
         self.hide('trail-info');
+        self.hide('reccommendations');
         self.hide('elevation');
         self.hide('myCarousel');
 
@@ -896,17 +899,56 @@ var Trail = function(data) {
     self.end_elevation = ko.observable(Math.round(data.elevation[data.elevation.length-1]));
     self.flights = ko.observable(Math.round(data.total_elevation_change/10));
     
-    //Calculations
+    //Work Calculations
     var avgGrade = data.total_elevation_change/(data.total_distance*5280/2);
     self.avgGrade = ko.observable((avgGrade*100).toFixed(1));
     var work = (280.5 * Math.pow(avgGrade,5) - 58.7 * Math.pow(avgGrade,4) - 76.8 * Math.pow(avgGrade,3) + 51.9 * Math.pow(avgGrade,2) + 19.6 * avgGrade + 2.5)/2.5;
     self.workRatio = ko.observable(work.toFixed(2));
     self.flat_equivalent = ko.observable((work*self.total_distance()).toFixed(2));
 
-    self.seasons = ko.observableArray(data.seasons);
-
     self.activities = ko.observableArray(data.activities);
     self.photo_spheres = data.photo_spheres;
+    self.seasons = ko.observableArray(data.seasons);
+
+    //Time Estimate based on avg grade
+    var pace;
+    if (self.avgGrade() < 4 ) {
+      pace = 3;
+    }
+    else if (self.avgGrade() > 4 && self.avgGrade() < 7) {
+      pace = 2.5;
+    }
+    else{
+      pace = 2;
+    }
+    //need to know if loop or there-and-back to double
+    self.time = ko.observable( Math.round(self.total_distance()/pace*60) );
+
+    //Estimate of water to pack 1L/2hr active hiking
+    //need to know if loop or there-and-back to double 
+    self.water = ko.observable( Math.ceil(self.time()/120) );
+
+    //Estimate Weight
+    var weight;
+    weight = self.water()*2.2;
+    self.weight = ko.observable(weight);
+
+    //Estimated pack size
+    //add sophistication with more variables, time(days), water sources (divide water)
+    var pack;
+    if ( self.activities().indexOf('Camp') == -1 && self.weight() <= 5 ) {
+      pack = '0 - 10';
+    }
+    else if ( self.activities().indexOf('Camp') == -1 && (5 < self.weight() <= 15 )) {
+      pack = '10 - 25';
+    }
+    else if ( self.activities().indexOf('Camp') != -1 || (15 < self.weight() <= 30 )) {
+      pack = '25 - 40';
+    }
+    else {
+      pack = '40+';
+    }
+    self.pack = ko.observable(pack);
     
     //Create Marker object
     var marker = new google.maps.Marker({

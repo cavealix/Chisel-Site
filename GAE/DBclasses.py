@@ -22,6 +22,7 @@ class Place(db.Model):
     abr_state = db.StringProperty()
     country = db.StringProperty()
     abr_country = db.StringProperty()
+    photo = db.StringProperty()
 
     @property 
     def serialize(self):
@@ -40,6 +41,7 @@ class Place(db.Model):
             'state': self.state,
             'abr_state': self.abr_state,
             'country': self.country,
+            'photo': self.photo,
             'pois': pois
         }
 

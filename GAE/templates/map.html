@@ -14,7 +14,7 @@
   </div>
 
 
-  <!-- Flickr masterslider -->
+  <!-- Flickr Knockstrap -->
   <div class="section collapse" id="myCarousel" data-bind="carousel: { content: { data: photoList } }"></div>
 
 
@@ -59,6 +59,22 @@
   </div>
 
 
+  <!-- Forecast -->
+  <div class="mini-section collapse container-fluid" id="forecast">
+    <!-- Current Weather -->
+    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: range"></span></h4>
+    <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
+      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
+        <h5 data-bind="text: weekday"></h5>
+        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
+        <p data-bind="text: avg"></p>
+        <p data-bind="text: range"></p>
+        <p data-bind="text: desc"></p>
+      </li>
+    </ul>
+  </div>
+
+
   <!-- Trail Info -->
   <div class="mini-section collapse container-fluid" id="trail-info" data-bind="with: currentTrail">
     <div class="row">
@@ -77,8 +93,9 @@
         <ul>
           <li>Avg. Grade: %<span data-bind="text: avgGrade"></span></li>
           <li title="The overall elevation change in number of flights of stairs">Elevation as stairs : <span data-bind="text: flights"></span> flights</li>
-          <li title="An approximate ratio of effort accounting for distance with elvation compared to flat distance. (How much harder it's going to be)">Work Ratio: <span data-bind="text: workRatio"></span></li>
+          <!-- <li title="An approximate ratio of effort accounting for distance with elvation compared to flat distance. (How much harder it's going to be)">Work Ratio: <span data-bind="text: workRatio"></span></li> -->
           <li title="Approximate number of flat miles equivalent to effort with elevation. (Flat distance, same effort)">Flat Equivalent: <span data-bind="text: flat_equivalent"></span> mi</li>
+          <li title="Estimated active hiking time based on avg grade and distance, does not include breaks.">Estimated time: <span data-bind="text: time"></span> min</li>
         </ul>
       </div>
 
@@ -99,24 +116,38 @@
   </div>
 
 
-  <!-- Forecast -->
-  <div class="mini-section collapse container-fluid" id="forecast">
-    <!-- Current Weather -->
-    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: range"></span></h4>
-    <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
-      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
-        <h5 data-bind="text: weekday"></h5>
-        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
-        <p data-bind="text: avg"></p>
-        <p data-bind="text: range"></p>
-        <p data-bind="text: desc"></p>
-      </li>
-    </ul>
+  <!-- Elevation -->
+  <div class="canvas collapse" id="elevation">
   </div>
 
 
-  <!-- Elevation -->
-  <div class="canvas collapse" id="elevation">
+  <!-- Recommendations -->
+  <div class="mini-section  container-fluid" id="reccommendations" data-bind="with: currentTrail">
+    <div class="row">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2" id="clothing">
+        <h5>Clothing</h5>
+        <ul>
+          <!-- <li>Head: <span data-bind="text: total_distance"></span> mi</li>
+          <li>Upper: <span data-bind="text: total_distance"></span> mi</li>
+          <li>Lower: <span data-bind="text: total_distance"></span> mi</li>
+          <li>Shoes: <span data-bind="text: total_distance"></span> mi</li> -->
+        </ul>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-sm-4" id="Food/Water">
+        <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Food / Water</h5>
+        <ul>
+          <li title="Estimated minimum amount of water to take based on estimated completion time.">Est. Water: <span data-bind="text: water"></span> L</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3" id="gear">
+        <h5>Gear</h5>
+        <li title="Estimated weight based on water, food, and recommended gear."> Est. Weight: <span data-bind="text: weight"></span> lbs</li>
+        <li title="Estimated pack size based on water and weight estimate and if camping is an option."> Pack Size: <span data-bind="text: pack"></span> L</li>
+      </div>
+
+    </div>
   </div>
 
 
@@ -129,7 +160,6 @@
         </li>
       </ul>
   </div> -->
-
   
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/static/css/map.css">
@@ -142,26 +172,9 @@
   <!-- Map JS -->
   <script src="/static/js/map.js"></script>
 
-  <script>
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip(); 
-});
-</script>
 
   <!-- Google Maps -->
   <script onload="initMap()" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI&libraries=places,visualization" 
     async defer ></script>
-
-  <!-- Initialize Tooltips -->
-  <script>
-    $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
-    });
-  </script>
-
-  <!-- Auto search content if entered on homepage -->
-  <!-- {% if video_id != None %}
-    <script>VM.youtubeSearch('{{ video_id }}');</script>
-  {% endif %} -->
 
 {% endblock %}

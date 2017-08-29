@@ -2,56 +2,32 @@
 
 {% block content %}
     
-
-    <div class="section">
-
-      <div class="canvas"></div>
+    <div class="canvas" id="chisel">
 
       <div id="welcome">
-        <H1>Chisel Outdoors</H1>
         <h2>See It, Go There</h2>
+        <a href="/map" role="button" class="btn btn-primary btn-large">Explore the Map</a>
+        <p>Already know where you want to go? Find it below.</p>
       </div>
-        
-      <video playsinline autoplay muted loop poster="/static/imgs/Chisel.jpg" id="bgvid">
+
+      <!-- <video playsinline autoplay muted loop poster="/static/imgs/Chisel.jpg" id="bgvid">
         <source src="/static/video/spark_video.mp4" type="video/mp4">
-      </video>
-
-    </div>
-
-    <div class="mini-section" id="youtube-search">
-      <form method="post" action="{{ url_for('map', ) }}" enctype="multipart/form-data">
-        <input type="text" name="url" placeholder="Paste in video url">
-        <input class="btn btn-success" type="submit" value="Go There!">
-      </form>
+      </video> -->
+   
     </div>
 
   <!-- Park/Trail List -->
   {% for park in parks %}
-  <button class="accordion">{{ park.name }}</button>
-  <div class="section panel">
-    <p>Lorem ipsum...</p>
-  </div>
+    <div class="section">
+
+      <a href="/parks/{{park.key().id()}}"><img src="{{park.photo}}"></a>
+      <h2 class="park_name">{{park.name}}</h2>
+   
+    </div>
   {% endfor %}
     
-
-    
-
-  <!-- Welcome container 
-
-  <div class="welcome">
-    <div class="container" id="">
-      <div class="row">
-        <div class="col-md-10 col-md-offset-1" id="welcome_text" style="background-color: rgba(51, 51, 51, 0.35); border-radius: 15px; padding: 10px;">
-            <p>Welcome to our preview launch. Sign up for updates and to give us feedback at our forum.</p>
-          <p>Explore trails with geotagged 360 photos and learn what you need to be prepared for your next trip.</p>
-        </div>
-      </div>
-      <a href="http://www.chiseloutdoors.com/beta/search/" class="btn btn-default" role="button" style="font-size:30px;"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>Find Trails</a>
-    </div>
-  </div>
-
-  End Welcome container -->
 <link rel="stylesheet" type="text/css" href="/static/css/home.css">
-<script src="/static/js/home.js"></script>
+
 
 {% endblock %}
+

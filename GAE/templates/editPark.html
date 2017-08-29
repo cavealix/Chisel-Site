@@ -5,6 +5,8 @@
     <form method="post" action="{{ url_for('editPark', park_id=park.key().id()) }}">
         <h1>Edit {{ park.name }}</h1>
         <input type="text" name="name" value="{{park.name}}">
+        <input type="url" name="photo" value="{{park.photo}}">
+
         <select name="type" value="{{park.type}}">
           <option value="Nat'l Park">Nat'l Park</option>
           <option value="State Park">State Park</option>
