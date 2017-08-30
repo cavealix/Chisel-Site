@@ -626,6 +626,17 @@ var ViewModel = function() {
       });
     };
 
+    self.selectDay = function( day ) {
+      if (self.currentTrail() != undefined ) {
+        self.packLoadout( self.currentTrail(), day );
+        console.log('pack loadout for ' + day.weekday());
+      }
+      else {
+        alert( 'Please select a trail to pack for' );
+      }
+      
+    };
+
     //User clicks on park marker
     self.selectResult = function(search_result) {
         self.currentPlace( search_result );
@@ -886,15 +897,12 @@ var ViewModel = function() {
 var Loadout = function( trail, weather ) {
   self = this;
 
-
-
   //Clothing
   self.head = ko.observable();
   self.tops = ko.observable();
   self.bottoms = ko.observable();
   self.shoes = ko.observable();
   self.jacket = ko.observable();
-
 
   //Provisions
   self.water = ko.observable();
@@ -969,20 +977,9 @@ var Trail = function(data) {
     self.photo_spheres = data.photo_spheres;
     self.seasons = ko.observableArray(data.seasons);
 
-    //Time Estimate based on avg grade
-    //var pace;
-    //if (self.avgGrade() < 4 ) {
-    //  pace = 3;
-    //}
-    //else if (self.avgGrade() > 4 && self.avgGrade() < 7) {
-    //  pace = 2.5;
-    //}
-    //else{
-    //  pace = 2;
-    //}
     var naismithsTime = self.total_distance()/2.5*60 + self.total_elevation_change()/2000*60;
     //need to know if loop or there-and-back to double
-    self.time = ko.observable( Math.round( naismithsTime));//self.total_distance()/pace*60) );
+    self.time = ko.observable( Math.round( naismithsTime) );//self.total_distance()/pace*60) );
 
     
     //Create Marker object

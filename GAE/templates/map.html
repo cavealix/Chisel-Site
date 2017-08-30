@@ -64,7 +64,7 @@
     <!-- Current Weather -->
     <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"> °F</span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"> °F</span></h4>
     <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
-      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
+      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4" data-bind="click: $parent.selectDay">
         <h5 data-bind="text: weekday"></h5>
         <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
         <p data-bind="text: avg"> °F</p>
