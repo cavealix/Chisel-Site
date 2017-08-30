@@ -62,13 +62,13 @@
   <!-- Forecast -->
   <div class="canvas collapse container-fluid" id="forecast">
     <!-- Current Weather -->
-    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: range"></span></h4>
+    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"> °F</span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"> °F</span></h4>
     <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
       <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4">
         <h5 data-bind="text: weekday"></h5>
         <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
-        <p data-bind="text: avg"></p>
-        <p data-bind="text: range"></p>
+        <p data-bind="text: avg"> °F</p>
+        <p> <span data-bind="text: low"></span> - <span data-bind="text: high"></span>°F</p>
         <p data-bind="text: desc"></p>
       </li>
     </ul>
@@ -99,7 +99,7 @@
           <li title="The overall elevation change in number of flights of stairs">Stair Elevation : <span data-bind="text: flights"></span> flights</li>
           <!-- <li title="An approximate ratio of effort accounting for distance with elvation compared to flat distance. (How much harder it's going to be)">Work Ratio: <span data-bind="text: workRatio"></span></li> -->
           <li title="Approximate number of flat miles equivalent to effort with elevation. (Flat distance, same effort)">Flat Equivalent: <span data-bind="text: flat_equivalent"></span> mi</li>
-          <li title="Shortest estimated active hiking time based Naismiths Rule, does not include breaks.">Estimated time: <span data-bind="text: time"></span> min</li>
+          <li title="Shortest estimated active hiking time based on Naismiths Rule at 2.5 mph average pace, does not include breaks.">Estimated time: <span data-bind="text: time"></span> min</li>
         </ul>
       </div>
 

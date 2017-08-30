@@ -695,7 +695,7 @@ var ViewModel = function() {
         self.currentTrail(trail);
         self.currentTrail().highlight();
         self.currentTrail().bounce();
-        self.packLoadout(trail);
+        self.packLoadout( trail, self.currentWeather() );
 
         //Close photo sphere canvas
         self.hide('photo_sphere_canvas');
@@ -722,9 +722,9 @@ var ViewModel = function() {
     };
 
     //Determine best loadot
-    self.packLoadout = function( trail ) {
+    self.packLoadout = function( trail, weather ) {
       
-      var loadout = new Loadout( trail );
+      var loadout = new Loadout( trail, weather );
 
 
 
@@ -883,16 +883,38 @@ var ViewModel = function() {
 
 }
 
-var Loadout = function( trail ) {
+var Loadout = function( trail, weather ) {
   self = this;
+
+
+
+  //Clothing
+  self.head = ko.observable();
+  self.tops = ko.observable();
+  self.bottoms = ko.observable();
+  self.shoes = ko.observable();
+  self.jacket = ko.observable();
+
+
+  //Provisions
+  self.water = ko.observable();
+  self.food = ko.observable();
+
+  //Gear
+
+  //Weight & Pack
+  self.weight = ko.observable();
+  self.pack = ko.observable();
+
+  
   //Estimate of water to pack 1L/2hr active hiking
   //need to know if loop or there-and-back to double 
-  self.water = ko.observable( Math.ceil(trail.time()/120) );
-
+  self.water(Math.ceil(trail.time()/120));
+  
   //Estimate Weight
   var weight;
   weight = self.water()*2.2;
-  self.weight = ko.observable(weight);
+  self.weight(weight);
 
   //Estimated pack size
   //add sophistication with more variables, time(days), water sources (divide water)
@@ -909,7 +931,7 @@ var Loadout = function( trail ) {
   else {
     pack = '40+';
   }
-  self.pack = ko.observable(pack);
+  self.pack(pack);
 };
 
 // Trail //////////////////////////////////////////////////////
@@ -1292,8 +1314,9 @@ var Day = function(day, weekday) {
 
   self.weekday = ko.observable(weekday);
   self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
-  self.avg   =  ko.observable(Math.round(day.temp.day) + '°F');
-  self.range =  ko.observable(Math.round(day.temp.min) + ' - ' + Math.round(day.temp.max) + '°F');
+  self.avg   =  ko.observable( Math.round(day.temp.day) );
+  self.low   =  ko.observable( Math.round(day.temp.min) );
+  self.high = ko.observable( Math.round(day.temp.max) );
   self.desc  =  ko.observable(day.weather[0].description);
 }
 
