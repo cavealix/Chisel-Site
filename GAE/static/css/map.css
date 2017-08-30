@@ -1,8 +1,5 @@
 /* Local override */
 
-.mini-section {
-}
-
 #destination {
   text-align: center;
 }
@@ -72,6 +69,9 @@
 .day {
   display: inline-block;
   text-align: center;
+  /* background-color: rgba(100, 100, 100, .3); */
+  border-radius: 25px;
+  padding: 0px;
 }
 
 

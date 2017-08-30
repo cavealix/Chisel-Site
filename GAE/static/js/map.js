@@ -62,6 +62,7 @@ var ViewModel = function() {
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
     self.currentPhoto = ko.observable();
+    self.loadout = ko.observable();
 
     self.resultArray = ko.observableArray([]);
     self.filteredList = ko.observableArray( self.parkList() );
@@ -694,6 +695,7 @@ var ViewModel = function() {
         self.currentTrail(trail);
         self.currentTrail().highlight();
         self.currentTrail().bounce();
+        self.packLoadout(trail);
 
         //Close photo sphere canvas
         self.hide('photo_sphere_canvas');
@@ -711,16 +713,22 @@ var ViewModel = function() {
 
         self.chartElevation( trail );
 
-        console.log(trail);
+        //console.log(trail);
         
         //Show trail data
         self.show('elevation');
         self.show('trail-info');
         self.show('reccommendations');
+    };
 
-        //fit map to trail bounds, self.bounds designed for 
-        //  taking parks and trails
-        //map.fitBounds(trail.bounds);
+    //Determine best loadot
+    self.packLoadout = function( trail ) {
+      
+      var loadout = new Loadout( trail );
+
+
+
+      self.loadout( loadout );
     };
 
     //Reveal Photo Sphere
@@ -875,6 +883,35 @@ var ViewModel = function() {
 
 }
 
+var Loadout = function( trail ) {
+  self = this;
+  //Estimate of water to pack 1L/2hr active hiking
+  //need to know if loop or there-and-back to double 
+  self.water = ko.observable( Math.ceil(trail.time()/120) );
+
+  //Estimate Weight
+  var weight;
+  weight = self.water()*2.2;
+  self.weight = ko.observable(weight);
+
+  //Estimated pack size
+  //add sophistication with more variables, time(days), water sources (divide water)
+  var pack;
+  if ( trail.activities().indexOf('Camp') == -1 && self.weight() <= 5 ) {
+    pack = '0 - 10';
+  }
+  else if ( trail.activities().indexOf('Camp') == -1 && (5 < self.weight() <= 15 )) {
+    pack = '10 - 25';
+  }
+  else if ( trail.activities().indexOf('Camp') != -1 || (15 < self.weight() <= 30 )) {
+    pack = '25 - 40';
+  }
+  else {
+    pack = '40+';
+  }
+  self.pack = ko.observable(pack);
+};
+
 // Trail //////////////////////////////////////////////////////
 var Trail = function(data) {
     var self = this;
@@ -911,44 +948,20 @@ var Trail = function(data) {
     self.seasons = ko.observableArray(data.seasons);
 
     //Time Estimate based on avg grade
-    var pace;
-    if (self.avgGrade() < 4 ) {
-      pace = 3;
-    }
-    else if (self.avgGrade() > 4 && self.avgGrade() < 7) {
-      pace = 2.5;
-    }
-    else{
-      pace = 2;
-    }
+    //var pace;
+    //if (self.avgGrade() < 4 ) {
+    //  pace = 3;
+    //}
+    //else if (self.avgGrade() > 4 && self.avgGrade() < 7) {
+    //  pace = 2.5;
+    //}
+    //else{
+    //  pace = 2;
+    //}
+    var naismithsTime = self.total_distance()/2.5*60 + self.total_elevation_change()/2000*60;
     //need to know if loop or there-and-back to double
-    self.time = ko.observable( Math.round(self.total_distance()/pace*60) );
+    self.time = ko.observable( Math.round( naismithsTime));//self.total_distance()/pace*60) );
 
-    //Estimate of water to pack 1L/2hr active hiking
-    //need to know if loop or there-and-back to double 
-    self.water = ko.observable( Math.ceil(self.time()/120) );
-
-    //Estimate Weight
-    var weight;
-    weight = self.water()*2.2;
-    self.weight = ko.observable(weight);
-
-    //Estimated pack size
-    //add sophistication with more variables, time(days), water sources (divide water)
-    var pack;
-    if ( self.activities().indexOf('Camp') == -1 && self.weight() <= 5 ) {
-      pack = '0 - 10';
-    }
-    else if ( self.activities().indexOf('Camp') == -1 && (5 < self.weight() <= 15 )) {
-      pack = '10 - 25';
-    }
-    else if ( self.activities().indexOf('Camp') != -1 || (15 < self.weight() <= 30 )) {
-      pack = '25 - 40';
-    }
-    else {
-      pack = '40+';
-    }
-    self.pack = ko.observable(pack);
     
     //Create Marker object
     var marker = new google.maps.Marker({

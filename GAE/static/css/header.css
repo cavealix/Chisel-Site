@@ -11,10 +11,11 @@
   position: relative;
   overflow: hidden;
 }
+
 .mini-section{
   height: 'auto';
   max-height: 200px;
-  min-height: 150px;
+  min-height: 125px;
   width: 100%;
   display: block;
 }
@@ -23,6 +24,10 @@
 .canvas {
   height: 100%;
   width: 100%;
+}
+
+.spacer {
+  height: 1em;
 }
 
 
