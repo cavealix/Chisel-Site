@@ -62,7 +62,7 @@
   <!-- Forecast -->
   <div class="canvas collapse container-fluid" id="forecast">
     <!-- Current Weather -->
-    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"> °F</span> with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"> °F</span></h4>
+    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</h4>
     <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
       <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4" data-bind="click: $parent.selectDay">
         <h5 data-bind="text: weekday"></h5>
@@ -77,6 +77,48 @@
 
   <!-- Spacer -->
   <div class="spacer"></div>
+
+
+  <!-- Park Info -->
+  <div class="mini-section collapse container-fluid" id="park" data-bind="with: selectedPark">
+    <div class="row">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="park-info">
+        <h5>The Basics</h5>
+        <ul>
+          <li>Go There: <br><a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
+          <li>Phone: <span data-bind="text: phone"></span></li>
+          <li title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">Permit/Pass?:
+            <ul data-bind="foreach: permits"> 
+              <li data-bind="text: $data"></li>
+            </ul>
+          </li>  
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-4" id="park-stats">
+        <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
+        <ul>
+          <li>Number of trails: <span data-bind="text: numberTrails"></span></li>
+          <li>Total miles: <span data-bind="text: trailMiles"></span></li>
+        </ul>
+      </div>
+
+    <!--
+      <div class="col-lg-2 col-md-2 col-sm-2" id="park-activities">
+        <h5>Activities</h5>
+        <ul data-bind="foreach: activities">
+            <li><span data-bind="text: $data"></span></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons">
+        <h5>Best Seasons</h5>
+          <ul data-bind="foreach: seasons">
+              <li><span data-bind="text: $data"></span></li>
+          </ul>
+      </div> -->
+    </div>
+  </div>
 
 
   <!-- Trail Info -->
@@ -130,7 +172,7 @@
 
 
   <!-- Loadout -->
-  <div class="canvas  container-fluid" id="reccommendations" data-bind="with: loadout">
+  <div class="canvas  container-fluid collapse" id="loadout" data-bind="with: loadout">
     <h4 style="text-align: center;">What to Take</h4>
     <div class="row">
       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2" id="clothing">

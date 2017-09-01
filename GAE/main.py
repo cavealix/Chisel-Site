@@ -264,7 +264,7 @@ def addTrail():
 
                 if 'National Park' in place['name']:
                     place_type = 'National Park'
-                elif 'State Park' in place['name']:
+                elif 'State Park' or 'State Natural Area' in place['name']:
                     place_type = 'State Park'
                 elif 'National Forrest' in place['name']:
                     place_type = 'National Forrest'
@@ -280,15 +280,22 @@ def addTrail():
                 name = place['name'],
                 place_id = place['place_id'],
                 location = location,
+                address = place['formatted_address'],
+                phone = place['formatted_phone_number'],
+                mapUrl = place['url'],
                 place_type = place_type,
                 place_tags = place['types'],
                 state = state,
                 abr_state = abr_state,
                 country = country,
-                abr_country = abr_country
+                abr_country = abr_country,
+                trailMiles = 0
                 )
             print newPlace
             newPlace.put()
+            place = newPlace
+        else:
+            place = place_search
 
 
         #Trail info
@@ -315,6 +322,7 @@ def addTrail():
 
         #Save Trail
         newTrail = Trail(
+            park = place,
             name=request.form['name'], 
             place_id=place_id,
             position=coords[0],
@@ -326,6 +334,10 @@ def addTrail():
             activities = activities
         )
         newTrail.put()
+
+        #Add to cumulative trail miles in park
+        place.trailMiles = place.trailMiles + int(round(newTrail.total_distance))
+        place.put()
 
         #Save Photo Sphere
         urls = request.form.getlist('sphere_url')

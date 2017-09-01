@@ -15,6 +15,9 @@ class Place(db.Model):
     name = db.StringProperty(required = True)
     place_id = db.StringProperty()
     location = db.GeoPtProperty()
+    address = db.StringProperty()
+    phone = db.StringProperty()
+    mapUrl = db.StringProperty()
     place_type = db.StringProperty()
     place_tags = db.StringListProperty()
     fid = db.StringProperty()
@@ -23,6 +26,7 @@ class Place(db.Model):
     country = db.StringProperty()
     abr_country = db.StringProperty()
     photo = db.StringProperty()
+    trailMiles = db.IntegerProperty()
 
     @property 
     def serialize(self):
@@ -32,17 +36,28 @@ class Place(db.Model):
         for poi in self.pois:
             pois.append(poi.serialize)
 
+        trails = []
+        for trail in self.trails:
+            trails.append(trail.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
             'place_id' : self.place_id,
+            'address' : self.address,
+            'phone' : self.phone,
+            'place_type' : self.place_type,
+            'mapUrl' : self.mapUrl,
             'lat' : self.location.lat,
             'lon' : self.location.lon,
             'state': self.state,
             'abr_state': self.abr_state,
             'country': self.country,
             'photo': self.photo,
-            'pois': pois
+            'pois': pois,
+            'trailMiles': self.trailMiles,
+            'numberTrails': len(trails)
+
         }
 
 class POI(db.Model):
@@ -66,6 +81,7 @@ class POI(db.Model):
 
 
 class Trail(db.Model):
+    park = db.ReferenceProperty(Place, collection_name='trails')
     name = db.StringProperty(required = True)
     place_id = db.StringProperty()
     park_key = db.Key()

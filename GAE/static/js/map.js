@@ -62,6 +62,7 @@ var ViewModel = function() {
     self.currentPlace = ko.observable();
     self.currentTrail = ko.observable();
     self.currentPhoto = ko.observable();
+    self.selectedPark = ko.observable();
     self.loadout = ko.observable();
 
     self.resultArray = ko.observableArray([]);
@@ -400,6 +401,8 @@ var ViewModel = function() {
         self.hide('trail-info');
         self.hide('elevation');
         self.hide('myCarousel');
+        self.hide('photo_sphere_canvas');
+        self.hide('loadout');
         self.clearList(self.poiList());
         self.clearList(self.photoSphereList());   
     };
@@ -634,7 +637,6 @@ var ViewModel = function() {
       else {
         alert( 'Please select a trail to pack for' );
       }
-      
     };
 
     //User clicks on park marker
@@ -677,14 +679,16 @@ var ViewModel = function() {
       };
 
       //set park as selected destination
+      self.selectedPark( park );
       self.destination( self );
       park.bounce();
 
       //adjust UI
       self.hide('elevation');
       self.hide('trail-info');
-      self.hide('reccommendations');
+      self.hide('loadout');
       self.hide('photo_sphere_canvas');
+      self.show('park');
       self.show('prep-icons');
       self.show('list');
       self.closeMenu();
@@ -729,7 +733,7 @@ var ViewModel = function() {
         //Show trail data
         self.show('elevation');
         self.show('trail-info');
-        self.show('reccommendations');
+        self.show('loadout');
     };
 
     //Determine best loadot
@@ -859,7 +863,7 @@ var ViewModel = function() {
         self.hide('prep-icons');
         self.hide('forecast');
         self.hide('trail-info');
-        self.hide('reccommendations');
+        self.hide('loadout');
         self.hide('elevation');
         self.hide('myCarousel');
 
@@ -1109,16 +1113,22 @@ var Park = function(data) {
     self.place_id = data.place_id;
     self.name = ko.observable(data.name);
     self.position = new google.maps.LatLng(data.lat, data.lon);
+    self.address = ko.observable(data.address);
+    self.phone = ko.observable(data.phone);
+    self.mapUrl = ko.observable(data.mapUrl);
     self.state = data.state;
-    self.type = 'State Park';
+    self.place_type = data.place_type;
     self.pois = data.pois;
+    self.permits = ko.observableArray();
+    self.numberTrails = ko.observable( data.numberTrails );
+    self.trailMiles = ko.observable( data.trailMiles );
     //self.activities = ko.observableArray(data.activities);
-    //self.address = "http://localhost:8080/parks/" + data.id;
 
     var markerUrl;
-    switch (self.type ) {
+    switch (self.place_type ) {
       case 'State Park':
         markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
+        self.permits( ['$70 annual permit', '$8 day pass +13 yrs old'] );
         break;
       case 'Nat\'l Park':
         markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png';
