@@ -1122,7 +1122,17 @@ var Park = function(data) {
     self.permits = ko.observableArray();
     self.numberTrails = ko.observable( data.numberTrails );
     self.trailMiles = ko.observable( data.trailMiles );
-    //self.activities = ko.observableArray(data.activities);
+    self.activities = ko.observableArray();
+    
+    console.log(data.activities);
+
+    //iterate through object keys
+    Object.keys(data.activities).forEach(function(key) {
+      //create new activity
+      self.activities.push( new Activity(key, data.activities[key] ));
+      console.log(data.activities.key);
+    });
+
 
     var markerUrl;
     switch (self.place_type ) {
@@ -1173,6 +1183,13 @@ var Park = function(data) {
     this.set = function() {
       marker.setMap(map);
     };
+}
+
+var Activity = function(activity, number){
+  self = this;
+
+  self.type = ko.observable(activity);
+  self.number = ko.observable(number);
 }
 
 // POI Object ///////////////////////////////////////////

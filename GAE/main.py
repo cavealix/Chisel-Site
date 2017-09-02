@@ -337,6 +337,7 @@ def addTrail():
 
         #Add to cumulative trail miles in park
         place.trailMiles = place.trailMiles + int(round(newTrail.total_distance))
+        place.activities = place.activities + activities
         place.put()
 
         #Save Photo Sphere

@@ -27,6 +27,7 @@ class Place(db.Model):
     abr_country = db.StringProperty()
     photo = db.StringProperty()
     trailMiles = db.IntegerProperty()
+    activities = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -37,8 +38,12 @@ class Place(db.Model):
             pois.append(poi.serialize)
 
         trails = []
+
         for trail in self.trails:
             trails.append(trail.serialize)
+
+        activities = {i:self.activities.count(i) for i in self.activities}
+
 
         return {
             'id' : self.key().id(),
@@ -56,7 +61,8 @@ class Place(db.Model):
             'photo': self.photo,
             'pois': pois,
             'trailMiles': self.trailMiles,
-            'numberTrails': len(trails)
+            'numberTrails': len(trails),
+            'activities': activities
 
         }
 

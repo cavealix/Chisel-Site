@@ -67,8 +67,8 @@
       <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4" data-bind="click: $parent.selectDay">
         <h5 data-bind="text: weekday"></h5>
         <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
-        <p data-bind="text: avg"> °F</p>
-        <p> <span data-bind="text: low"></span> - <span data-bind="text: high"></span>°F</p>
+        <p><span data-bind="text: avg"></span>°F</p>
+        <p><span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</p>
         <p data-bind="text: desc"></p>
       </li>
     </ul>
@@ -103,15 +103,14 @@
         </ul>
       </div>
 
-    <!--
       <div class="col-lg-2 col-md-2 col-sm-2" id="park-activities">
         <h5>Activities</h5>
         <ul data-bind="foreach: activities">
-            <li><span data-bind="text: $data"></span></li>
+            <li><span data-bind="text: type"></span>: <span data-bind="text: number"></span></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons">
+      <!-- <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons">
         <h5>Best Seasons</h5>
           <ul data-bind="foreach: seasons">
               <li><span data-bind="text: $data"></span></li>
