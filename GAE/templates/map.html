@@ -62,7 +62,7 @@
   <!-- Forecast -->
   <div class="canvas collapse container-fluid" id="forecast">
     <!-- Current Weather -->
-    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</h4>
+    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F with <span data-bind="text: humidity"></span>% humidity</h4>
     <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
       <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4" data-bind="click: $parent.selectDay">
         <h5 data-bind="text: weekday"></h5>
@@ -70,6 +70,7 @@
         <p><span data-bind="text: avg"></span>°F</p>
         <p><span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</p>
         <p data-bind="text: desc"></p>
+        <p><span data-bind="text: humidity"></span>% Humid</p>
       </li>
     </ul>
   </div>
@@ -87,11 +88,6 @@
         <ul>
           <li>Go There: <br><a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
           <li>Phone: <span data-bind="text: phone"></span></li>
-          <li title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">Permit/Pass?:
-            <ul data-bind="foreach: permits"> 
-              <li data-bind="text: $data"></li>
-            </ul>
-          </li>  
         </ul>
       </div>
 
@@ -110,12 +106,12 @@
         </ul>
       </div>
 
-      <!-- <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons">
-        <h5>Best Seasons</h5>
-          <ul data-bind="foreach: seasons">
-              <li><span data-bind="text: $data"></span></li>
+      <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons"
+        title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">Permits/Passes:
+          <ul data-bind="foreach: permits"> 
+            <li data-bind="text: $data"></li>
           </ul>
-      </div> -->
+      </div>
     </div>
   </div>
 
@@ -171,33 +167,44 @@
 
 
   <!-- Loadout -->
-  <div class="canvas  container-fluid collapse" id="loadout" data-bind="with: loadout">
-    <h4 style="text-align: center;">What to Take</h4>
-    <div class="row">
-      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2" id="clothing">
+  <div class="canvas  container-fluid collapse" id="loadout">
+    <h4 style="text-align: center;" data-bind="with: selectedDay">What to Take for <span data-bind="text: weekday"></span></h4>
+    <div class="row" data-bind="with: loadout">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6" id="clothing">
         <h5>Clothing</h5>
-        <ul>
-          <!-- <li>Head: <span data-bind="text: total_distance"></span> mi</li>
-          <li>Upper: <span data-bind="text: total_distance"></span> mi</li>
-          <li>Lower: <span data-bind="text: total_distance"></span> mi</li>
-          <li>Shoes: <span data-bind="text: total_distance"></span> mi</li> -->
+        <ul data-bind="foreach: clothing">
+          <li data-bind="text: $data"></li>
         </ul>
       </div>
 
-      <div class="col-lg-4 col-md-4 col-sm-4" id="Food/Water">
+      <div class="col-lg-3 col-md-3 col-sm-6" id="Food/Water">
         <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Food / Water</h5>
         <ul>
-          <li title="Estimated minimum amount of water to take based on estimated completion time.">Est. Water: <span data-bind="text: water"></span> L</li>
+          <li title="Estimated minimum amount of water to take based on estimated completion time."><span data-bind="text: water"></span> L water</li>
+        </ul>
+        <ul title="Estimated amount of provisions to take based on trail length." data-bind="foreach: food">
+          <li data-bind="text: $data"></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3" id="gear">
-        <h5>Gear</h5>
-        <li title="Estimated weight based on water, food, and recommended gear."> Est. Weight: <span data-bind="text: weight"></span> lbs</li>
+      <div class="col-lg-3 col-md-3 col-sm-6" id="gear">
+        <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Gear</h5>
+        <ul data-bind="foreach: gear">
+          <li data-bind="text: $data"></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-6" id="pack">
+        <h5>Pack</h5>
+        <li title="Estimated weight based on water, food, and recommended gear.">Est. Weight: <span data-bind="text: weight"></span> lbs</li>
         <li title="Estimated pack size based on water and weight estimate and if camping is an option."> Pack Size: <span data-bind="text: pack"></span> L</li>
       </div>
     </div>
   </div>
+
+
+  <!-- Spacer -->
+  <div class="spacer"></div>
 
 
   <!-- Park/Trail List -->

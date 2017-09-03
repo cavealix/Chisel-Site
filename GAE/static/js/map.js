@@ -63,6 +63,7 @@ var ViewModel = function() {
     self.currentTrail = ko.observable();
     self.currentPhoto = ko.observable();
     self.selectedPark = ko.observable();
+    self.selectedDay = ko.observable();
     self.loadout = ko.observable();
 
     self.resultArray = ko.observableArray([]);
@@ -103,79 +104,6 @@ var ViewModel = function() {
 
             self.flickrSearch(photo_id);
         }
-    };
-
-    //Query Flickr by photo_id
-    self.flickrSearch = function(photo_id){
-        
-        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.getLocation'+
-            '&api_key=3affae96f735ec3e200682d77d67eadb&photo_id='+photo_id;
-        //console.log(url);
-        
-        $.getJSON( url, {
-          format: "json"
-        })
-        .done(function( data ) {
-            console.log(data);
-        })
-        .error( function(data) {
-            if (data.status == 200){
-                data = data.responseText;
-                data = data.replace('jsonFlickrApi(', '');
-                data = data.replace(')','');
-                data = JSON.parse(data);
-                console.log(data);
-
-                if (data.photo.location != null) {
-                    var location = data.photo.location;
-                    var position = new google.maps.LatLng( location.latitude, location.longitude );
-                    //(Need to get photo caption/description for use as title)
-                    var title = 'Flickr Photo';
-
-                    //Set as new position for weather/place queries
-                    //self.currentPosition( position );
-
-                    self.destination(new Content(position, title));
-                    self.centerMap(self.destination().position);
-                    self.zoom();
-
-                    self.queryTrails(self.destination().position);
-
-                    self.getForecast();
-                    self.show('prep-icons');
-
-                    //self.videosByLocation();
-
-                }
-                else {
-                    alert('Content is not geo-tagged');
-                    //(Find by tags, name, etc)
-                }
-            }
-            else{
-                alert('AJAX flickrSearch request failed');
-            } 
-        });
-    };
-
-    //Query Flickr by for neaby photos
-    //Requires OAuth sign-in
-    self.flickrQueryByLocation = function( position ){
-        
-        var url = 'https://api.flickr.com/services/rest/?method=flickr.photos.geo.photosForLocation'+
-            '&api_key=3affae96f735ec3e200682d77d67eadb&lat='+position.lat+'&lon='+position.lng;
-        console.log(url);
-        
-        $.getJSON( url, {
-          format: "json"
-        })
-        .done(function( data ) {
-            console.log(data);
-        })
-        .error( function(data) {
-            alert('flickrQueryByLocation failed');
-            console.log(data);
-        });
     };
 
     // Changes XML to JSON
@@ -339,6 +267,8 @@ var ViewModel = function() {
               //seperate current weather
               if (i == 0) {
                 self.currentWeather( new Day(arr.list[i], weekday[index] ));
+                //'Select' current day weather for loadout
+                self.selectedDay( self.currentWeather );
               }
               else{
                 self.forecast.push( new Day(arr.list[i], weekday[index] ));
@@ -631,6 +561,7 @@ var ViewModel = function() {
 
     self.selectDay = function( day ) {
       if (self.currentTrail() != undefined ) {
+        self.selectedDay(day);
         self.packLoadout( self.currentTrail(), day );
         console.log('pack loadout for ' + day.weekday());
       }
@@ -730,6 +661,7 @@ var ViewModel = function() {
 
         //console.log(trail);
         
+        self.hide('park');
         //Show trail data
         self.show('elevation');
         self.show('trail-info');
@@ -740,8 +672,6 @@ var ViewModel = function() {
     self.packLoadout = function( trail, weather ) {
       
       var loadout = new Loadout( trail, weather );
-
-
 
       self.loadout( loadout );
     };
@@ -901,49 +831,125 @@ var ViewModel = function() {
 var Loadout = function( trail, weather ) {
   self = this;
 
-  //Clothing
-  self.head = ko.observable();
-  self.tops = ko.observable();
-  self.bottoms = ko.observable();
-  self.shoes = ko.observable();
-  self.jacket = ko.observable();
 
+  //Clothing
+  self.clothing = ko.observableArray();
   //Provisions
   self.water = ko.observable();
-  self.food = ko.observable();
-
+  self.food = ko.observableArray();
   //Gear
-
+  self.gear = ko.observableArray();
   //Weight & Pack
-  self.weight = ko.observable();
+  self.weight = ko.observable( 0 );
   self.pack = ko.observable();
 
-  
+
+  //Clothing
+  //rain
+  if ( weather.desc().includes('rain') ) {
+    self.clothing().push('Poncho');
+
+    if ( weather.avg() > 90 ) {
+      self.clothing().push('Short Synthetic Shirt');
+      self.clothing().push('Synthetic Shorts');
+      self.clothing().push('Chacos');
+    }
+    else {
+      self.clothing().push('Long Synthetic Shirt');
+      self.clothing().push('Synthetic Pants');
+      self.clothing().push('Chacos');
+    }
+  }
+  //clear
+  else {
+    self.clothing().push('Hat');
+    self.clothing().push('Sunglasses');
+    self.clothing().push('Sunscreen');
+    
+    if ( weather.avg() > 90 ) {
+      self.clothing().push('Short Synthetic Shirt');
+      self.clothing().push('Synthetic Shorts');
+      self.clothing().push('Chacos');
+    }
+    else {
+      self.clothing().push('Long Synthetic Shirt');
+      self.clothing().push('Synthetic Pants');
+      self.clothing().push('Hiking Boots');
+    }  
+  }
+
   //Estimate of water to pack 1L/2hr active hiking
   //need to know if loop or there-and-back to double 
   self.water(Math.ceil(trail.time()/120));
+  //Provisions
+  if ( trail.total_distance() < 2 ) {
+    self.food().push('Light Snacks');
+    self.food().push('(Fruit, Granola)');
+    self.weight( self.weight() + 1 );
+  }
+  else if ( 2 < trail.total_distance() < 5 ) {
+    self.food().push('Medium Snacks');
+    self.food().push('(Fruit, Granola, Jerky)');
+    self.weight( self.weight() + 3 );
+  }
+  else {
+    self.food().push('All the Snacks');
+    self.food().push('(A whole pizza)');
+    self.weight( self.weight() + 5 );
+  }
+  
+
+  //Gear
+  //first aid kit
+  if ( trail.total_distance > 2 && trail.avgGrade < 3) {
+    self.gear().push('Basic First Aid Kit');
+    self.weight( self.weight() + 1 );
+  }
+  else {
+    self.gear().push('Medium First Aid Kit');
+    self.weight( self.weight() + 3);
+  }
+  //tent / hammock
+  if (trail.activities().includes('Camp') ) {
+    ['Tent', 'Sleeping Pad', 'Sleeping Bag'].forEach(function(g) {
+      self.gear().push(g);
+    });
+    self.weight( self.weight() + 5 );
+  }
+  //water bottles/pack
+  if ( self.water() < 2 ) {
+    self.gear().push('Water Bottles');
+    self.gear().push('or CamelBak');
+    self.weight( self.weight() + 1 );
+  }
+  else if ( 2 < self.water() < 5 ) {
+    self.gear().push('CamelBak');
+    self.weight( self.weight() + 3 );
+  }
+  else {
+    self.gear().push('Dromedary');
+    self.weight( self.weight() + 1 );
+  }
+
   
   //Estimate Weight
-  var weight;
-  weight = self.water()*2.2;
-  self.weight(weight);
+  self.weight( self.weight() + self.water()*2.2 );
 
   //Estimated pack size
   //add sophistication with more variables, time(days), water sources (divide water)
   var pack;
   if ( trail.activities().indexOf('Camp') == -1 && self.weight() <= 5 ) {
-    pack = '0 - 10';
+    self.pack('0 - 10');
   }
   else if ( trail.activities().indexOf('Camp') == -1 && (5 < self.weight() <= 15 )) {
-    pack = '10 - 25';
+    self.pack('5 - 20');
   }
   else if ( trail.activities().indexOf('Camp') != -1 || (15 < self.weight() <= 30 )) {
-    pack = '25 - 40';
+    self.pack('15 - 40');
   }
   else {
-    pack = '40+';
+    self.pack('40+');
   }
-  self.pack(pack);
 };
 
 // Trail //////////////////////////////////////////////////////
@@ -1342,6 +1348,10 @@ var Day = function(day, weekday) {
   self.low   =  ko.observable( Math.round(day.temp.min) );
   self.high = ko.observable( Math.round(day.temp.max) );
   self.desc  =  ko.observable(day.weather[0].description);
+  self.humidity = ko.observable(day.humidity);
+
+  //calc wind chill T = avg temp, V = wind speed
+  //windChill = 35.74 + 0.6215(T) – 35.75(V^0.16) + 0.4275T(V^0.16)
 }
 
 // Photo Object /////////////////////////////////////////////////
