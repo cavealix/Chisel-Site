@@ -9,6 +9,23 @@ class User(db.Model):
     last_name = db.StringProperty()
     pw = db.StringProperty()
 
+class Loadout(db.Model):
+    #apparel
+    headwear = db.StringListProperty()
+    tops = db.StringListProperty()
+    bottoms = db.StringListProperty()
+    footwear = db.StringListProperty()
+
+    #provisions
+    water = db.StringProperty()
+    food = db.StringListProperty()
+
+    #gear
+    gear = db.StringListProperty()
+
+    #pack
+    weight = db.IntegerProperty()
+    pack = db.IntegerProperty()
 
 #Create Park DB
 class Place(db.Model):
@@ -99,6 +116,12 @@ class Trail(db.Model):
     total_elevation_change = db.FloatProperty()
     activities = db.StringListProperty()
     seasons = db.StringListProperty()
+    photos = db.StringListProperty()
+    videos = db.StringListProperty()
+
+    #Booleans
+    camping = db.BooleanProperty()
+    pointToPoint = db.BooleanProperty()
 
     @property 
     def serialize(self):

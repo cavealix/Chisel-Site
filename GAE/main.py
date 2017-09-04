@@ -198,7 +198,14 @@ def deletePoi():
 
     return json.dumps({ 'status':'OK' });
     
-
+#Loadout Page -------------------------------------------------
+@app.route('/loadoutFor/<int:trail_id>', methods=['Get', 'Post'])
+def loadoutFor(trail_id):
+    if request.method == 'Post':
+        return redirect ( url_for('map'))
+    else:
+        trail = Trail.get_by_id(trail_id);
+        return render_template('buildLoadout.html', trail=trail)
 
 #Trail Page -------------------------------------------------
 @app.route('/trailAPI/<int:trail_id>', methods=['Get', 'Post'])
@@ -222,19 +229,14 @@ def trailAPI(trail_id):
 
     return redirect( url_for('map'))
 
-@app.route('/parks/<int:park_id>/<int:trail_id>', methods=['Get'])
-def trail(park_id, trail_id):
-    park = Park.get_by_id(park_id)
-    trail = Trail.get_by_id(trail_id)
+@app.route('/verifyTrail/<int:trail_id>', methods=['Get', 'Post'])
+def verifyTrail(trail_id):
+    if request.method == 'Post':
+        return redirect ( url_for('map'))
+    else:
+        trail = Trail.get_by_id(trail_id);
+        return render_template('verifyTrail.html', trail=trail)
 
-    #q = search terms, ex. 'sailing|boating -fishing', | = or, - = not, | must be escaped as %7C
-    options = locationSearchOptions('', 5, trail.position, '1mi')
-
-    videos = youtube_search(options)
-    #print videos, len(videos)
-
-    trail_json = json.dumps(trail.serialize)
-    return render_template('trail.html', park=park, trail=trail, trail_json=trail_json, videos=videos)
 
 #Add Trail
 @app.route('/addTrail', methods=['Get', 'Post'])

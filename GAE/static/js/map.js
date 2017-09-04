@@ -511,30 +511,6 @@ var ViewModel = function() {
 
 // VIEW //////////////////////////////////////////////
 
-    //Clear all trails on map
-    self.clearTrails = function() {
-        // Remove trail markers and paths from map
-        for (var i = 0; i < self.trailList().length; i++) {
-            self.trailList()[i].clear();
-        }
-
-        self.trailList( [] );
-    };
-
-    //Clear all Parks on map
-    self.clearParks = function() {
-      // Remove trail markers and paths from map
-      for (var i = 0; i < self.parkList().length; i++) {
-          self.parkList()[i].clear();
-      }
-
-      self.parkList( [] );
-
-      // Remove POIs from map
-      self.clearList(self.poiList);
-      self.poiList( [] );
-    };
-
     //Add marker for each result from guideSearch
     self.addMarker = function(place) {
       var marker = new google.maps.Marker({
@@ -684,15 +660,6 @@ var ViewModel = function() {
       }      
     };
 
-    //clear all markers/icons in list from map
-    self.clearList = function(list) {
-      for (var i = 0; i < list.length; i++) {
-          list[i].clear();
-        };
-
-      list = [];    
-    };
-
     //Center Map around entered position
     self.centerMap = function(position) {
 
@@ -756,25 +723,62 @@ var ViewModel = function() {
         $('#'+id).collapse('hide');
     };
 
-    //Clear map of park location icons
-    self.clearMap = function() {
-        // Removes the markers from the map
-        for (var i = 0; i < self.parkList().length; i++) {
-            self.parkList()[i].clear();
-        }
+    //Clear all trails on map
+    self.clearTrails = function() {
+      // Remove trail markers and paths from map
+      for (var i = 0; i < self.trailList().length; i++) {
+          self.trailList()[i].clear();
+      }
+
+      self.trailList( [] );
+    };
+
+    //Clear all Parks on map
+    self.clearParks = function() {
+      // Remove trail markers and paths from map
+      for (var i = 0; i < self.parkList().length; i++) {
+          self.parkList()[i].clear();
+      }
+
+      self.parkList( [] );
+    };
+
+    //Clear all POIs on map
+    self.clearPois = function() {
+      // Remove trail markers and paths from map
+      for (var i = 0; i < self.poiList().length; i++) {
+          self.poiList()[i].clear();
+      }
+
+      self.poiList( [] );
+    };
+
+    //Clear all Parks on map
+    self.clearPhotoSpheres = function() {
+      // Remove trail markers and paths from map
+      for (var i = 0; i < self.photoSphereList().length; i++) {
+          self.photoSphereList()[i].clear();
+      }
+
+      self.photoSphereList( [] );
+    };
+
+    //clear all markers/icons in list from map
+    self.clearList = function(list) {
+      for (var i = 0; i < list.length; i++) {
+          list[i].clear();
+        };
+
+      list = [];    
     };
 
     //Clear all icons and set to initial state
     self.resetMap = function() {
         //Clear all content on map
-        self.clearMap();
         self.clearTrails();
         self.clearParks();
-
-        self.poiList().forEach(function(poi){
-          poi.clear;
-        });
-        self.clearList(self.poiList());
+        self.clearPois();
+        self.clearPhotoSpheres();
 
         //clear destination variable
         self.destination().clear();
@@ -792,10 +796,12 @@ var ViewModel = function() {
         //hide geo-specific location
         self.hide('prep-icons');
         self.hide('forecast');
+        self.hide('park-info');
         self.hide('trail-info');
         self.hide('loadout');
         self.hide('elevation');
         self.hide('myCarousel');
+        self.hide('photo_sphere_canvas');
 
         //empty previous results
         self.forecast.removeAll();
@@ -961,6 +967,7 @@ var Trail = function(data) {
     self.type = ko.observable('Trail'); //Treck, Ski Route, Off Road
     self.place_id = data.place_id;
     self.position = new google.maps.LatLng(data.lat, data.lon);
+    self.verify = '/verifyTrail/' + data.id;
 
     //set bounds to include all of trail
     var end = data.coords[data.coords.length-1];

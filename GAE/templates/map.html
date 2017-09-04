@@ -102,7 +102,7 @@
       <div class="col-lg-2 col-md-2 col-sm-2" id="park-activities">
         <h5>Activities</h5>
         <ul data-bind="foreach: activities">
-            <li><span data-bind="text: type"></span>: <span data-bind="text: number"></span></li>
+            <li><span data-bind="text: type"></span>: <span data-bind="text: number"></span> trails</li>
         </ul>
       </div>
 
@@ -126,6 +126,7 @@
           <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
           <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
           <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
+          <li><a data-bind="attr:{href: verify}">Been here? Verify and make recommendations.</a></li>
         </ul>
       </div>
 
@@ -170,14 +171,14 @@
   <div class="canvas  container-fluid collapse" id="loadout">
     <h4 style="text-align: center;" data-bind="with: selectedDay">What to Take for <span data-bind="text: weekday"></span></h4>
     <div class="row" data-bind="with: loadout">
-      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6" id="clothing">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-6" id="clothing">
         <h5>Clothing</h5>
         <ul data-bind="foreach: clothing">
           <li data-bind="text: $data"></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-6" id="Food/Water">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6" id="Food/Water">
         <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Food / Water</h5>
         <ul>
           <li title="Estimated minimum amount of water to take based on estimated completion time."><span data-bind="text: water"></span> L water</li>
@@ -187,14 +188,14 @@
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-6" id="gear">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6" id="gear">
         <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Gear</h5>
         <ul data-bind="foreach: gear">
           <li data-bind="text: $data"></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-6" id="pack">
+      <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6" id="pack">
         <h5>Pack</h5>
         <li title="Estimated weight based on water, food, and recommended gear.">Est. Weight: <span data-bind="text: weight"></span> lbs</li>
         <li title="Estimated pack size based on water and weight estimate and if camping is an option."> Pack Size: <span data-bind="text: pack"></span> L</li>

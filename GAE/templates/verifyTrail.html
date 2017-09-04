@@ -1,0 +1,10 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+<h1>Upload you .gpx file for {{ trail.name }}</h1>
+<p>When you verify that you've been here you get to share your photos and/or videos to broaden your audience and build a recommended loadout. If others find your recommendations helpful and buy from your loadout, you get a commission.</p>
+
+<a href="/loadoutFor/{{trail.key().id()}}">Verify</a>
+
+{% endblock %}
