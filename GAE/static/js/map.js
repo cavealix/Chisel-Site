@@ -19,8 +19,8 @@ var prep_icons = [
   "title": "Camp", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
   "title": "Hospital", "alt": "hospital-btn", "type": "hospital"},
-  //{"img": "/static/imgs/google_icons/ic_info_black_36dp/web/ic_info_black_36dp_2x.png",
-  //"title": "POIs", "alt": "pois-btn", "type": "pois"},
+  {"img": "/static/imgs/google_icons/ic_room_black_36dp/web/ic_room_black_36dp_2x.png",
+  "title": "POIs", "alt": "pois-btn", "type": "pois"},
   {"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
   "title": "Photos", "alt": "photos-btn", "type": "photos"}];
 
@@ -290,9 +290,16 @@ var ViewModel = function() {
         }
         //toggle park pois
         else if (iconButton.type == 'pois'){
-            self.poiList().forEach(function(poi){
-            poi.toggle();
-          });
+            //if park selected and pois present, clear them
+            if ( self.selectedPark() != undefined && self.poiList() != [] ) {
+              self.clearPois();              
+            }
+            else {
+              self.selectedPark().pois.forEach( function(poi) {
+                self.poiList( new POI(park, poi) );
+              });
+            }
+
         }
         //else search Google places
         else{
@@ -582,7 +589,7 @@ var ViewModel = function() {
       //Create/show saved POIs 
       for (var i = 0; i < park.pois.length; i++) {
         var poi = park.pois[i];
-        self.poiList().push( new POI(park, poi.id, poi.position, poi.type, poi.icon, poi.sphere_embed, poi.description ));
+        self.poiList().push( new POI(park, poi ));
       };
 
       //set park as selected destination
@@ -1209,13 +1216,13 @@ var Activity = function(activity, number){
 var POI = function(park, id, position, type, icon, sphere_embed, description) {
   var self = this;
 
-  self.id = id;
+  self.id = poi.id;
   self.park_id = park.id;
-  self.type = type;
-  self.position = position;
-  self.icon = icon;
-  self.sphere_embed = sphere_embed;
-  self.description = description;
+  self.type = poi.type;
+  self.position = poi.position;
+  self.icon = poi.icon;
+  self.sphere_embed = poi.sphere_embed;
+  self.description = poi.description;
   self.markerState = true;
 
   var marker = new google.maps.Marker({
@@ -1350,7 +1357,7 @@ var Day = function(day, weekday) {
   var self = this;
 
   self.weekday = ko.observable(weekday);
-  self.img   =  ko.observable("http://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
+  self.img   =  ko.observable("https://openweathermap.org/img/w/" + day.weather[0].icon + ".png");
   self.avg   =  ko.observable( Math.round(day.temp.day) );
   self.low   =  ko.observable( Math.round(day.temp.min) );
   self.high = ko.observable( Math.round(day.temp.max) );

@@ -4,7 +4,7 @@
 
 <h1>Build your loadout for {{ trail.name }}</h1>
 
-<form>
+<form id="form">
     <h2>Apparel</h2>
     <input type='text' name='headwear' placeholder='Headwear'>
     <input type='text' name='top' placeholder='Top'>
@@ -45,9 +45,9 @@
     <br><br>
 
     <h2>Highlights</h2>
-    <input type='text' name='highlights' placeholder='The Good Stuff'>
+    <textarea name="highlights" placeholder="Describe the highlights of your experience in 140 characters" rows="3" cols="70" form="form" maxlength="140"></textarea>
     <h2>Warnings</h2>
-    <input type='text' name='warnings' placeholder='The Bad Stuff'>
+    <textarea name="warnings" placeholder="Give a heads up on what others should watch out for in 140 characters" rows="3" cols="70" form="form" maxlength="140"></textarea>
 
     <br><br>
 

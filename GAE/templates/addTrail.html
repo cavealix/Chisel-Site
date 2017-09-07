@@ -4,30 +4,11 @@
 
     <form method="post" action="{{ url_for('addTrail') }}" enctype="multipart/form-data">
         <h1>Add a Trail</h1>
-        <input type="text" name="name" placeholder="New Trail">
-        <input type="text" name="place" id="place" value="" style="">
-        <input type="file" name="gpx" id="gpx" accept=".gpx">
+        <input type="text" name="name" placeholder="New Trail Name">
+        <input type="text" name="place" id="place" value="" style="visibility: hidden;">
 
-        <input type='checkbox' name='activity' value='Hike'>Hike
-        <input type='checkbox' name='activity' value='Bike'>Bike
-        <input type='checkbox' name='activity' value='Camp'>Camp
-        <input type='checkbox' name='activity' value='Equestrian'>Equestrian
-        <input type='checkbox' name='activity' value='Pets'>Pets
-        <input type='checkbox' name='activity' value='Climb'>Climb
-        <input type='checkbox' name='activity' value='Motorized'>Motorized Vehicle
-        <!-- <input type='checkbox' name='activity' value='Scuba'>Scuba
-        <input type='checkbox' name='activity' value='Canoe/Kayak'>Canoe/Kayak
-        <input type='checkbox' name='activity' value='Sail'>Sail -->
         <br>
-
-        <!-- Add photo spheres -->
-        <div id="dynamicInput">
-            <input type="text" name="sphere_url" placeholder="sphere url">
-            <input type="text" name="embed_code" placeholder="embed code">
-            <br>
-        </div>
-        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
-
+        <input type="file" name="gpx" id="gpx" accept=".gpx">
         <br>
 
         <input type="submit" value="Add">

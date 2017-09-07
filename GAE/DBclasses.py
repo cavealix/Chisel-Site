@@ -9,23 +9,6 @@ class User(db.Model):
     last_name = db.StringProperty()
     pw = db.StringProperty()
 
-class Loadout(db.Model):
-    #apparel
-    headwear = db.StringListProperty()
-    tops = db.StringListProperty()
-    bottoms = db.StringListProperty()
-    footwear = db.StringListProperty()
-
-    #provisions
-    water = db.StringProperty()
-    food = db.StringListProperty()
-
-    #gear
-    gear = db.StringListProperty()
-
-    #pack
-    weight = db.IntegerProperty()
-    pack = db.IntegerProperty()
 
 #Create Park DB
 class Place(db.Model):
@@ -116,8 +99,6 @@ class Trail(db.Model):
     total_elevation_change = db.FloatProperty()
     activities = db.StringListProperty()
     seasons = db.StringListProperty()
-    photos = db.StringListProperty()
-    videos = db.StringListProperty()
 
     #Booleans
     camping = db.BooleanProperty()
@@ -164,3 +145,43 @@ class Sphere(db.Model):
             'embed_code' : self.embed_code,
             'position' : {'lat': self.position.lat, 'lng': self.position.lon}
         }
+
+
+class Trip(db.Model):
+    trail = db.ReferenceProperty(Trail, collection_name='trips')
+
+class Loadout(db.Model):
+    trip = db.ReferenceProperty(Trip, collection_name='loadouts')
+    #apparel
+    headwear = db.StringListProperty()
+    tops = db.StringListProperty()
+    bottoms = db.StringListProperty()
+    footwear = db.StringListProperty()
+
+    #provisions
+    water = db.StringProperty()
+    food = db.StringListProperty()
+
+    #gear
+    gear = db.StringListProperty()
+
+    #pack
+    weight = db.IntegerProperty()
+    pack = db.IntegerProperty()
+
+    #content
+    photos = db.StringListProperty()
+    videos = db.StringListProperty()
+
+class Photo(db.Model):
+    trip = db.ReferenceProperty(Trip, collection_name='photos')
+    url = db.StringProperty()
+
+class Video(db.Model):
+    trip = db.ReferenceProperty(Trip, collection_name='videos')
+    url = db.StringProperty()
+
+class Advice(db.Model):
+    trip = db.ReferenceProperty(Trip, collection_name='advice')
+    highlights = db.TextProperty()
+    warnings = db.TextProperty()

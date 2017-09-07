@@ -6,19 +6,39 @@
     	<h1>Edit {{trail.name}} </h1>
     	<input type="text" name="name" value="{{ trail.name }}">
 
-        {% for sphere in trail.spheres %}
-            <input type="text" name="sphere" value="sphere"> 
-        {% endfor %}
+        <input type='checkbox' name='activity' value='Hike'>Hike
+        <input type='checkbox' name='activity' value='Bike'>Bike
+        <input type='checkbox' name='activity' value='Camp'>Camp
+        <input type='checkbox' name='activity' value='Equestrian'>Equestrian
+        <input type='checkbox' name='activity' value='Pets'>Pets
+        <input type='checkbox' name='activity' value='Climb'>Climb
+        <input type='checkbox' name='activity' value='Motorized'>Motorized Vehicle
+        <!-- <input type='checkbox' name='activity' value='Scuba'>Scuba
+        <input type='checkbox' name='activity' value='Canoe/Kayak'>Canoe/Kayak
+        <input type='checkbox' name='activity' value='Sail'>Sail -->
+        <br>
+
+        <!-- Add photo spheres -->
+        <div id="dynamicInput">
+            <input type="text" name="sphere_url" placeholder="sphere url">
+            <input type="text" name="embed_code" placeholder="embed code">
+            <br>
+        </div>
+        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
+
+
         <!-- <input type="textarea" name="description" value="{{ trail.description }}">
         <input type="text" name="coords" value="{{ trail.coords }}"> -->
-        <input type="text" name="elev" id="elev" value="" style="">
-    	<input type="submit" value="Edit">
+        <input type="text" name="elev" id="elev" value="" style="visibility: hidden;">
 
         <!-- Season -->
         <input type='checkbox' name='season' value='Spring'>Spring
         <input type='checkbox' name='season' value='Summer'>Summer
         <input type='checkbox' name='season' value='Fall'>Fall
         <input type='checkbox' name='season' value='Winter'>Winter
+
+        <br>
+        <input type="submit" value="Edit">
 
     	<a href="{{ url_for('map') }}">Cancel</a>
     </form>

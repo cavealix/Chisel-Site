@@ -36,7 +36,7 @@ app = Flask(__name__)
 #Login -------------------------------------------------
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('firebaselogin.html')
 
 #API -------------------------------------------------
 @app.route('/parksJSON')
@@ -342,27 +342,7 @@ def addTrail():
         place.activities = place.activities + activities
         place.put()
 
-        #Save Photo Sphere
-        urls = request.form.getlist('sphere_url')
-        embeds = request.form.getlist('embed_code')
-
-        print(urls)
-
-        #Store spheres if present
-        if urls != [] and urls != ['']:
-            for x in xrange(len(urls)):
-                string = urls[x].split('@')[1]
-                string = string.split(',')
-                lat = string[0]
-                lng = string[1]
-                position = db.GeoPt(float(lat), float(lng))
-                sphere = Sphere(
-                    trail = newTrail,
-                    embed_code = embeds[x].split('"')[1],
-                    position = position
-                )
-                print sphere
-                sphere.put()
+        
 
         return redirect( url_for('editTrail', trail_id=newTrail.key().id()) )
     #Get
@@ -393,6 +373,26 @@ def editTrail(trail_id):
             trail.total_elevation_change = round(total_elevation_change)
 
         trail.put()
+
+        #Save Photo Sphere
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        #Store spheres if present
+        if urls != [] and urls != ['']:
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+                position = db.GeoPt(float(lat), float(lng))
+                sphere = Sphere(
+                    trail = trail,
+                    embed_code = embeds[x].split('"')[1],
+                    position = position
+                )
+                print sphere
+                sphere.put()
 
         return redirect( url_for('map' ))
     #Get
