@@ -41,7 +41,7 @@ var ViewModel = function(park_json) {
         icon = "/static/imgs/google_icons/ic_wc_black_36dp/web/ic_wc_black_36dp_1x.png";
         break;
       case "showers":
-        icon = "/static/imgs/google_icons/ic_pets_black_36dp/web/ic_pets_black_36dp_1x.png";
+        icon = "/static/imgs/google_icons/ic_wc_black_36dp/web/ic_wc_black_36dp_1x.png";
         break;
       case "campsite":
         icon = "/static/imgs/google_icons/ic_change_history_black_36dp/web/ic_change_history_black_36dp_1x.png";
@@ -66,6 +66,9 @@ var ViewModel = function(park_json) {
         break;
       case "dog_station":
         icon = "/static/imgs/google_icons/ic_pets_black_36dp/web/ic_pets_black_36dp_1x.png";
+        break;
+      case "parking":
+        icon = "/static/imgs/google_icons/ic_local_parking_black_36dp/web/ic_local_parking_black_36dp_1x.png";
     }
 
     var poi = new POI(park, '', e.latLng, type, icon, '', '' );
