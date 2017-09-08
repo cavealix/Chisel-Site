@@ -59,31 +59,14 @@
   </div>
 
 
-  <!-- Forecast -->
-  <div class="canvas collapse container-fluid" id="forecast">
-    <!-- Current Weather -->
-    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F with <span data-bind="text: humidity"></span>% humidity</h4>
-    <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
-      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-4 col-xs-4" data-bind="click: $parent.selectDay">
-        <h5 data-bind="text: weekday"></h5>
-        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
-        <p><span data-bind="text: avg"></span>°F</p>
-        <p><span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</p>
-        <p data-bind="text: desc"></p>
-        <p><span data-bind="text: humidity"></span>% Humid</p>
-      </li>
-    </ul>
-  </div>
-
-
   <!-- Spacer -->
   <div class="spacer"></div>
 
 
   <!-- Park Info -->
-  <div class="mini-section collapse container-fluid" id="park" data-bind="with: selectedPark">
+  <div class="canvas collapse container-fluid" id="park-info" data-bind="with: selectedPark">
     <div class="row">
-      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="park-info">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xl-offset-1 col-lg-offset-1 col-md-offset-1" id="park-basics">
         <h5>The Basics</h5>
         <ul>
           <li>Go There: <br><a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
@@ -91,7 +74,7 @@
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-4" id="park-stats">
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="park-stats">
         <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
         <ul>
           <li>Number of trails: <span data-bind="text: numberTrails"></span></li>
@@ -99,15 +82,16 @@
         </ul>
       </div>
 
-      <div class="col-lg-2 col-md-2 col-sm-2" id="park-activities">
+      <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" id="park-activities">
         <h5>Activities</h5>
         <ul data-bind="foreach: activities">
             <li><span data-bind="text: type"></span>: <span data-bind="text: number"></span> trails</li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-2" id="park-seasons"
-        title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">Permits/Passes:
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="park-seasons"
+        title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">
+        <h5>Permits/Passes:</h5>
           <ul data-bind="foreach: permits"> 
             <li data-bind="text: $data"></li>
           </ul>
@@ -117,20 +101,20 @@
 
 
   <!-- Trail Info -->
-  <div class="mini-section collapse container-fluid" id="trail-info" data-bind="with: currentTrail">
+  <div class="canvas collapse container-fluid" id="trail-info" data-bind="with: currentTrail">
     <div class="row">
-      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="stats">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="stats">
         <h5>The Basics</h5>
         <ul>
           <li>Distance: <span data-bind="text: total_distance"></span> mi</li>
           <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
           <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
           <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
-          <li><a data-bind="attr:{href: verify}">Been here? Verify and make recommendations.</a></li>
+          <li><a data-bind="attr:{href: verify}">Been here? Verify and <br> make recommendations.</a></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-4" id="what_to_expect">
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="what_to_expect">
         <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
         <ul>
           <li>Avg. Grade: %<span data-bind="text: avgGrade"></span></li>
@@ -141,20 +125,37 @@
         </ul>
       </div>
 
-      <div class="col-lg-2 col-md-2 col-sm-2" id="activities">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6" id="activities">
         <h5>Activities</h5>
         <ul data-bind="foreach: activities">
             <li><span data-bind="text: $data"></span></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-2" id="seasons">
+      <div class="col-lg-3 col-md-3 col-sm-2 col-xs-6" id="seasons">
         <h5>Best Seasons</h5>
           <ul data-bind="foreach: seasons">
               <li><span data-bind="text: $data"></span></li>
           </ul>
       </div>
     </div>
+  </div>
+
+
+  <!-- Forecast -->
+  <div class="canvas collapse container-fluid" id="forecast">
+    <!-- Current Weather -->
+    <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F with <span data-bind="text: humidity"></span>% humidity</h4>
+    <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
+      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-2 col-xs-4" data-bind="click: $parent.selectDay">
+        <h5 data-bind="text: weekday"></h5>
+        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
+        <p><span data-bind="text: avg"></span>°F</p>
+        <p><span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</p>
+        <p data-bind="text: desc"></p>
+        <p><span data-bind="text: humidity"></span>% Humid</p>
+      </li>
+    </ul>
   </div>
 
 

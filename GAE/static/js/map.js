@@ -290,15 +290,10 @@ var ViewModel = function() {
         }
         //toggle park pois
         else if (iconButton.type == 'pois'){
-            //if park selected and pois present, clear them
-            if ( self.selectedPark() != undefined && self.poiList() != [] ) {
-              self.clearPois();              
-            }
-            else {
-              self.selectedPark().pois.forEach( function(poi) {
-                self.poiList( new POI(park, poi) );
-              });
-            }
+          //if park selected and pois present, clear them
+          self.poiList().forEach( function(poi) {
+            poi.toggle();
+          });
 
         }
         //else search Google places
@@ -331,17 +326,19 @@ var ViewModel = function() {
               //Include currentPosition in map resize
               map.fitBounds(bounds.extend( self.destination().position ));
             }
+
+          //FOR NOW - clear trails and show results in relation to park
+          self.clearTrails();
+          self.hide('trail-info');
+          self.hide('elevation');
+          self.hide('myCarousel');
+          self.hide('photo_sphere_canvas');
+          self.hide('loadout');
+          self.clearList(self.poiList());
+          self.clearList(self.photoSphereList());
         }
 
-        //FOR NOW - clear trails and show results in relation to park
-        self.clearTrails();
-        self.hide('trail-info');
-        self.hide('elevation');
-        self.hide('myCarousel');
-        self.hide('photo_sphere_canvas');
-        self.hide('loadout');
-        self.clearList(self.poiList());
-        self.clearList(self.photoSphereList());   
+           
     };
 
     self.placeDetails = function( search_result ) {
@@ -602,7 +599,7 @@ var ViewModel = function() {
       self.hide('trail-info');
       self.hide('loadout');
       self.hide('photo_sphere_canvas');
-      self.show('park');
+      self.show('park-info');
       self.show('prep-icons');
       self.show('list');
       self.closeMenu();
@@ -644,7 +641,7 @@ var ViewModel = function() {
 
         //console.log(trail);
         
-        self.hide('park');
+        self.hide('park-info');
         //Show trail data
         self.show('elevation');
         self.show('trail-info');
@@ -1213,7 +1210,7 @@ var Activity = function(activity, number){
 }
 
 // POI Object ///////////////////////////////////////////
-var POI = function(park, id, position, type, icon, sphere_embed, description) {
+var POI = function(park, poi) {
   var self = this;
 
   self.id = poi.id;
@@ -1224,13 +1221,14 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
   self.sphere_embed = poi.sphere_embed;
   self.description = poi.description;
   self.markerState = true;
+  self.visible = true;
 
   var marker = new google.maps.Marker({
     map: map,
     title: self.description,
-    position: position,
+    position: poi.position,
     icon: {
-      url: icon
+      url: poi.icon
     }
   });
 
@@ -1242,20 +1240,24 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
     }
   });
 
-  self.clear = function() {
-    marker.setMap(null);
-  };
+  //Track visible status
+  //google.maps.event.addListener(marker, 'visible_changed', function() {
+  //  console.log('visible_changed triggered');
+  //});
 
   self.toggle = function() {
-    //console.log(marker.setMap);
-    if (self.markerState) {
-      marker.setMap(null);
-      self.markerState = false;
+    if (self.visible) {
+      marker.setVisible(false);
+      self.visible = false;
     }
     else {
-      marker.setMap('map');
-      self.markerState = true;
-    }
+      marker.setVisible(true);
+      self.visible = true;
+    } 
+  };
+
+  self.clear = function() {
+    marker.setMap(null);
   };
 
   self.serialize = function() {
@@ -1399,9 +1401,9 @@ var Circle = function(position, radius){
 }
 
 //Event listener for finding content from map page
-document.getElementById('search_submit').onclick = function() {
-    VM.stripURL(document.getElementById('url').value);
-}
+//document.getElementById('search_submit').onclick = function() {
+//    VM.stripURL(document.getElementById('url').value);
+//}
 
 //Enable Bootstrap Tool Tips
 
