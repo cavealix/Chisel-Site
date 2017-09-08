@@ -4,7 +4,6 @@
 
     <form method="post" action="{{ url_for('addTrail') }}" enctype="multipart/form-data">
         <h1>Add a Trail</h1>
-        <input type="text" name="name" placeholder="New Trail Name">
         <input type="text" name="place" id="place" value="" style="visibility: hidden;">
 
         <br>
@@ -33,7 +32,7 @@
     <script src="/static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
 
     <!-- JS -->
-    <script src="/static/js/addTreck.js"></script>
+    <script src="/static/js/addTrail.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ&libraries=places&callback=initAutocomplete"
          async defer></script>
 

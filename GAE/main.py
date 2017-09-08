@@ -325,7 +325,7 @@ def addTrail():
         #Save Trail
         newTrail = Trail(
             park = place,
-            name=request.form['name'], 
+            name= request.files['gpx'].filename.replace('.GPX',''), 
             place_id=place_id,
             position=coords[0],
             coords= coords,
@@ -362,6 +362,7 @@ def editTrail(trail_id):
         trail = Trail.get_by_id(trail_id)
 
         trail.seasons = request.form.getlist('season')
+        trail.name = request.form['name']
 
         #if elevation being added, analize
         if trail.elevation == []:
