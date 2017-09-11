@@ -15,7 +15,7 @@ from modules.allEqual import allEqual
 
 # import the db library from GAE
 from google.appengine.ext import db
-from DBclasses import Place, Trail, User, Sphere, POI
+from DBclasses import Place, Trail, User, Sphere, POI, Trip, Photo, Video, Loadout
 
 import googlemaps
 from googlemaps import elevation, places
@@ -199,13 +199,58 @@ def deletePoi():
     return json.dumps({ 'status':'OK' });
     
 #Loadout Page -------------------------------------------------
-@app.route('/loadoutFor/<int:trail_id>', methods=['Get', 'Post'])
-def loadoutFor(trail_id):
-    if request.method == 'Post':
+@app.route('/addTrip/<int:trail_id>', methods=['Get', 'Post'])
+def addTrip(trail_id):
+    if request.method == 'POST':
+
+        trail = Trail.get_by_id(trail_id)
+
+        #add Spheres
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        #Store spheres if present
+        if urls != [] and urls != ['']:
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+                position = db.GeoPt(float(lat), float(lng))
+                sphere = Sphere(
+                    trail = trail,
+                    embed_code = embeds[x].split('"')[1],
+                    position = position
+                )
+                sphere.put()
+
+        #Save Trip
+        trip = Trip(
+            trail = trail,
+            highlights = request.form['highlights'],
+            warnings = request.form['warnings']
+        )
+        trip.put()
+
+        #Save Photo
+        photo = Photo(
+            trip = trip,
+            url = request.form['photo']
+        )
+        photo.put()
+
+        #Save Video
+        video = Video(
+            trip = trip,
+            video = request.form['video']
+        )
+        video.put()
+
         return redirect ( url_for('map'))
+
     else:
         trail = Trail.get_by_id(trail_id);
-        return render_template('buildLoadout.html', trail=trail)
+        return render_template('addTrip.html', trail=trail)
 
 #Trail Page -------------------------------------------------
 @app.route('/trailAPI/<int:trail_id>', methods=['Get', 'Post'])

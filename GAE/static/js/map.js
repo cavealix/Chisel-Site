@@ -40,6 +40,8 @@ function initMap() {
 
     //query all parks
     VM.queryParks();
+
+    $('[data-toggle="tooltip"]').tooltip();
     
 }
 
@@ -1232,8 +1234,16 @@ var POI = function(park, poi) {
     }
   });
 
+  var infowindow = new google.maps.InfoWindow({
+    content: self.type
+  });
+
   //Select POI to display photoSphere if present
   google.maps.event.addListener(marker, 'click', function() { 
+    
+    infowindow.open(map, marker);
+
+    //disapy  related photo sphere if available
     if (self.sphere_embed != '' && self.sphere_embed != null){
       VM.selectPhotoSphere(self.sphere_embed);
       VM.show('photo_sphere_canvas');

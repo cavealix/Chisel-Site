@@ -134,23 +134,14 @@ class Trail(db.Model):
             'photo_spheres' : spheres
         }
 
-class Sphere(db.Model):
-    trail = db.ReferenceProperty(Trail, collection_name='photo_spheres')
-    embed_code = db.StringProperty()
-    position = db.GeoPtProperty()
-
-    @property
-    def serialize(self):
-        return {
-            'embed_code' : self.embed_code,
-            'position' : {'lat': self.position.lat, 'lng': self.position.lon}
-        }
-
 
 class Trip(db.Model):
     trail = db.ReferenceProperty(Trail, collection_name='trips')
+    highlights = db.TextProperty()
+    warnings = db.TextProperty()
 
 class Loadout(db.Model):
+
     trip = db.ReferenceProperty(Trip, collection_name='loadouts')
     #apparel
     headwear = db.StringListProperty()
@@ -173,6 +164,20 @@ class Loadout(db.Model):
     photos = db.StringListProperty()
     videos = db.StringListProperty()
 
+
+class Sphere(db.Model):
+    trail = db.ReferenceProperty(Trail, collection_name='photo_spheres')
+    trip = db.ReferenceProperty(Trip, collection_name='photo_spheres')
+    embed_code = db.StringProperty()
+    position = db.GeoPtProperty()
+
+    @property
+    def serialize(self):
+        return {
+            'embed_code' : self.embed_code,
+            'position' : {'lat': self.position.lat, 'lng': self.position.lon}
+        }
+
 class Photo(db.Model):
     trip = db.ReferenceProperty(Trip, collection_name='photos')
     url = db.StringProperty()
@@ -181,7 +186,4 @@ class Video(db.Model):
     trip = db.ReferenceProperty(Trip, collection_name='videos')
     url = db.StringProperty()
 
-class Advice(db.Model):
-    trip = db.ReferenceProperty(Trip, collection_name='advice')
-    highlights = db.TextProperty()
-    warnings = db.TextProperty()
+    

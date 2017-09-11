@@ -1,0 +1,59 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <h1>Share your experience and build your recommended loadout for {{ trail.name }}</h1>
+
+    <form id="trip" method="post" action="{{ url_for('addTrip', trail_id=trail.key().id()) }}" enctype="multipart/form-data">
+        <!-- 
+        <h2>Apparel</h2>
+        <input type='text' name='headwear' placeholder='Headwear'>
+        <input type='text' name='top' placeholder='Top'>
+        <input type='text' name='bottom' placeholder='bottom'>
+        <input type='text' name='footwear' placeholder='Footwear'>
+    
+        <h2>Provisions</h2>
+        <input type='text' name='water' placeholder='Water (L)'>
+        <input type='text' name='food' placeholder='Food'>
+    
+        <h2>Gear</h2>
+        <input type='text' name='gear' placeholder='Gear'>
+        <input type='text' name='stuff' placeholder='Stuff'>
+    
+        <h2>Pack</h2>
+        <input type='text' name='pack' placeholder='Pack Size (L)'>  
+        -->
+
+        <h2>Build your audience by sharing your Instagram/Flickr Photos and Youtube Videos</h2>
+        <input type='text' name='photo' placeholder='Photo Url'>
+        <input type='text' name='video' placeholder='Video Url'>  
+
+        <br><br>
+
+        <h2>Best Months</h2>
+        <input type='checkbox' name='month' value='1'>January
+        <input type='checkbox' name='month' value='2'>February
+        <input type='checkbox' name='month' value='3'>March
+        <input type='checkbox' name='month' value='4'>April
+        <input type='checkbox' name='month' value='5'>May
+        <input type='checkbox' name='month' value='6'>June
+        <input type='checkbox' name='month' value='7'>July
+        <input type='checkbox' name='month' value='8'>August
+        <input type='checkbox' name='month' value='9'>September
+        <input type='checkbox' name='month' value='10'>October
+        <input type='checkbox' name='month' value='11'>Novemeber
+        <input type='checkbox' name='month' value='12'>December
+
+        <br><br>
+
+        <h2>Highlights</h2>
+        <textarea form="trip" name="highlights" placeholder="Describe the highlights of your experience in 140 characters" rows="3" cols="70" form="form" maxlength="140"></textarea>
+        <h2>Warnings</h2>
+        <textarea form="trip" name="warnings" placeholder="Give a heads up on what others should watch out for in 140 characters" rows="3" cols="70" form="form" maxlength="140"></textarea>
+
+        <br><br>
+
+        <input type='submit' value='Submit'>
+    </form>
+
+{% endblock %}
