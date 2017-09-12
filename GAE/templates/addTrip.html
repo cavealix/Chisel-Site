@@ -30,6 +30,16 @@
 
         <br><br>
 
+        <!-- Add photo spheres -->
+        <div id="dynamicInput">
+            <input type="text" name="sphere_url" placeholder="sphere url">
+            <input type="text" name="embed_code" placeholder="embed code">
+            <br>
+        </div>
+        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
+
+        <br><br>
+
         <h2>Best Months</h2>
         <input type='checkbox' name='month' value='1'>January
         <input type='checkbox' name='month' value='2'>February
@@ -55,5 +65,8 @@
 
         <input type='submit' value='Submit'>
     </form>
+
+
+    <script src="/static/js/addTrip.js"></script>
 
 {% endblock %}

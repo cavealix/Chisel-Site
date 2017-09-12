@@ -140,6 +140,24 @@ class Trip(db.Model):
     highlights = db.TextProperty()
     warnings = db.TextProperty()
 
+    @property 
+    def serialize(self):
+
+        photos = []
+        for photo in self.photos:
+            photos.append(photo.serialize)
+
+        videos = []
+        for video in self.videos:
+            videos.append(video.serialize)
+
+        return {
+            'highlights' : self.highlights,
+            'warnings' : self.warnings,
+            'photos' : photos,
+            'videos' : videos
+        }
+
 class Loadout(db.Model):
 
     trip = db.ReferenceProperty(Trip, collection_name='loadouts')
@@ -160,9 +178,20 @@ class Loadout(db.Model):
     weight = db.IntegerProperty()
     pack = db.IntegerProperty()
 
-    #content
-    photos = db.StringListProperty()
-    videos = db.StringListProperty()
+
+    @property 
+    def serialize(self):
+        return {
+            'headwear' : self.headwear,
+            'tops' : self.tops,
+            'bottoms' : self.bottoms,
+            'footwear' : self.footwear,
+            'water' : self.water,
+            'food' : self.food,
+            'gear' : self.gear,
+            'weight' : self.weight,
+            'pack' : self.pack
+        }
 
 
 class Sphere(db.Model):
@@ -182,8 +211,20 @@ class Photo(db.Model):
     trip = db.ReferenceProperty(Trip, collection_name='photos')
     url = db.StringProperty()
 
+    @property 
+    def serialize(self):
+        return {
+            'url' : self.url
+        }
+
 class Video(db.Model):
     trip = db.ReferenceProperty(Trip, collection_name='videos')
     url = db.StringProperty()
+
+    @property 
+    def serialize(self):
+        return {
+            'url' : self.url
+        }
 
     

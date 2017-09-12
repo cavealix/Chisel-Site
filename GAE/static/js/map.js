@@ -968,6 +968,8 @@ var Loadout = function( trail, weather ) {
 var Trail = function(data) {
     var self = this;
 
+    console.log(data.trails);
+
     self.id = data.id;
     self.name = ko.observable(data.name);
     self.type = ko.observable('Trail'); //Treck, Ski Route, Off Road

@@ -55,26 +55,40 @@ def parkAPI(place_id):
     logging.info('HI')
     return jsonify( Trails=[t.serialize for t in trails] )
 
-#Trail API
+@app.route('/trailAPI/<int:trail_id>', methods=['Get', 'Post'])
+def trailAPI(trail_id):
+    if request.method == 'Post':
+        trail = Trail.get_by_id(trail_id)
+    
+        #edit data
+        data = request.json['data']
+    
+        total_elevation_change = 0
+        for i in range(0,len(data['elevation'])-1):
+            leg = abs(data['elevation'][i]-abs(data['elevation'][i+1]))
+            total_elevation_change = total_elevation_change + leg
+    
+        trail.elevation = data['elevation']
+        trail.total_elevation_change = total_elevation_change
+    
+        #save changes
+        trail.put()
+
+    return redirect( url_for('map'))
+
+@app.route('/tripAPI/<int:trail_id>', methods=['Get'])
+def tripAPI(trail_id):
+    trail = Trail.get_by_id(trail_id)
+    
+    trips = trail.trips
+
+    return jsonify( Trips=[t.serialize for t in trips])
+
+#Sphere API
 @app.route('/sphereAPI/<int:sphere_id>')
 def sphereAPI(sphere_id):
     sphere = Sphere.get_by_id(sphere_id)
     return jsonify(sphere=sphere.serialize)
-
-#Add Video
-@app.route('/addVideo/<int:park_id>/<int:trail_id>', methods = ['Post'])
-def addVideo(park_id, trail_id):
-    url = request.form['url']
-    if trail_id == None:
-        park = Park.get_by_id(park_id)
-        park.videos.append(db.Link(url))
-        park.put()
-        return redirect( url_for('park', park_id = park.key().id() ))
-    else:
-        trail = Trail.get_by_id(trail_id)
-        trail.videos.append(db.Link(url))
-        trail.put()
-        return redirect( url_for( 'trail', park_id=trail.park_id, trail_id=trail.key().id() ))
 
 
 #Home -------------------------------------------------
@@ -198,7 +212,8 @@ def deletePoi():
 
     return json.dumps({ 'status':'OK' });
     
-#Loadout Page -------------------------------------------------
+
+#Trip Page -------------------------------------------------
 @app.route('/addTrip/<int:trail_id>', methods=['Get', 'Post'])
 def addTrip(trail_id):
     if request.method == 'POST':
@@ -252,28 +267,8 @@ def addTrip(trail_id):
         trail = Trail.get_by_id(trail_id);
         return render_template('addTrip.html', trail=trail)
 
+
 #Trail Page -------------------------------------------------
-@app.route('/trailAPI/<int:trail_id>', methods=['Get', 'Post'])
-def trailAPI(trail_id):
-    if request.method == 'Post':
-        trail = Trail.get_by_id(trail_id)
-    
-        #edit data
-        data = request.json['data']
-    
-        total_elevation_change = 0
-        for i in range(0,len(data['elevation'])-1):
-            leg = abs(data['elevation'][i]-abs(data['elevation'][i+1]))
-            total_elevation_change = total_elevation_change + leg
-    
-        trail.elevation = data['elevation']
-        trail.total_elevation_change = total_elevation_change
-    
-        #save changes
-        trail.put()
-
-    return redirect( url_for('map'))
-
 @app.route('/verifyTrail/<int:trail_id>', methods=['Get', 'Post'])
 def verifyTrail(trail_id):
     if request.method == 'Post':
@@ -281,7 +276,6 @@ def verifyTrail(trail_id):
     else:
         trail = Trail.get_by_id(trail_id);
         return render_template('verifyTrail.html', trail=trail)
-
 
 #Add Trail
 @app.route('/addTrail', methods=['Get', 'Post'])
@@ -461,6 +455,7 @@ def deleteTrail(park_id, trail_id):
         park = Park.get_by_id(park_id)
         trail = Trail.get_by_id(trail_id)
         return render_template('deleteTrail.html', park=park, trail=trail)
+
 
 @app.errorhandler(500)
 def server_error(e):
