@@ -338,9 +338,7 @@ var ViewModel = function() {
           self.hide('loadout');
           self.clearList(self.poiList());
           self.clearList(self.photoSphereList());
-        }
-
-           
+        }   
     };
 
     self.placeDetails = function( search_result ) {
@@ -425,6 +423,27 @@ var ViewModel = function() {
           self.addMarker(result);
         }
       }
+    };
+
+    self.queryTrips = function( trail ) {
+      //Query and show trails within selected park
+        url = "/tripAPI/" + trail.id;
+        //console.log(url);
+        $.getJSON( url, {
+          format: "json"
+        })
+        .done(function( data ) {
+
+          console.log(data);
+            //data.Trips.forEach( function(trip) {
+            //  self.tripsList.push( new Trip(trail, park.place_id) );
+            //});
+
+            
+        })
+        .error( function() {
+            alert('Trips AJAX request failed');
+        });
     };
 
     //Trails by park.place_id
@@ -641,8 +660,10 @@ var ViewModel = function() {
 
         self.chartElevation( trail );
 
-        //console.log(trail);
-        
+        //API calls
+        self.queryTrips( trail );
+
+        //UI changes        
         self.hide('park-info');
         //Show trail data
         self.show('elevation');
