@@ -29,6 +29,7 @@ class Place(db.Model):
     trailMiles = db.IntegerProperty()
     activities = db.StringListProperty()
     weekday_text = db.StringListProperty()
+    video_ids = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -64,8 +65,8 @@ class Place(db.Model):
             'trailMiles': self.trailMiles,
             'numberTrails': len(trails),
             'activities': activities,
-            'weekday_text': self.weekday_text
-
+            'weekday_text': self.weekday_text,
+            'video_ids': self.video_ids
         }
 
 class POI(db.Model):

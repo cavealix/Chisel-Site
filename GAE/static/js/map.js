@@ -63,6 +63,7 @@ var ViewModel = function() {
     self.photoSphereList = ko.observableArray([]);
     self.poiList = ko.observableArray([]);
     self.photoList = ko.observableArray([]);
+    self.videoList = ko.observableArray([]);
 
     //Currently selected location (Parks/Trails)
     self.destination = ko.observable();
@@ -629,6 +630,11 @@ var ViewModel = function() {
         self.poiList().push( new POI(park, poi ));
       };
 
+      self.videoList([]);
+      park.video_ids.forEach(function(id){
+        self.videoList().push( new Video(id) );
+      });
+
       //set park as selected destination
       self.selectedPark( park );
       self.destination( self );
@@ -642,6 +648,7 @@ var ViewModel = function() {
       self.show('park-info');
       self.show('prep-icons');
       self.show('list');
+      self.show('Youtube_videos');
       self.closeMenu();
     };
 
@@ -1215,8 +1222,7 @@ var Park = function(data) {
     self.numberTrails = ko.observable( data.numberTrails );
     self.trailMiles = ko.observable( data.trailMiles );
     self.activities = ko.observableArray();
-    
-    console.log(data.activities);
+    self.video_ids = data.video_ids;
 
     //iterate through object keys
     Object.keys(data.activities).forEach(function(key) {
@@ -1460,6 +1466,18 @@ var Photo = function(photo){
   self.src = 'https://farm'+photo.farm+'.staticflickr.com/'+photo.server+'/'+photo.id+'_'+photo.secret+'.jpg';
   self.alt = photo.title;
   self.content = photo.title;
+}
+
+// Video Object /////////////////////////////////////////////////
+var Video = function(id){
+  self = this;
+
+  self.content = '<iframe id="ytplayer" type="text/html" 
+                      src="https://www.youtube.com/embed/'+id+'?"
+                      frameborder="0">
+                  </iframe>';
+  //self.alt = photo.title;
+  //self.content = photo.title;
 }
 
 // Circle Object //////////////////////////////////////////////

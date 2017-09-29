@@ -277,6 +277,7 @@ def verifyTrail(trail_id):
         return redirect ( url_for('map'))
     else:
         trail = Trail.get_by_id(trail_id);
+
         return render_template('verifyTrail.html', trail=trail)
 
 #Add Trail
@@ -321,6 +322,12 @@ def addTrail():
 
             photos = [] 
 
+            options = locationSearchOptions('', 25, location, '1mi')
+            videos = youtube_search(options)
+            video_ids = []
+            for video in videos:
+                video_ids.append(video['id']['videoId'])
+            print(video_ids)
 
 
             newPlace = Place(
@@ -337,7 +344,8 @@ def addTrail():
                 country = country,
                 abr_country = abr_country,
                 trailMiles = 0,
-                weekday_text = place['opening_hours']['weekday_text']
+                weekday_text = place['opening_hours']['weekday_text'],
+                video_ids = video_ids
                 )
             print newPlace
             newPlace.put()
