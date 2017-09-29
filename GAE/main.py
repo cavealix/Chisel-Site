@@ -94,8 +94,10 @@ def sphereAPI(sphere_id):
 #Home -------------------------------------------------
 @app.route('/', methods=['Get'])
 def home():
-    parks = db.GqlQuery("select * from Place")
-    return render_template('home.html', parks=parks)
+    #parks = db.GqlQuery("select * from Place")
+    #return render_template('home.html', parks=parks)
+
+    return redirect( url_for('map'))
 
 #List Parks
 @app.route('/parks', methods=['Get'])
@@ -317,6 +319,10 @@ def addTrail():
             location = place['geometry']['location']
             location = db.GeoPt(float(location['lat']), float(location['lng']))
 
+            photos = [] 
+
+
+
             newPlace = Place(
                 name = place['name'],
                 place_id = place['place_id'],
@@ -330,7 +336,8 @@ def addTrail():
                 abr_state = abr_state,
                 country = country,
                 abr_country = abr_country,
-                trailMiles = 0
+                trailMiles = 0,
+                weekday_text = place['opening_hours']['weekday_text']
                 )
             print newPlace
             newPlace.put()

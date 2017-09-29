@@ -28,6 +28,7 @@ class Place(db.Model):
     photo = db.StringProperty()
     trailMiles = db.IntegerProperty()
     activities = db.StringListProperty()
+    weekday_text = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -62,7 +63,8 @@ class Place(db.Model):
             'pois': pois,
             'trailMiles': self.trailMiles,
             'numberTrails': len(trails),
-            'activities': activities
+            'activities': activities,
+            'weekday_text': self.weekday_text
 
         }
 
@@ -99,6 +101,8 @@ class Trail(db.Model):
     total_elevation_change = db.FloatProperty()
     activities = db.StringListProperty()
     seasons = db.StringListProperty()
+    segments = db.BlobProperty()
+    out_n_back = db.BooleanProperty()
 
     #Booleans
     camping = db.BooleanProperty()
@@ -107,14 +111,16 @@ class Trail(db.Model):
     @property 
     def serialize(self):
         #returns data in serializable format
-        path = []
-        for coord in self.coords:
-            pt = {'lat': coord.lat, 'lon': coord.lon}
-            path.append(pt)
 
         spheres = []
         for photo in self.photo_spheres:
             spheres.append(photo.serialize)
+
+            #returns data in serializable format
+        path = []
+        for coord in self.coords:
+            pt = {'lat': coord.lat, 'lon': coord.lon}
+            path.append(pt)
 
         return {
             'id' : self.key().id(),
@@ -131,7 +137,8 @@ class Trail(db.Model):
             'total_elevation_change' : self.total_elevation_change,
             'activities' : self.activities,
             'seasons' : self.seasons,
-            'photo_spheres' : spheres
+            'photo_spheres' : spheres,
+            'segments' : self.segments
         }
 
 

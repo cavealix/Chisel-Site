@@ -1,28 +1,30 @@
-var map, google, VM, parksData, content_url;
+var map, google, VM, parksData, content_url, loadout;
 
 
 //List of btns for querying nearby places and park info
 var prep_icons = [
   {"img": "/static/imgs/google_icons/ic_restaurant_black_36dp/web/ic_restaurant_black_36dp_2x.png",
-  "title": "Food", "alt": "food-btn", "type": "restaurant"},
+  "title": "Nearby Food", "alt": "food-btn", "type": "restaurant"},
   {"img": "/static/imgs/google_icons/ic_store_mall_directory_black_36dp/web/ic_store_mall_directory_black_36dp_2x.png",
-  "title": "Gear Shops", "alt": "gear-shop-icon", "type": "clothing_store"},
+  "title": "Nearby Gear Shops", "alt": "gear-shop-icon", "type": "clothing_store"},
   {"img": "/static/imgs/google_icons/ic_local_bar_black_36dp/web/ic_local_bar_black_36dp_2x.png",
-  "title": "Pubs", "alt": "pubs-btn", "type": "bar"},
+  "title": "Nearby Pubs", "alt": "pubs-btn", "type": "bar"},
   {"img": "/static/imgs/google_icons/ic_hotel_black_36dp/web/ic_hotel_black_36dp_2x.png",
-  "title": "Lodging", "alt": "lodging-btn", "type": "lodging"},
+  "title": "Nearby Lodging", "alt": "lodging-btn", "type": "lodging"},
   {"img": "/static/imgs/google_icons/ic_local_gas_station_black_36dp/web/ic_local_gas_station_black_36dp_2x.png",
-  "title": "Gas", "alt": "gas-btn", "type": "gas_station"},
+  "title": "Nearby Gas", "alt": "gas-btn", "type": "gas_station"},
   {"img": "/static/imgs/google_icons/ic_flight_black_36dp/web/ic_flight_black_36dp_2x.png",
-  "title": "Airfare", "alt": "airfare-btn", "type": "airport"},
+  "title": "Nearby Airports", "alt": "airfare-btn", "type": "airport"},
   {"img": "/static/imgs/google_icons/ic_change_history_black_36dp/web/ic_change_history_black_36dp_2x.png",
-  "title": "Camp", "alt": "camp-btn", "type": "campground"},
+  "title": "Nearby Camps", "alt": "camp-btn", "type": "campground"},
   {"img": "/static/imgs/google_icons/ic_local_hospital_black_36dp/web/ic_local_hospital_black_36dp_2x.png",
-  "title": "Hospital", "alt": "hospital-btn", "type": "hospital"},
+  "title": "Nearby Clinics", "alt": "hospital-btn", "type": "hospital"},
   {"img": "/static/imgs/google_icons/ic_room_black_36dp/web/ic_room_black_36dp_2x.png",
-  "title": "POIs", "alt": "pois-btn", "type": "pois"},
-  {"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
-  "title": "Photos", "alt": "photos-btn", "type": "photos"}];
+  "title": "Toggle Park POIs", "alt": "pois-btn", "type": "pois"},
+  //{"img": "/static/imgs/google_icons/ic_camera_alt_black_36dp/web/ic_camera_alt_black_36dp_2x.png",
+  //"title": "Photos", "alt": "photos-btn", "type": "photos"},
+  {"img": "/static/imgs/google_icons/ic_show_chart_black_36dp/web/ic_show_chart_black_36dp_2x.png",
+  "title": "Toggle Trail Elevation", "alt": "elev-btn", "type": "elevation"}];
 
 
 function initMap() {
@@ -41,7 +43,13 @@ function initMap() {
     //query all parks
     VM.queryParks();
 
-    $('[data-toggle="tooltip"]').tooltip();
+    //Match heights of cols
+    $('.box').matchHeight();
+
+    // Add a marker clusterer to manage the markers.
+    //https://developers.google.com/maps/documentation/javascript/marker-clustering/
+    //var markerCluster = new MarkerClusterer(map, VM.markers,
+    //    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
     
 }
 
@@ -288,7 +296,7 @@ var ViewModel = function() {
         //if photo btn, query Flickr
         if (iconButton.type == 'photos'){
             //show flickr photos
-            self.show('myCarousel');
+            $('#myCarousel').collapse('toggle');
         }
         //toggle park pois
         else if (iconButton.type == 'pois'){
@@ -296,7 +304,15 @@ var ViewModel = function() {
           self.poiList().forEach( function(poi) {
             poi.toggle();
           });
-
+        }
+        else if (iconButton.type == 'elevation'){
+          if (self.destination().type() == 'Trail'){
+            $('#elevation').collapse('toggle');
+          }
+          else{
+            alert('Select which trail you want to view the elevation for');
+          }
+          
         }
         //else search Google places
         else{
@@ -425,6 +441,7 @@ var ViewModel = function() {
       }
     };
 
+    //Query trips related to trail
     self.queryTrips = function( trail ) {
       //Query and show trails within selected park
         url = "/tripAPI/" + trail.id;
@@ -433,6 +450,8 @@ var ViewModel = function() {
           format: "json"
         })
         .done(function( data ) {
+
+          var trips = data.Trips;
 
           console.log(data);
             //data.Trips.forEach( function(trip) {
@@ -666,7 +685,6 @@ var ViewModel = function() {
         //UI changes        
         self.hide('park-info');
         //Show trail data
-        self.show('elevation');
         self.show('trail-info');
         self.show('loadout');
     };
@@ -674,7 +692,7 @@ var ViewModel = function() {
     //Determine best loadot
     self.packLoadout = function( trail, weather ) {
       
-      var loadout = new Loadout( trail, weather );
+      loadout = new Loadout( trail, weather );
 
       self.loadout( loadout );
     };
@@ -866,7 +884,9 @@ var Loadout = function( trail, weather ) {
 
 
   //Clothing
+  self.headwear = ko.observableArray();
   self.clothing = ko.observableArray();
+  self.footwear = ko.observable();
   //Provisions
   self.water = ko.observable();
   self.food = ko.observableArray();
@@ -877,39 +897,69 @@ var Loadout = function( trail, weather ) {
   self.pack = ko.observable();
 
 
-  //Clothing
-  //rain
-  if ( weather.desc().includes('rain') ) {
-    self.clothing().push('Poncho');
+  var raining = weather.desc().includes('rain');
+  var snowing = weather.desc().includes('snow');
+  var tempLow = weather.low();
+  var tempAvg = weather.avg();
+  var tempHigh = weather.high();
+  var distance = trail.total_distance();
+  var grade = trail.avgGrade();
 
-    if ( weather.avg() > 90 ) {
-      self.clothing().push('Short Synthetic Shirt');
-      self.clothing().push('Synthetic Shorts');
-      self.clothing().push('Chacos');
+
+  //Shoes  
+  var shoe = ['Any Shoe'];  
+  if (distance > 3 && grade <= 3){
+    shoe[0] = 'Hiking Shoe or Sandal';
+  }
+  else if (distance => 5 || grade > 3){
+    shoe[0] = 'Hike Shoe or Boot';
+  }
+  else if (distance > 10 || grade > 5){
+    shoe[0] = 'Hike Boot';
+  }
+
+  if (raining && tempAvg < 70){
+    shoe.push('Waterproof');
+  }
+  if (tempAvg < 50){
+    shoe.push('Insulated');
+  }
+  shoe.reverse();
+  shoe.join( );
+  self.clothing().push(shoe);
+
+
+  //Clothing
+  apparel = [];
+  if (tempAvg => 85) {
+    apparel.push('T-Shirt');
+    apparel.push('Shorts');
+  }
+  else if ( 65 <= tempAvg < 85){
+    apparel.push('T-Shirt');
+    apparel.push('Pants');
+  }
+  else if ( 50 <= tempAvg < 65){
+    apparel.push('Base Layer');
+    apparel.push('Longsleeve');
+    apparel.push('Pants');
+    apparel.push('Beanie/Insulated Hat');
+    apparel.push('Wool Socks');
+  }
+
+  if (raining || snowing){
+    if (tempAvg > 75){
+      apparel.push('Poncho');
     }
     else {
-      self.clothing().push('Long Synthetic Shirt');
-      self.clothing().push('Synthetic Pants');
-      self.clothing().push('Chacos');
+      apparel.push('Rain/Waterproof Jacket');
+      apparel.push('Rain Pants');
     }
   }
-  //clear
-  else {
-    self.clothing().push('Hat');
-    self.clothing().push('Sunglasses');
-    self.clothing().push('Sunscreen');
-    
-    if ( weather.avg() > 90 ) {
-      self.clothing().push('Short Synthetic Shirt');
-      self.clothing().push('Synthetic Shorts');
-      self.clothing().push('Chacos');
-    }
-    else {
-      self.clothing().push('Long Synthetic Shirt');
-      self.clothing().push('Synthetic Pants');
-      self.clothing().push('Hiking Boots');
-    }  
-  }
+  apparel.forEach(function(item){
+    self.clothing().push(item);
+  })
+
 
   //Estimate of water to pack 1L/2hr active hiking
   //need to know if loop or there-and-back to double 
@@ -989,7 +1039,7 @@ var Loadout = function( trail, weather ) {
 var Trail = function(data) {
     var self = this;
 
-    console.log(data.trails);
+    //console.log(data.trails);
 
     self.id = data.id;
     self.name = ko.observable(data.name);

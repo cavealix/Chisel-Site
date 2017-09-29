@@ -42,19 +42,25 @@ function initAutocomplete() {
     var service = new google.maps.places.PlacesService(map);
 
     service.getDetails({
-      placeId: place.id
+      placeId: place.place_id
     }, function(place, status) {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         var marker = new google.maps.Marker({
           map: map,
           position: place.geometry.location
         });
+
+        place.photos.forEach( function( photo ) {
+          console.log( 0 );
+        });
+
+        //save place to global variable
+        document.getElementById('place').value = JSON.stringify(place);
         console.log(place);
       }
     });
 
-    //save place to global variable
-    document.getElementById('place').value = JSON.stringify(places[0]);
+    
 
     //Get Instagram place id
     //var fid = instaLocationSearch(places[0]);
