@@ -65,6 +65,8 @@ var ViewModel = function() {
     self.photoList = ko.observableArray([]);
     self.videoList = ko.observableArray([]);
 
+    self.videoList().push( new Video({'video_id':'R2nKFCe-e1Y', 'title': 'Welcome to Chisel Outdoors', 'description':'An intro video'}) );
+
     //Currently selected location (Parks/Trails)
     self.destination = ko.observable();
 
@@ -631,8 +633,8 @@ var ViewModel = function() {
       };
 
       self.videoList([]);
-      park.video_ids.forEach(function(id){
-        self.videoList().push( new Video(id) );
+      park.videos.forEach(function(video){
+        self.videoList().push( new Video(video) );
       });
 
       //set park as selected destination
@@ -648,7 +650,7 @@ var ViewModel = function() {
       self.show('park-info');
       self.show('prep-icons');
       self.show('list');
-      self.show('Youtube_videos');
+      self.show('youtubeSlider');
       self.closeMenu();
     };
 
@@ -854,6 +856,7 @@ var ViewModel = function() {
         self.hide('elevation');
         self.hide('myCarousel');
         self.hide('photo_sphere_canvas');
+        self.hide('youtubeSlider');
 
         //empty previous results
         self.forecast.removeAll();
@@ -1208,6 +1211,7 @@ var Photo_Sphere = function(data) {
 var Park = function(data) {
     var self = this;
 
+    self.type = ko.observable('Park');
     self.id = data.id;
     self.place_id = data.place_id;
     self.name = ko.observable(data.name);
@@ -1222,7 +1226,7 @@ var Park = function(data) {
     self.numberTrails = ko.observable( data.numberTrails );
     self.trailMiles = ko.observable( data.trailMiles );
     self.activities = ko.observableArray();
-    self.video_ids = data.video_ids;
+    self.videos = data.videos;
 
     //iterate through object keys
     Object.keys(data.activities).forEach(function(key) {
@@ -1469,15 +1473,12 @@ var Photo = function(photo){
 }
 
 // Video Object /////////////////////////////////////////////////
-var Video = function(id){
+var Video = function(video){
   self = this;
 
-  self.content = '<iframe id="ytplayer" type="text/html" 
-                      src="https://www.youtube.com/embed/'+id+'?"
-                      frameborder="0">
-                  </iframe>';
-  //self.alt = photo.title;
-  //self.content = photo.title;
+  self.embed = ko.observable('http://www.youtube.com/embed/'+video.video_id+'?hd=1&wmode=opaque&controls=1&showinfo=0');
+  self.title = ko.observable(video.title);
+  self.description = ko.observable(video.description);
 }
 
 // Circle Object //////////////////////////////////////////////

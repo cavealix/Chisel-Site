@@ -29,7 +29,6 @@ class Place(db.Model):
     trailMiles = db.IntegerProperty()
     activities = db.StringListProperty()
     weekday_text = db.StringListProperty()
-    video_ids = db.StringListProperty()
 
     @property 
     def serialize(self):
@@ -40,12 +39,14 @@ class Place(db.Model):
             pois.append(poi.serialize)
 
         trails = []
-
         for trail in self.trails:
             trails.append(trail.serialize)
 
         activities = {i:self.activities.count(i) for i in self.activities}
 
+        videos = []
+        for video in self.videos:
+            videos.append(video.serialize)
 
         return {
             'id' : self.key().id(),
@@ -66,7 +67,7 @@ class Place(db.Model):
             'numberTrails': len(trails),
             'activities': activities,
             'weekday_text': self.weekday_text,
-            'video_ids': self.video_ids
+            'videos': videos
         }
 
 class POI(db.Model):
@@ -227,12 +228,24 @@ class Photo(db.Model):
 
 class Video(db.Model):
     trip = db.ReferenceProperty(Trip, collection_name='videos')
-    url = db.StringProperty()
+    park = db.ReferenceProperty(Place, collection_name='videos')
+    video_id = db.StringProperty()
+    title = db.StringProperty()
+    description = db.TextProperty()
+    thumbnails = db.TextProperty()
+    imgDefault = db.StringProperty()
+    imgMedium = db.StringProperty()
+    imgHigh = db.StringProperty()
 
     @property 
     def serialize(self):
         return {
-            'url' : self.url
+            'video_id' : self.video_id,
+            'title' : self.title,
+            'description' : self.description,
+            'imgDefault' : self.imgDefault,
+            'imgMedium' : self.imgMedium,
+            'imgHigh' : self.imgHigh
         }
 
     

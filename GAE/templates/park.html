@@ -24,6 +24,42 @@
     
     {% endif %}
 
+
+    <!-- Youtube MasterSlider -->
+    <div class="master-slider ms-skin-default" id="youtubeSlider">
+
+        {% for video in park.videos %}
+        <!-- slide -->
+        <div class="ms-slide">
+      
+            <img src="/static/masterslider/style/blank.gif" data-src="{{ video.imgHigh }}" alt="Youtube video thumbnail"/>
+            
+            <!-- slide text layer -->
+            <div class="ms-layer ms-caption" style="bottom:0px; text-align: center; font-size: 1.5em; color: white; background-color: rgba(100, 100, 100, 0.5);">
+                {{ video.description }}
+            </div> 
+    
+            <!-- youtube video -->
+            <a href="http://www.youtube.com/embed/{{ video.video_id }}?hd=1&wmode=opaque&controls=1&showinfo=0" title="{{ video.description }}" data-type="video">Youtube video</a>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <script type="text/javascript">
+      //Instantiate youtube Slider
+      var slider = new MasterSlider();
+      slider.setup('youtubeSlider' , {
+          width:800,    // slider standard width
+          height:350,   // slider standard height
+          space:5,
+          loop:true
+      });
+      // adds Arrows navigation control to the slider.
+      slider.control('arrows');
+      //slider.control('bullets', {align: "top"});
+    </script>
+
     <script src="/static/js/park.js"></script>
 
 {% endblock %}

@@ -322,14 +322,6 @@ def addTrail():
 
             photos = [] 
 
-            options = locationSearchOptions('', 25, location, '1mi')
-            videos = youtube_search(options)
-            video_ids = []
-            for video in videos:
-                video_ids.append(video['id']['videoId'])
-            print(video_ids)
-
-
             newPlace = Place(
                 name = place['name'],
                 place_id = place['place_id'],
@@ -345,11 +337,27 @@ def addTrail():
                 abr_country = abr_country,
                 trailMiles = 0,
                 weekday_text = place['opening_hours']['weekday_text'],
-                video_ids = video_ids
                 )
-            print newPlace
             newPlace.put()
             place = newPlace
+
+            options = locationSearchOptions('', 25, location, '1mi')
+            videos = youtube_search(options)
+
+            for video in videos:
+                newVideo = Video(
+                    video_id = video['id']['videoId'],
+                    title = video['snippet']['title'],
+                    description = video['snippet']['description'],
+                    park = place,
+                    imgDefault = video['snippet']['thumbnails']['default']['url'],
+                    imgMedium = video['snippet']['thumbnails']['medium']['url'],
+                    imgHigh = video['snippet']['thumbnails']['high']['url']
+                )
+                newVideo.put()
+
+
+
         else:
             place = place_search
 
