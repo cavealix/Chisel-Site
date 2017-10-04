@@ -114,8 +114,7 @@ def map():
 @app.route('/parks/<int:park_id>/', methods=['Get'])
 def park(park_id):
     park = Place.get_by_id(park_id)
-    trails = Trail.gql("where park_id = :park_id", park_id=park_id).fetch(limit=None)
-    return render_template('park.html', park=park, trails=trails)
+    return render_template('park.html', park=park, park_json=json.dumps(park.serialize))
 
 #Add Park
 @app.route('/addPark', methods=['Get', 'Post'])

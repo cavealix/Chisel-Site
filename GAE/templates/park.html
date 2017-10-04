@@ -2,7 +2,212 @@
 
 {% block content %}
 
-    <h1>{{ park.name }}</h1>
+
+    <!-- Selection Header -->
+    <div class='canvas' data-bind='with: destination'>
+      <h1 id="destination" data-bind='text: name'>{{park.name}}</h1>
+    </div>
+
+
+    <!-- Map Section -->
+    <div class="section">
+      <!-- Menu -->
+      <div class="menu" data-bind="with: currentPlace">
+        <!-- Close icon -->
+        <div class="icon-close">
+          <img id="close-btn" data-bind="click: $parent.closeMenu" src="/static/imgs/google_icons/ic_cancel_white_36dp/web/ic_cancel_white_36dp_1x.png" alt="close-icon">
+        </div>
+        <!-- Current Marker Info -->
+            
+        <h2 data-bind="text: name"></h2>
+        <ul id="current_place">
+          <li>Rating: <span data-bind="text: rating"></span></li>
+          <li>Directions: <a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
+          <li>Phone: <span data-bind="text: phone"></span></li>
+          <li title="Distance by road between park/trail and establishment">Distance: <span data-bind="text: distanceFromDestination"></span></li>
+          <li title="Approximate drive time between park/trail and establishment">Approx. Drive Time: <span data-bind="text: durationFromDestination"></span></li>
+
+        </ul>  
+      </div>
+
+        <!-- Map -->
+        <div class="section" id="map_container">
+        <!-- When nearly all parks covered, allow user to search park by name -->
+        <!-- <input id="pac-input" class="controls" type="text" placeholder="Search Box"> -->
+            <div class="canvas" id="map"></div>
+        </div>
+    </div>
+
+
+    <!-- Info Btns -->
+    <div class="icon_bar" id="prep-icons">
+        <ul class="btns" data-bind="foreach: prep_icons">
+            <li class="info-btn">
+              <img data-toggle="tooltip" data-container="body" data-placement="bottom" data-bind="attr: {src: img, title: title, alt: alt}, click: $parent.search">
+            </li>
+            <li>|</li>
+        </ul>
+    </div>
+
+
+    <!-- Spacer -->
+    <div class="spacer"></div>
+
+
+    <!-- Park Info -->
+    <div class="canvas container-fluid" id="park-info" data-bind="with: park">
+      <div class="row">
+      <div class=" col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xl-offset-1 col-lg-offset-1 col-md-offset-1" id="park-basics">
+        <div class="box">
+          <h5>The Basics</h5>
+          <ul>
+            <li>Go There: <br><a data-bind="attr:{href: mapUrl}" target="_blank"><span data-bind="text: address" ></span></a></li>
+            <li>Phone: <span data-bind="text: phone"></span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="park-stats">
+        <div class="box">
+          <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
+          <ul>
+            <li>Number of trails: <span data-bind="text: numberTrails"></span></li>
+            <li>Total miles: <span data-bind="text: trailMiles"></span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" id="park-activities">
+        <div class="box">
+          <h5>Activities</h5>
+          <ul data-bind="foreach: activities">
+              <li><span data-bind="text: type"></span>: <span data-bind="text: number"></span> trails</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="park-seasons"
+        title="12 and under free, 50% off 65+, 50% off permanently disabled, 100% off disabled veterans">
+        <div class="box">
+          <h5>Permits/Passes:</h5>
+          <ul data-bind="foreach: permits"> 
+            <li data-bind="text: $data"></li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </div>
+
+
+    <!-- Trail Info -->
+    <div class="canvas collapse container-fluid" id="trail-info" data-bind="with: currentTrail">
+      <div class="row">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4 col-xs-6 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-offset-1" id="stats">
+        <h5>The Basics</h5>
+        <ul>
+          <li>Distance: <span data-bind="text: total_distance"></span> mi</li>
+          <li>Start Elevation: <span data-bind="text: start_elevation"></span> ft</li>
+          <li>End Elevation: <span data-bind="text: end_elevation"></span> ft</li>
+          <li>Elevation Change: <span data-bind="text: total_elevation_change"></span> ft</li>
+          <!-- <li><a data-bind="attr:{href: verify}">Been here? Verify and <br> make recommendations.</a></li> -->
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" id="what_to_expect">
+        <h5 data-toggle="tooltip" title="All the data translated into something more relevant to the day to day.">What to Expect</h5>
+        <ul>
+          <li>Avg. Grade: %<span data-bind="text: avgGrade"></span></li>
+          <li title="The overall elevation change in number of flights of stairs">Stair Elevation : <span data-bind="text: flights"></span> flights</li>
+          <!-- <li title="An approximate ratio of effort accounting for distance with elvation compared to flat distance. (How much harder it's going to be)">Work Ratio: <span data-bind="text: workRatio"></span></li> -->
+          <li title="Approximate number of flat miles equivalent to effort with elevation. (Flat distance, same effort)">Flat Equivalent: <span data-bind="text: flat_equivalent"></span> mi</li>
+          <li title="Shortest estimated active hiking time based on Naismiths Rule at 2.5 mph average pace, does not include breaks.">Estimated time: <span data-bind="text: time"></span> min</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6" id="activities">
+        <h5>Activities</h5>
+        <ul data-bind="foreach: activities">
+            <li><span data-bind="text: $data"></span></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-2 col-xs-6" id="seasons">
+        <h5>Best Seasons</h5>
+          <ul data-bind="foreach: seasons">
+              <li><span data-bind="text: $data"></span></li>
+          </ul>
+      </div>
+      </div>
+    </div>
+
+
+    <!-- Elevation -->
+    <div class="canvas collapse" id="elevation">
+    </div>
+
+
+    <!-- Forecast -->
+    <div class="canvas  container-fluid" id="forecast">
+      <!-- Current Weather -->
+      <h4 id="currentWeather" data-bind="with: currentWeather" style="text-align: center;">Currently <span data-bind="text: avg"></span> °F with <span data-bind="text: desc"></span> <img data-bind="attr:{src: img}"> between <span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F with <span data-bind="text: humidity"></span>% humidity</h4>
+      <ul class="canvas rows" id="forecast-week" data-bind="foreach: forecast">
+      <li class="day col-xl-2 col-lg-2 col-md-2 col-sm-2 col-xs-4" data-bind="click: $parent.selectDay">
+        <h5 data-bind="text: weekday"></h5>
+        <img id="weather-img" alt="weather forecast" data-bind="attr: {src: img}">
+        <p><span data-bind="text: avg"></span>°F</p>
+        <p><span data-bind="text: low"></span> - <span data-bind="text: high"></span> °F</p>
+        <p id="weather-desc" data-bind="text: desc"></p>
+        <p><span data-bind="text: humidity"></span>% Humid</p>
+      </li>
+      </ul>
+    </div>
+
+
+    <!-- Spacer -->
+    <div class="spacer"></div>
+
+
+    <!-- Loadout -->
+    <div class="canvas  container-fluid collapse" id="loadout">
+      <h4 style="text-align: center;" data-bind="with: selectedDay">What to Take for <span data-bind="text: weekday"></span></h4>
+      <div class="row" data-bind="with: loadout">
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 col-xs-6 col-xl-offset-1 col-lg-offset-1 col-md-offset-1 col-sm-6" id="clothing">
+        <h5>Clothing</h5>
+        <ul data-bind="foreach: clothing">
+          <li data-bind="text: $data"></li>
+        </ul>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 col-xs-6" id="Food/Water">
+        <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Food / Water</h5>
+        <ul>
+          <li title="Estimated minimum amount of water to take based on estimated completion time."><span data-bind="text: water"></span> L water</li>
+        </ul>
+        <ul title="Estimated amount of provisions to take based on trail length." data-bind="foreach: food">
+          <li data-bind="text: $data"></li>
+        </ul>
+      </div>
+
+      <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 col-xs-6" id="gear">
+        <h5 data-toggle="tooltip" title="Estimates on how much food to pack.">Gear</h5>
+        <ul data-bind="foreach: gear">
+          <li data-bind="text: $data"></li>
+        </ul>
+      </div>
+
+      <div class="col-xl-2 col-lg-2 col-md-2 col-sm-6 col-xs-6" id="pack">
+        <h5>Pack</h5>
+        <li title="Estimated weight based on water, food, and recommended gear.">Est. Weight: <span data-bind="text: weight"></span> lbs</li>
+        <li title="Estimated pack size based on water and weight estimate and if camping is an option."> Pack Size: <span data-bind="text: pack"></span> L</li>
+      </div>
+      </div>
+    </div>
+
+
+    <!-- Spacer -->
+    <div class="spacer"></div>
+
+    <!-- <h1>{{ park.name }}</h1>
     
         <a href="{{ url_for('deletePark', park_id=park.key().id()) }}">Delete</a>
         <a href="{{ url_for('editPark', park_id=park.key().id()) }}">Edit</a>
@@ -21,8 +226,27 @@
     {% else %}
 
         <p>No trails here, please add some.</p>
-    
-    {% endif %}
+    {% endif %}-->
+
+    <script>var park_json = {{ park_json|safe }};</script>
+
+    <div class="canvas collapse" id="amazon">
+        <script type="text/javascript">
+        amzn_assoc_placement = "adunit0";
+        amzn_assoc_search_bar = "true";
+        amzn_assoc_tracking_id = "chiseloutdoor-20";
+        amzn_assoc_ad_mode = "search";
+        amzn_assoc_ad_type = "smart";
+        amzn_assoc_marketplace = "amazon";
+        amzn_assoc_region = "US";
+        amzn_assoc_title = "Shop Related Products";
+        amzn_assoc_default_search_phrase = "cold weather jackets";
+        amzn_assoc_default_category = "All";
+        amzn_assoc_linkid = "9360d3d32fb8276e016aae5992d5f928";
+        amzn_assoc_search_bar_position = "top";
+        </script>
+        <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+    </div>
 
 
     <!-- Youtube MasterSlider -->
@@ -43,8 +267,8 @@
             <a href="http://www.youtube.com/embed/{{ video.video_id }}?hd=1&wmode=opaque&controls=1&showinfo=0" title="{{ video.description }}" data-type="video">Youtube video</a>
         </div>
         {% endfor %}
-
     </div>
+
 
     <script type="text/javascript">
       //Instantiate youtube Slider
@@ -60,6 +284,16 @@
       //slider.control('bullets', {align: "top"});
     </script>
 
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/css/park.css">
+    <!-- Knockout -->
+    <script src="/static/js/knockout/knockout-3.4.0.js"></script>
+    <!-- Google Graph -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="/static/js/park.js"></script>
+
+    <!-- Google Maps -->
+    <script onload="initMap()" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9OHhxzexIo2nYScmEqSM4Rsqp9mRSflI&libraries=places,visualization" 
+    async defer ></script>
 
 {% endblock %}

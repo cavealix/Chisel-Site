@@ -1,0 +1,197 @@
+/* Local override */
+
+#destination {
+  text-align: center;
+}
+
+/* Pop In Menu */
+.menu {
+    background-color: #333;
+    opacity: .85;
+    left: -300px;  /* start off behind the scenes */
+    height: inherit;
+    position: absolute;
+    width: 300px;
+    z-index: 1;
+    color: white;
+    display: inline-block;
+}
+.menu h1 {
+    text-align: center;
+}
+.menu ul {
+  border-top: 1px solid #636366;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  border-bottom: 1px solid #636366;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 45px;
+  padding-bottom: 3px;
+  padding-left: 20px;
+  padding-top: 3px;
+}
+.icon-close {
+  cursor: pointer;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+/* Knockstrap Carousel */
+#myCarousel img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Flickr Photos
+#flickr-photo {
+  width: 100%;
+  height: 100%;
+}
+/* Photo Sphere */
+#photo_sphere {
+  width: 100%;
+  height: 100%;
+}
+
+/* Trail Info */
+
+
+/* Weather */
+#forecast-week {
+  vertical-align: middle;
+  width: 100%;
+  padding-left: auto;
+  padding-right: auto;
+}
+.day {
+  display: inline-block;
+  text-align: center;
+  /* background-color: rgba(100, 100, 100, .3); */
+  border-radius: 25px;
+  padding: 0px;
+}
+
+
+
+/* Icon Bar */
+.icon_bar {
+    width: 100%;
+    font-size: 1.25em;
+    margin-bottom: 20px;
+}
+.icon_bar ul {
+    text-align: center;
+    font-family: Raleway, 400;
+}
+.icon_bar ul li {
+    padding: 0.5em .75em;
+    display: inline-block;
+    text-align: center;
+}
+.icon_bar img {
+    max-height: 25px;
+    max-width: 25px;
+}
+
+/* List */
+#list ul{
+    list-style: none;
+}
+#list a{
+    text-decoration: none;
+}
+#list a:link {
+    color: gray;
+}
+#list a:hover {
+    color: orange;
+}
+
+/* Navbar */
+.navbar {
+    margin-bottom: 0px;
+}
+
+/* Search Box */
+#description {
+ font-family: Roboto;
+ font-size: 15px;
+ font-weight: 300;
+}
+
+#infowindow-content .title {
+  font-weight: bold;
+}
+
+#infowindow-content {
+  display: none;
+}
+
+#map #infowindow-content {
+  display: inline;
+}
+
+.pac-card {
+  margin: 10px 10px 0 0;
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  font-family: Roboto;
+}
+
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  padding: 5px 11px;
+}
+
+.pac-controls label {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 400px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
+
+#title {
+  color: #fff;
+  background-color: #4d90fe;
+  font-size: 25px;
+  font-weight: 500;
+  padding: 6px 12px;
+}
+#target {
+  width: 345px;
+}
+
+
+
+/* Mobile */
+@media screen and (max-width: 400px){
+  #weather-desc {
+    display: none;
+  }
+}
