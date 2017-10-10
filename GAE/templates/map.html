@@ -4,8 +4,10 @@
 
 
   <!-- Selection Header -->
-  <div class='canvas' data-bind='with: destination'>
-    <h1 id="destination" data-bind='text: name'>Destination</h1>
+  <div class='canvas' id="destination" data-bind='with: destination'>
+    <a data-bind="click: gothere">
+      <h1 data-bind="text: name"></h1>
+    </a>
   </div>
 
 

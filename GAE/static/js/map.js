@@ -96,6 +96,10 @@ var ViewModel = function() {
     //Google Map Service for nearbySearch and placeDetails
     var service = new google.maps.places.PlacesService(map);
 
+    //Go to url for selected park
+    gothere = function(){
+      window.location.href = self.destination().url();
+    }
 
 // API CALLS //////////////////////////////////////////
 
@@ -610,48 +614,50 @@ var ViewModel = function() {
       self.resultArray.removeAll();
       
       //remove photo spheres from map
-      for (var i = 0; i < self.photoSphereList().length; i++) {
-        self.photoSphereList()[i].clear();
-      };
-      self.photoSphereList.removeAll();
+      //for (var i = 0; i < self.photoSphereList().length; i++) {
+      //  self.photoSphereList()[i].clear();
+      //};
+      //self.photoSphereList.removeAll();
       //clear previous forecast
-      self.forecast.removeAll();
+      //self.forecast.removeAll();
       //clear previous trails
-      self.clearTrails();
+      //self.clearTrails();
       //clear previous pois
-      self.clearList( self.poiList() );
+      //self.clearList( self.poiList() );
 
       //query trails for park
-      self.queryTrails( park );
+      //self.queryTrails( park );
       //query weather
-      self.getForecast( park );
+      //self.getForecast( park );
       
       //Create/show saved POIs 
-      for (var i = 0; i < park.pois.length; i++) {
-        var poi = park.pois[i];
-        self.poiList().push( new POI(park, poi ));
-      };
+      //for (var i = 0; i < park.pois.length; i++) {
+      //  var poi = park.pois[i];
+      //  self.poiList().push( new POI(park, poi ));
+      //};
 
-      self.videoList([]);
-      park.videos.forEach(function(video){
-        self.videoList().push( new Video(video) );
-      });
+      //self.videoList([]);
+      //park.videos.forEach(function(video){
+      //  self.videoList().push( new Video(video) );
+      //});
 
       //set park as selected destination
       self.selectedPark( park );
-      self.destination( self );
+      self.destination( park );
       park.bounce();
 
+      self.centerMap( park.position );
+
       //adjust UI
-      self.hide('elevation');
-      self.hide('trail-info');
-      self.hide('loadout');
-      self.hide('photo_sphere_canvas');
+      //self.hide('elevation');
+      //self.hide('trail-info');
+      //self.hide('loadout');
+      //self.hide('photo_sphere_canvas');
       self.show('park-info');
-      self.show('prep-icons');
-      self.show('list');
-      self.show('youtubeSlider');
-      self.closeMenu();
+      //self.show('prep-icons');
+      //self.show('list');
+      //self.show('youtubeSlider');
+      //self.closeMenu();
     };
 
     //Highlight trail to distinguish from the rest
@@ -1213,6 +1219,7 @@ var Park = function(data) {
 
     self.type = ko.observable('Park');
     self.id = data.id;
+    self.url = ko.observable('/parks/'+data.id);
     self.place_id = data.place_id;
     self.name = ko.observable(data.name);
     self.position = new google.maps.LatLng(data.lat, data.lon);
@@ -1252,6 +1259,10 @@ var Park = function(data) {
         markerUrl = 'http://maps.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png';
     }
 
+    var infowindow = new google.maps.InfoWindow({
+      content: '<a href="localhost:8080/parks/'+self.id+'">'+self.name()+'</a>'
+    });
+
     var marker = new google.maps.Marker({
       position: self.position,
       map: map,
@@ -1265,6 +1276,7 @@ var Park = function(data) {
     //Trigger 'Switch Park' KO event
     google.maps.event.addListener(marker, 'click', function() {       
       VM.selectPark( self );
+      //infowindow.open(map, marker);
     });
 
     this.bounce = function() {
