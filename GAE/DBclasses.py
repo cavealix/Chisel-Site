@@ -15,6 +15,7 @@ class Place(db.Model):
     name = db.StringProperty(required = True)
     place_id = db.StringProperty()
     location = db.GeoPtProperty()
+    viewport = db.ListProperty(float)
     address = db.StringProperty()
     phone = db.StringProperty()
     mapUrl = db.StringProperty()
@@ -48,6 +49,10 @@ class Place(db.Model):
         for video in self.videos:
             videos.append(video.serialize)
 
+        spheres = []
+        for photo in self.photo_spheres:
+            spheres.append(photo.serialize)
+
         return {
             'id' : self.key().id(),
             'name' : self.name,
@@ -67,7 +72,29 @@ class Place(db.Model):
             'numberTrails': len(trails),
             'activities': activities,
             'weekday_text': self.weekday_text,
-            'videos': videos
+            'spheres' : spheres
+            #'videos': videos
+        }
+
+    @property
+    def mini(self):
+
+        activities = {i:self.activities.count(i) for i in self.activities}
+
+        return {
+            'id' : self.key().id(),
+            'name' : self.name,
+            'place_id' : self.place_id,
+            'address' : self.address,
+            'phone' : self.phone,
+            'place_type' : self.place_type,
+            'mapUrl' : self.mapUrl,
+            'lat' : self.location.lat,
+            'lon' : self.location.lon,
+            'state': self.state,
+            'abr_state': self.abr_state,
+            'country': self.country,
+            'activities' : self.activities
         }
 
 class POI(db.Model):
@@ -204,6 +231,7 @@ class Loadout(db.Model):
 
 
 class Sphere(db.Model):
+    park = db.ReferenceProperty(Place, collection_name='photo_spheres')
     trail = db.ReferenceProperty(Trail, collection_name='photo_spheres')
     trip = db.ReferenceProperty(Trip, collection_name='photo_spheres')
     embed_code = db.StringProperty()

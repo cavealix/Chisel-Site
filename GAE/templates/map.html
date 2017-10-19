@@ -5,9 +5,10 @@
 
   <!-- Selection Header -->
   <div class='canvas' id="destination" data-bind='with: destination'>
-    <a data-bind="click: gothere">
+    <h1 data-bind="text: name"></h1>
+    <!-- <a data-bind="click: gothere">
       <h1 data-bind="text: name"></h1>
-    </a>
+    </a> -->
   </div>
 
 
@@ -219,25 +220,41 @@
   <!-- Spacer -->
   <div class="spacer"></div>
 
+  <h3 style="text-align: center;">You were going to order from Amazon anyways. Help support us, order through the link below.</h3>
+  <div class="" style="margin: auto; width: 50%;">
+     <script type="text/javascript">
+        amzn_assoc_ad_type = "banner";
+        amzn_assoc_marketplace = "amazon";
+        amzn_assoc_region = "US";
+        amzn_assoc_placement = "assoc_banner_placement_default";
+        amzn_assoc_campaigns = "warehouse";
+        amzn_assoc_banner_type = "category";
+        amzn_assoc_p = "48";
+        amzn_assoc_isresponsive = "false";
+        amzn_assoc_banner_id = "0J2EZCY2WJBH8KXFSMG2";
+        amzn_assoc_width = "728";
+        amzn_assoc_height = "90";
+        amzn_assoc_tracking_id = "chiseloutdoor-20";
+        amzn_assoc_linkid = "27ff526511ccd4f9f7e2629e215d73bb";
+     </script>
+     <script src="//z-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&Operation=GetScript&ID=OneJS&WS=1"></script>
+  </div>
+
 
   <!-- Youtube MasterSlider -->
-  <div class="master-slider ms-skin-default collapse" id="youtubeSlider">
+  <!-- <div class="master-slider ms-skin-default collapse" id="youtubeSlider">
     
-    <!-- slide -->
+
     <div class="ms-slide" data-bind="with: videoList()[0]">
       
       <img src="/static/masterslider/style/blank.gif" data-src="/static/masterslider/images/3.jpg" alt="lorem ipsum dolor sit"/>
-      <!-- slide text layer -->
-      <!-- <div class="ms-layer ms-caption" style="bottom:10px; left:30px; text-align: center;">
-        <span data-bind="text: description"></span>
-      </div> -->
     
-      <!-- youtube video -->
+      
       <a data-bind="attr: { href: embed, text: title}" data-type="video">Youtube video</a>
     </div>
 
 
-  </div>
+  </div> -->
 
 
   <!-- Park/Trail List -->

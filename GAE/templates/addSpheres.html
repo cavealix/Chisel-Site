@@ -1,0 +1,23 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+    <h1>Add Photo Spheres</h1>
+    <form method="post" action="{{ url_for('addSpheres') }}">
+
+        <!-- Add photo spheres -->
+        <div id="dynamicInput">
+            <input type="text" name="sphere_url" placeholder="sphere url">
+            <input type="text" name="embed_code" placeholder="embed code">
+            <br>
+        </div>
+        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
+
+        <br><br>
+        <input type="submit" value="Submit">
+
+    </form>
+
+    <script src="/static/js/addSpheres.js"></script>
+
+{% endblock %}

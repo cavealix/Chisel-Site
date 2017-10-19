@@ -5,7 +5,7 @@
     <form method="post" action="{{ url_for('editPark', park_id=park.key().id()) }}">
         <h1>Edit {{ park.name }}</h1>
         <input type="text" name="name" value="{{park.name}}">
-        <input type="url" name="photo" value="{{park.photo}}">
+        <!-- <input type="url" name="photo" value="{{park.photo}}"> -->
 
         <select name="type" value="{{park.type}}">
           <option value="Nat'l Park">Nat'l Park</option>
@@ -67,6 +67,15 @@
             <option value="WI">WI</option>
             <option value="WY">WY</option>
         </select>
+
+        <!-- Add photo spheres -->
+        <div id="dynamicInput">
+            <input type="text" name="sphere_url" placeholder="sphere url">
+            <input type="text" name="embed_code" placeholder="embed code">
+            <br>
+        </div>
+
+        <input type="button" value="Add Photo Sphere" onClick="addInput('dynamicInput');">
     
         <input type="submit" value="Edit">
         <a href="{{ url_for('park', park_id=park.key().id()) }}">Cancel</a>
@@ -95,8 +104,7 @@
 
     <!-- Knockout -->
     <script src="/static/js/knockout/knockout-3.4.0.js"></script>
-
-    <script>var park_json = JSON.parse('{{park_json|safe}}');</script>
+    <script> var park_json = ('{{ park_json|tojson }}');</script>
     <script src="/static/js/editPark.js"></script>
 
     <!-- Google Maps API -->
@@ -104,6 +112,6 @@
     <script src="https://apis.google.com/js/client.js?onload=googleApiClientReady"></script>
 
     <!-- Google Maps -->
-    <script onload="main( park_json )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" async defer></script>
+    <script onload="main( JSON.parse(park_json) )" onerror="mapError()" src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyB9HruWNEZUBfdIyuBEehLKI0whMeX_bAQ" async defer></script>
 
 {% endblock %}

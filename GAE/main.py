@@ -1,4 +1,5 @@
 import logging, json, urllib
+from cgi import escape
 
 # Flask
 from flask import Flask, render_template, url_for, request, \
@@ -39,7 +40,7 @@ def login():
     return render_template('firebaselogin.html')
 
 #API -------------------------------------------------
-@app.route('/parksJSON')
+@app.route('/parks')
 #@cross_origin()
 def parksJSON():
     parks = db.GqlQuery("select * from Place")
@@ -111,35 +112,11 @@ def map():
 
 
 #Park Page-------------------------------------------------
-@app.route('/parks/<int:park_id>/', methods=['Get'])
+@app.route('/park/<int:park_id>/', methods=['Get'])
 def park(park_id):
     park = Place.get_by_id(park_id)
+    print(park)
     return render_template('park.html', park=park, park_json=json.dumps(park.serialize))
-
-#Add Park
-@app.route('/addPark', methods=['Get', 'Post'])
-def addPark():
-    if request.method == 'POST':
-        #Enforce Access
-        #uid_cookie = request.cookies.get('uid')
-        #if uid_cookie != '' and uid_cookie != None \
-        #        and cookies.check_secure_val(uid_cookie):
-        #    user_id = uid_cookie.split('|')[0]
-        newPark = Park(
-            name=request.form['name'], 
-            lat=float(request.form['lat']),
-            lon=float(request.form['lon']),
-            type=request.form['type'],
-            state=request.form['state']
-        )
-        newPark.put()
-        
-        #notify user
-        #flash('New park created')
-        return redirect(url_for('parks'))
-    #Get
-    else:
-        return render_template('addPark.html')
 
 #Edit Park
 @app.route('/editPark/<int:park_id>', methods=['Get', 'Post'])
@@ -147,20 +124,43 @@ def editPark(park_id):
     #Post
     if request.method == 'POST':
         park = Place.get_by_id(park_id)
-        park.name = request.form['name']
-        park.type = request.form['type']
-        park.state = request.form['state']
-        park.photo = request.form['photo']
-        park.put()
-        return redirect( url_for('park', park_id=park.key().id() ))
+        #park.name = request.form['name']
+        #park.type = request.form['type']
+        #park.state = request.form['state']
+        #park.photo = request.form['photo']
+        #park.put()
+
+        #Save Photo Sphere
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        #Store spheres if present
+        if urls != [] and urls != ['']:
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+                position = db.GeoPt(float(lat), float(lng))
+                sphere = Sphere(
+                    park = park,
+                    embed_code = embeds[x].split('"')[1],
+                    position = position
+                )
+                print sphere
+                sphere.put()
+
+
+        return redirect( url_for('map') )
     #Get
     else:
         park = Place.get_by_id(park_id)
         park_json = json.dumps(park.serialize)
-        return render_template('editPark.html', park=park, park_json=park_json)
+        print(park_json)
+        return render_template('editPark.html', park=park, park_json=park.serialize)
 
 #Delete Park
-@app.route('/parks/<int:park_id>/delete', methods=['Get', 'Post'])
+@app.route('/park/<int:park_id>/delete', methods=['Get', 'Post'])
 def deletePark(park_id):
     #Post
     if request.method == 'POST':
@@ -212,6 +212,49 @@ def deletePoi():
     db.delete(poi)
 
     return json.dumps({ 'status':'OK' });
+
+#Spheres ----------------------------------------------
+@app.route('/spheres/add', methods=['Get', 'Post'])
+def addSpheres():
+    if request.method == 'Post':
+        
+        #Save Photo Sphere
+        urls = request.form.getlist('sphere_url')
+        embeds = request.form.getlist('embed_code')
+
+        #Store spheres if present
+        if urls != [] and urls != ['']:
+
+            parks = db.GqlQuery("select * from Park")
+
+            #for each sphere entered
+            for x in xrange(len(urls)):
+                string = urls[x].split('@')[1]
+                string = string.split(',')
+                lat = string[0]
+                lng = string[1]
+
+                #check against all parks
+                for park in parks: 
+
+                    print (park.viewport[0] +','+ lat +','+ park.viewport[2] +','+ park.viewport[1] +','+ lng +','+ park.viewport[3])
+                    #if lat between south/north and lng between east/west of park, add to park
+                    if (park.viewport[0] <= lat <= park.viewport[2] and park.viewport[1] <= lng <= park.viewport[3]):
+
+                        position = db.GeoPt(float(lat), float(lng))
+                        sphere = Sphere(
+                            park = park,
+                            embed_code = embeds[x].split('"')[1],
+                            position = position
+                        )
+                        print sphere
+                        sphere.put()
+                    else:
+                        print ('false')
+
+    else:
+        return render_template('addSpheres.html')
+
     
 
 #Trip Page -------------------------------------------------
@@ -319,12 +362,18 @@ def addTrail():
             location = place['geometry']['location']
             location = db.GeoPt(float(location['lat']), float(location['lng']))
 
+            south = place['geometry']['viewport']['south']
+            west = place['geometry']['viewport']['west']
+            north = place['geometry']['viewport']['north']
+            east = place['geometry']['viewport']['east']
+
             photos = [] 
 
             newPlace = Place(
                 name = place['name'],
                 place_id = place['place_id'],
                 location = location,
+                viewport = [south, west, north, east],
                 address = place['formatted_address'],
                 phone = place['formatted_phone_number'],
                 mapUrl = place['url'],
@@ -334,13 +383,13 @@ def addTrail():
                 abr_state = abr_state,
                 country = country,
                 abr_country = abr_country,
-                trailMiles = 0,
-                weekday_text = place['opening_hours']['weekday_text'],
+                trailMiles = 0
+                #weekday_text = place['opening_hours']['weekday_text'],
                 )
             newPlace.put()
             place = newPlace
 
-            options = locationSearchOptions('', 25, location, '1mi')
+            options = locationSearchOptions('hike | camp | bike | outdoors | %s' % (place.name), 25, location, '1mi')
             videos = youtube_search(options)
 
             for video in videos:
@@ -457,6 +506,7 @@ def editTrail(trail_id):
                 sphere.put()
 
         return redirect( url_for('map' ))
+    
     #Get
     else:
         #park = Park.get_by_id(park_id)

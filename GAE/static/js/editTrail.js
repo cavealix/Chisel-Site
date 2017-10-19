@@ -3,7 +3,6 @@ var map;
 // Main ////////////////////////////////////////////////////
 var main = function(trail_json) {
 
-
   map = new google.maps.Map(document.getElementById('map'), {
     center: new google.maps.LatLng(trail_json.lat, trail_json.lon),
     zoom: 15,
@@ -13,7 +12,6 @@ var main = function(trail_json) {
   // Instantiate Knockout VM
   VM = new ViewModel(trail_json);
   ko.applyBindings(VM);
-
 
 }
 
@@ -108,8 +106,7 @@ var ViewModel = function(trail_json) {
   if (trail.elevation = []){
     self.queryElevation(trail);
     console.log(trail.elevation);
-  }
-  
+  } 
 }
 
 
@@ -168,7 +165,6 @@ var Trail = function(data) {
         strokeOpacity: 1.0,
         strokeWeight: 3
     });
-
 }
 
 

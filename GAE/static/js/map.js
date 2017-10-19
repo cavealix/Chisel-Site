@@ -46,11 +46,6 @@ function initMap() {
     //Match heights of cols
     $('.box').matchHeight();
 
-    // Add a marker clusterer to manage the markers.
-    //https://developers.google.com/maps/documentation/javascript/marker-clustering/
-    //var markerCluster = new MarkerClusterer(map, VM.markers,
-    //    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-    
 }
 
 // View Model /////////////////////////////////////////////////
@@ -97,9 +92,9 @@ var ViewModel = function() {
     var service = new google.maps.places.PlacesService(map);
 
     //Go to url for selected park
-    gothere = function(){
-      window.location.href = self.destination().url();
-    }
+    //gothere = function(){
+    //  window.location.href = self.destination().url();
+    //}
 
 // API CALLS //////////////////////////////////////////
 
@@ -509,7 +504,7 @@ var ViewModel = function() {
     //Query parks according to filter criteria
     self.queryParks = function( place_id ) {
         //Query parks in DB
-        $.getJSON( "/parksJSON", {
+        $.getJSON( "/parks", {
           format: "json"
         })
         .done(function( data ) {
@@ -598,7 +593,7 @@ var ViewModel = function() {
     };
 
     //User clicks on park marker
-    self.selectResult = function(search_result) {
+    self.selectResult = function( search_result ) {
         self.currentPlace( search_result );
         self.getDistance( search_result );
         self.placeDetails( search_result );
@@ -607,39 +602,42 @@ var ViewModel = function() {
     };
 
     //Query DB for trails with place id
-    self.selectPark = function(park) {
+    self.selectPark = function( park ) {
 
       //clear all previous info
       self.clearList(self.resultArray());
       self.resultArray.removeAll();
       
       //remove photo spheres from map
-      //for (var i = 0; i < self.photoSphereList().length; i++) {
-      //  self.photoSphereList()[i].clear();
-      //};
-      //self.photoSphereList.removeAll();
+      for (var i = 0; i < self.photoSphereList().length; i++) {
+        self.photoSphereList()[i].clear();
+      };
+      self.photoSphereList.removeAll();
       //clear previous forecast
-      //self.forecast.removeAll();
+      self.forecast.removeAll();
       //clear previous trails
-      //self.clearTrails();
+      self.clearTrails();
       //clear previous pois
-      //self.clearList( self.poiList() );
+      self.clearList( self.poiList() );
 
       //query trails for park
-      //self.queryTrails( park );
+      self.queryTrails( park );
       //query weather
-      //self.getForecast( park );
+      self.getForecast( park );
       
       //Create/show saved POIs 
-      //for (var i = 0; i < park.pois.length; i++) {
-      //  var poi = park.pois[i];
-      //  self.poiList().push( new POI(park, poi ));
-      //};
+      for (var i = 0; i < park.pois.length; i++) {
+        var poi = park.pois[i];
+        self.poiList().push( new POI(park, poi ));
+      };
 
-      //self.videoList([]);
-      //park.videos.forEach(function(video){
-      //  self.videoList().push( new Video(video) );
-      //});
+      //clear current photo spheres
+      self.photoSphereList.removeAll();
+
+      //Create photo sphere markers
+      for (var i = 0; i < park.spheres.length; i++) {
+        self.photoSphereList().push( new Photo_Sphere(park.spheres[i]) );
+      };
 
       //set park as selected destination
       self.selectedPark( park );
@@ -649,15 +647,15 @@ var ViewModel = function() {
       self.centerMap( park.position );
 
       //adjust UI
-      //self.hide('elevation');
-      //self.hide('trail-info');
-      //self.hide('loadout');
-      //self.hide('photo_sphere_canvas');
+      self.hide('elevation');
+      self.hide('trail-info');
+      self.hide('loadout');
+      self.hide('photo_sphere_canvas');
       self.show('park-info');
-      //self.show('prep-icons');
-      //self.show('list');
-      //self.show('youtubeSlider');
-      //self.closeMenu();
+      self.show('prep-icons');
+      self.show('list');
+      self.show('youtubeSlider');
+      self.closeMenu();
     };
 
     //Highlight trail to distinguish from the rest
@@ -1234,6 +1232,8 @@ var Park = function(data) {
     self.trailMiles = ko.observable( data.trailMiles );
     self.activities = ko.observableArray();
     self.videos = data.videos;
+    self.spheres = data.spheres;
+
 
     //iterate through object keys
     Object.keys(data.activities).forEach(function(key) {

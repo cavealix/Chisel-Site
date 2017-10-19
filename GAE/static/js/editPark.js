@@ -3,7 +3,6 @@ var map;
 // Main ////////////////////////////////////////////////////
 var main = function(park_json) {
 
-
   map = new google.maps.Map(document.getElementById('map'), {
     center: new google.maps.LatLng(park_json.lat, park_json.lon),
     zoom: 15,
@@ -14,8 +13,7 @@ var main = function(park_json) {
   VM = new ViewModel(park_json);
   ko.applyBindings(VM);
 
-
-}
+};
 
 var ViewModel = function(park_json) {
   var self = this;
@@ -156,7 +154,7 @@ var ViewModel = function(park_json) {
   //For each location in list, extend bounds
   self.bounds = function(list) {
         
-        var bounds = new google.maps.LatLngBounds;
+        var bounds = new google.maps.LatLngBounds();
         for (var i = 0; i < list.length; i++) {
             bounds.extend(list[i].position);
         }
@@ -173,9 +171,7 @@ var ViewModel = function(park_json) {
 
   //query for existing trails
   self.queryTrails( park );
-
-}
-
+};
 
 // Park Object ///////////////////////////////////////////
 var Park = function(park_json) {
@@ -200,7 +196,7 @@ var Park = function(park_json) {
   self.clear = function() {
     marker.setMap(null);
   };
-}
+};
 
 // Trail //////////////////////////////////////////////////////
 var Trail = function(data) {
@@ -266,8 +262,7 @@ var Trail = function(data) {
         strokeOpacity: 1.0,
         strokeWeight: 3
     });
-
-}
+};
 
 // POI Object ///////////////////////////////////////////
 var POI = function(park, id, position, type, icon, sphere_embed, description) {
@@ -307,6 +302,16 @@ var POI = function(park, id, position, type, icon, sphere_embed, description) {
       'icon': self.icon,
       'sphere_embed': self.sphere_embed,
       'description': self.description
-    }
-  }
-}
+    };
+  };
+};
+
+// Add New Sphere Input ///////////////////////////////////////
+function addInput(divName){
+
+  var newdiv = document.createElement('div');
+  newdiv.innerHTML = ' <input type="text" name="sphere_url" placeholder="sphere url">'+
+            '<input type="text" name="embed_code" placeholder="embedcode">'+
+        '<br>';
+  document.getElementById(divName).appendChild(newdiv); 
+};
